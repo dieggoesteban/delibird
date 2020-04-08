@@ -90,12 +90,31 @@
 // 	close(socket_cliente);
 // }
 
+
+uint32_t sizeOfArgumentos(int lengthArray, char* argumentos[], char* arrayTemp[]){
+	uint32_t size_buffer = 0;
+	uint32_t j = 0;
+
+	for(uint32_t i = 3; i < lengthArray; i++ ){
+		size_buffer += strlen(argumentos[i]) +1;
+		arrayTemp[j] = argumentos[i];
+		j++;
+	}
+	return size_buffer;
+}
+
+
+
+
+
+
 void procesarComando(int argc, char* argv[]) {
 	
 	char* proceso = argv[1];
-	//char* tipo_mensaje = argv[1];
+	char* tipo_mensaje = argv[2];
 	char* ip;
 	char* puerto;
+	char* arrayTemporal[argc-3];
 
 	if(strcmp(proceso,"BROKER") == 0 || strcmp(proceso,"SUSCRIPTOR") == 0) {
 		ip = config_get_string_value(config,"IP_BROKER");
@@ -113,31 +132,55 @@ void procesarComando(int argc, char* argv[]) {
 	log_info(logger,ip);
 	log_info(logger,puerto);
 
-	// if(strcmp(tipo_mensaje,"NEW_POKEMON") == 0) {
+	if(strcmp(tipo_mensaje,"NEW_POKEMON") == 0) {
+		log_info(logger, "entro a new_pokemon");
 		
-	// }
-	// else if(strcmp(tipo_mensaje,"APPEARED_POKEMON") == 0) {
+		uint32_t sizeOfArgs = sizeOfArgumentos(argc, argv, arrayTemporal);
+		t_paquete* paquete = malloc(sizeof(t_paquete));
+		paquete->buffer = malloc(sizeof(t_buffer));
+		paquete->buffer->size = sizeOfArgs;
+		paquete->buffer->stream = malloc(paquete->buffer->size);
+		// paquete = serializar_mensaje(arrayTemporal, NEW_POKEMON, sizeOfArgs);
+		// printf("codigo de MQ %i", paquete->codigo_mensaje);
+
+		t_new_pokemon* newPokemon = malloc(sizeof(t_new_pokemon));
+		t_posicion_cantidad* posCant = malloc(sizeof(t_posicion_cantidad));
+		posCant->posicion_x=5;
+		posCant->posicion_y=20;
+		posCant->cantidad=10;
+
+
+		newPokemon->ID_mensaje_recibido = 1234;
+		newPokemon->nombre="pikachu";
+		newPokemon->sizeNombre = strlen(newPokemon->nombre) +1;
+		newPokemon->posicionCantidad = posCant;
+
+		// printf("posicion_x: %i", newPokemon->posicionCantidad->posicion_x);
+		// printf("\nposicion_y: %i", newPokemon->posicionCantidad->posicion_y);
+		// printf("\ncantidad: %i", newPokemon->posicionCantidad->cantidad);
+
+		paquete = serializar_newPokemon(newPokemon);
 		
-	// }
-	// else if(strcmp(tipo_mensaje,"CATCH_POKEMON") == 0) {
+		t_new_pokemon* pikachu = deserializar_newPokemon(paquete->buffer);
+		printf("nombre del poke: %s", pikachu->nombre);
 		
-	// }
-	// else if(strcmp(tipo_mensaje,"CAUGHT_POKEMON") == 0) {
-		
-	// }
-	// else if(strcmp(tipo_mensaje,"GET_POKEMON") == 0) {
-		
-	// }
-	// else if(strcmp(tipo_mensaje,"CATCH_POKEMON") == 0) {
-		
-	// }
-	// else if(strcmp(tipo_mensaje,"CAUGHT_POKEMON") == 0) {
-		
-	// }
-	// else if(strcmp(tipo_mensaje,"GET_POKEMON") == 0) {
-		
-	// }
-	// else if(strcmp(tipo_mensaje,"LOCALIZED_POKEMON") == 0) {
-		
-	// }
+
+
+	}
+	else if(strcmp(tipo_mensaje,"APPEARED_POKEMON") == 0) {
+		log_info(logger, "entro a appeared_pokemon");
+	}
+	else if(strcmp(tipo_mensaje,"CATCH_POKEMON") == 0) {
+		log_info(logger, "entro a catch_pokemon");
+	}
+	else if(strcmp(tipo_mensaje,"CAUGHT_POKEMON") == 0) {
+		log_info(logger, "entro a caught_pokemon");
+	}
+	else if(strcmp(tipo_mensaje,"GET_POKEMON") == 0) {
+		log_info(logger, "entro a get_pokemon");
+	}
+	else if(strcmp(tipo_mensaje,"LOCALIZED_POKEMON") == 0) {
+		log_info(logger, "entro a localized_pokemon");
+	}
 }
+
