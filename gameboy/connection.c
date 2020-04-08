@@ -49,7 +49,6 @@ t_buffer* crear_buffer(uint32_t sizeStream, void* stream){
 
 t_paquete* crear_paquete(uint32_t mq_cod, uint32_t sizeStream, void* stream){
 	t_paquete* paquete = malloc(sizeof(t_paquete));
-	// crear_buffer(sizeStream, stream);
 	paquete->codigo_mensaje = mq_cod;
 	paquete->buffer = crear_buffer(sizeStream, stream);
 
@@ -89,24 +88,11 @@ t_paquete* serializar_newPokemon(t_new_pokemon* newPokemon){
 	paquete = crear_paquete(NEW_POKEMON, newPokemon_buffer->size, newPokemon_buffer->stream);
 
 	printf("codigo de mensaje en serialziar poke: %i", paquete->codigo_mensaje);
-    //no se si se le deberia hacer un free o algo al struct de posicionCAntidad, pero no creo
     return paquete;
 
 }
 
 
-// t_paquete* serializar_mensaje(char* argumentos[], uint32_t MQ, uint32_t size_buffer){
-// 	t_paquete* paquete = malloc(sizeof(t_paquete));
-// 	void* stream = malloc(size_buffer);
-
-// 	memcpy(stream, &argumentos, size_buffer);
-
-// 	paquete = crear_paquete(MQ, size_buffer, stream);
-
-
-// 	return paquete;
-
-// }
 
 t_new_pokemon* deserializar_newPokemon(t_buffer* buffer){
 	t_new_pokemon* newPokemon = malloc(sizeof(t_new_pokemon));
@@ -124,29 +110,10 @@ t_new_pokemon* deserializar_newPokemon(t_buffer* buffer){
 	 stream += sizeof(uint32_t);
 	 memcpy(&(newPokemon->posicionCantidad->posicion_y), stream, sizeof(uint32_t));
 	 stream += sizeof(uint32_t);
-	//  memcpy(&(newPokemon->nombre), stream, sizeof(uint32_t));
 
 	 memcpy(&(newPokemon->posicionCantidad->cantidad), stream, sizeof(uint32_t));
 	 
 	return newPokemon;
-
-	
-
-	//     t_persona* persona = malloc(sizeof(t_persona));
-    
-    // void* stream = buffer->stream;
-    // Deserializamos los campos que tenemos en el buffer
-    // memcpy(&(persona->dni), stream, sizeof(uint32_t));
-    // stream += sizeof(uint32_t);
-    // memcpy(&(persona->edad), stream, sizeof(uint8_t));
-    // stream += sizeof(uint8_t);
-    // memcpy(&(persona->pasaporte), stream, sizeof(uint32_t));
-    // stream += sizeof(uint32_t);
-    
-    // Por último, para obtener el nombre, primero recibimos el tamaño y luego el texto en sí:
-    // memcpy(&(persona->nombre_length), stream, sizeof(uint32_t));
-    // stream += sizeof(uint32_t);
-	//memcpy(&(persona->nombre), stream, sizeof(persona->nombre_length));
 }
 
 

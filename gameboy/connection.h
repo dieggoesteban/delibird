@@ -50,7 +50,6 @@ typedef struct
 int crear_conexion(char* ip, char* puerto);
 void enviar_mensaje(char* mensaje, int socket_cliente);
 char* recibir_mensaje(int socket_cliente);
-// t_paquete* serializar_mensaje( char* argumentos[],uint32_t MQ,uint32_t size_buffer);
 t_new_pokemon* deserializar_newPokemon(t_buffer* buffer);
 t_paquete* serializar_newPokemon(t_new_pokemon* newPokemon);
 // void eliminar_paquete(t_paquete* paquete);

@@ -132,16 +132,14 @@ void procesarComando(int argc, char* argv[]) {
 	log_info(logger,ip);
 	log_info(logger,puerto);
 
+	t_paquete* paquete = malloc(sizeof(t_paquete));
+	paquete->buffer = malloc(sizeof(t_buffer));
 	if(strcmp(tipo_mensaje,"NEW_POKEMON") == 0) {
 		log_info(logger, "entro a new_pokemon");
 		
 		uint32_t sizeOfArgs = sizeOfArgumentos(argc, argv, arrayTemporal);
-		t_paquete* paquete = malloc(sizeof(t_paquete));
-		paquete->buffer = malloc(sizeof(t_buffer));
 		paquete->buffer->size = sizeOfArgs;
 		paquete->buffer->stream = malloc(paquete->buffer->size);
-		// paquete = serializar_mensaje(arrayTemporal, NEW_POKEMON, sizeOfArgs);
-		// printf("codigo de MQ %i", paquete->codigo_mensaje);
 
 		t_new_pokemon* newPokemon = malloc(sizeof(t_new_pokemon));
 		t_posicion_cantidad* posCant = malloc(sizeof(t_posicion_cantidad));
@@ -155,17 +153,15 @@ void procesarComando(int argc, char* argv[]) {
 		newPokemon->sizeNombre = strlen(newPokemon->nombre) +1;
 		newPokemon->posicionCantidad = posCant;
 
-		// printf("posicion_x: %i", newPokemon->posicionCantidad->posicion_x);
-		// printf("\nposicion_y: %i", newPokemon->posicionCantidad->posicion_y);
-		// printf("\ncantidad: %i", newPokemon->posicionCantidad->cantidad);
-
 		paquete = serializar_newPokemon(newPokemon);
 		
 		t_new_pokemon* pikachu = deserializar_newPokemon(paquete->buffer);
 		printf("nombre del poke: %s", pikachu->nombre);
-		
 
 
+		free(paquete->buffer->stream);
+		free(paquete->buffer);
+		free(paquete);
 	}
 	else if(strcmp(tipo_mensaje,"APPEARED_POKEMON") == 0) {
 		log_info(logger, "entro a appeared_pokemon");
@@ -182,5 +178,8 @@ void procesarComando(int argc, char* argv[]) {
 	else if(strcmp(tipo_mensaje,"LOCALIZED_POKEMON") == 0) {
 		log_info(logger, "entro a localized_pokemon");
 	}
+
+	
+	
 }
 
