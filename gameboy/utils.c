@@ -149,7 +149,7 @@ void procesarComando(int argc, char* argv[]) {
 
 
 		newPokemon->ID_mensaje_recibido = 1234;
-		newPokemon->nombre="pikachu";
+		newPokemon->nombre=argv[3];
 		newPokemon->sizeNombre = strlen(newPokemon->nombre) +1;
 		newPokemon->posicionCantidad = posCant;
 

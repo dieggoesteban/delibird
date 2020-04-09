@@ -114,3 +114,12 @@
 [INFO] 00:12:43:874 gameboy/(4596:4596): 127.0.0.1
 [INFO] 00:12:43:976 gameboy/(4596:4596): 5003
 [INFO] 00:12:43:977 gameboy/(4596:4596): entro a new_pokemon
+[INFO] 01:00:28:902 gameboy/(4362:4362): 127.0.0.1
+[INFO] 01:00:28:914 gameboy/(4362:4362): 5003
+[INFO] 01:00:28:915 gameboy/(4362:4362): entro a new_pokemon
+[INFO] 01:00:42:822 gameboy/(4369:4369): 127.0.0.1
+[INFO] 01:00:42:824 gameboy/(4369:4369): 5003
+[INFO] 01:00:42:825 gameboy/(4369:4369): entro a new_pokemon
+[INFO] 01:01:47:287 gameboy/(4425:4425): 127.0.0.1
+[INFO] 01:01:47:289 gameboy/(4425:4425): 5003
+[INFO] 01:01:47:291 gameboy/(4425:4425): entro a new_pokemon
