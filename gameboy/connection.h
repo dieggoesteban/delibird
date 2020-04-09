@@ -47,6 +47,14 @@ typedef struct
 	t_posicion_cantidad* posicionCantidad;
 } t_new_pokemon;
 
+typedef struct{
+	uint32_t ID_mensaje_recibido_originalmente;
+	uint32_t sizePokemon;
+	char* pokemon;
+	t_list* posicion_cantidad; //una lista de t_posicion_cantidad
+}t_localized_pokemon;
+
+
 int crear_conexion(char* ip, char* puerto);
 void enviar_mensaje(char* mensaje, int socket_cliente);
 char* recibir_mensaje(int socket_cliente);

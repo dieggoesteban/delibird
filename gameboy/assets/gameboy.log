@@ -111,3 +111,6 @@
 [INFO] 01:23:32:107 gameboy/(10490:10490): 127.0.0.1
 [INFO] 01:23:33:145 gameboy/(10490:10490): 5003
 [INFO] 01:23:33:145 gameboy/(10490:10490): entro a new_pokemon
+[INFO] 00:12:43:874 gameboy/(4596:4596): 127.0.0.1
+[INFO] 00:12:43:976 gameboy/(4596:4596): 5003
+[INFO] 00:12:43:977 gameboy/(4596:4596): entro a new_pokemon
