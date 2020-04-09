@@ -41,17 +41,58 @@ typedef struct
 
 typedef struct
 {
+	uint32_t posicion_x;
+	uint32_t posicion_y;
+} t_posicion;
+
+typedef struct
+{
 	uint32_t ID_mensaje_recibido;
 	uint32_t sizeNombre;
 	char* nombre;
 	t_posicion_cantidad* posicionCantidad;
 } t_new_pokemon;
 
+typedef struct{
+	uint32_t ID_mensaje_recibido;
+	uint32_t sizeNombre;
+	char* nombre;
+	t_posicion* posicion;
+} t_appeared_pokemon;
+
+typedef struct{
+	uint32_t ID_mensaje_recibido;
+	uint32_t sizeNombre;
+	char* nombre;
+	t_posicion* posicion;
+}t_catch_pokemon;
+
+typedef struct{
+	uint32_t ID_mensaje_recibido;
+	uint32_t catchStatus; 
+}t_caught_pokemon;
+
+typedef struct{
+	uint32_t ID_mensaje_recibido;
+	uint32_t sizeNombre;
+	char* nombre;
+} t_get_pokemon;
+
+
 int crear_conexion(char* ip, char* puerto);
 void enviar_mensaje(char* mensaje, int socket_cliente);
 char* recibir_mensaje(int socket_cliente);
 t_new_pokemon* deserializar_newPokemon(t_buffer* buffer);
 t_paquete* serializar_newPokemon(t_new_pokemon* newPokemon);
+t_paquete* serializar_appearedPokemon(t_appeared_pokemon* pokemon);
+t_appeared_pokemon* deserializar_appearedPokemon(t_buffer* buffer);
+t_paquete* serializar_catchPokemon(t_catch_pokemon* pokemon);
+t_catch_pokemon* deserializar_catchPokemon(t_buffer* buffer);
+t_paquete* serializar_caughtPokemon(t_caught_pokemon* pokemon);
+t_catch_pokemon* deserializar_caughtPokemon(t_buffer* buffer);
+_paquete* serializar_gettPokemon(t_get_pokemon* pokemon);
+t_catch_pokemon* deserializar_getPokemon(t_buffer* buffer)
+
 // void eliminar_paquete(t_paquete* paquete);
 // void liberar_conexion(int socket_cliente);
 
