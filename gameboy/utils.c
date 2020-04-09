@@ -138,26 +138,28 @@ void procesarComando(int argc, char* argv[]) {
 		log_info(logger, "entro a new_pokemon");
 		
 		uint32_t sizeOfArgs = sizeOfArgumentos(argc, argv, arrayTemporal);
-		paquete->buffer->size = sizeOfArgs;
-		paquete->buffer->stream = malloc(paquete->buffer->size);
+		//REVISAR QUE HACER EXACTAMENTE CON ESTA FUNCION, ME DA PAJA AHORA
 
 		t_new_pokemon* newPokemon = malloc(sizeof(t_new_pokemon));
 		t_posicion_cantidad* posCant = malloc(sizeof(t_posicion_cantidad));
-		posCant->posicion_x=5;
-		posCant->posicion_y=20;
-		posCant->cantidad=10;
+
+		posCant->posicion_x=(uint32_t)atoi(argv[4]); //se usa el atoi para pasar de char* a int, despues casteo a uint32_t ya que todos nuestros datos son de ese tipo
+		posCant->posicion_y=(uint32_t)atoi(argv[5]);
+		posCant->cantidad=(uint32_t)atoi(argv[6]);
 
 
 		newPokemon->ID_mensaje_recibido = 1234;
 		newPokemon->nombre=argv[3];
 		newPokemon->sizeNombre = strlen(newPokemon->nombre) +1;
 		newPokemon->posicionCantidad = posCant;
+		
+		
 
 		paquete = serializar_newPokemon(newPokemon);
 		
 		t_new_pokemon* pikachu = deserializar_newPokemon(paquete->buffer);
 		printf("nombre del poke: %s", pikachu->nombre);
-
+		
 
 		free(paquete->buffer->stream);
 		free(paquete->buffer);
@@ -175,8 +177,41 @@ void procesarComando(int argc, char* argv[]) {
 	else if(strcmp(tipo_mensaje,"GET_POKEMON") == 0) {
 		log_info(logger, "entro a get_pokemon");
 	}
-	else if(strcmp(tipo_mensaje,"LOCALIZED_POKEMON") == 0) {
+	else if(strcmp(tipo_mensaje,"LOCALIZED_POKEMON") == 0) {//ESTE AL FINAL NO LO HACE GAMEBOY, PARECE SER LA UNICA MQ QUE NO -> PERO LO DEJO IGUAL ASI PRUEBO LA SERIALIZACION Y LA DESERIALIZACION (DESPUES SACAR THO)
 		log_info(logger, "entro a localized_pokemon");
+		uint32_t sizeOfArgs = sizeOfArgumentos(argc, argv, arrayTemporal);
+		paquete->buffer->size = sizeOfArgs;
+		paquete->buffer->stream = malloc(paquete->buffer->size);
+
+		t_localized_pokemon* localizedPokemon = malloc(sizeof(t_localized_pokemon));
+		t_posicion_cantidad* posCant1 = malloc(sizeof(t_posicion_cantidad));
+		t_posicion_cantidad* posCant2 = malloc(sizeof(t_posicion_cantidad));
+		t_list* listPosCant = list_create();
+
+		posCant1->posicion_x=5;
+		posCant1->posicion_y=10;
+		posCant1->cantidad=6;
+
+		list_add(listPosCant, posCant1);
+
+		posCant2->posicion_x=5;
+		posCant2->posicion_y=10;
+		posCant2->cantidad=6;
+
+		list_add(listPosCant, posCant2);
+
+		localizedPokemon->ID_mensaje_recibido_originalmente = 12342;
+		localizedPokemon->nombre = "lucario";
+		localizedPokemon->sizePokemon= strlen(localizedPokemon->nombre)+1;
+		localizedPokemon->sizePosicion_cantidad = list_size(listPosCant)*sizeof(t_posicion_cantidad);
+		localizedPokemon->posicion_cantidad = listPosCant;
+
+		// paquete=serializar_localizedPokemon(localizedPokemon); COMENTADO PORQUE OBVIO QUE LA SERIALIZACION DE LA LISTA ROMPE TODO
+
+		// t_localized_pokemon* lucario = deserializar_localizedPokemon(paquete->buffer);
+		// printf("nombre del poke: %s", lucario->nombre);
+
+
 	}
 
 	

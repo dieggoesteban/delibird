@@ -56,7 +56,8 @@ typedef struct
 typedef struct{
 	uint32_t ID_mensaje_recibido_originalmente;
 	uint32_t sizePokemon;
-	char* pokemon;
+	char* nombre;
+	uint32_t sizePosicion_cantidad; //LO AGREGO POR AHORA
 	t_list* posicion_cantidad; //una lista de t_posicion_cantidad
 }t_localized_pokemon;
 
@@ -99,8 +100,21 @@ t_paquete* serializar_caughtPokemon(t_caught_pokemon* pokemon);
 t_catch_pokemon* deserializar_caughtPokemon(t_buffer* buffer);
 t_paquete* serializar_getPokemon(t_get_pokemon* pokemon);
 t_catch_pokemon* deserializar_getPokemon(t_buffer* buffer);
+t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon);
+t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer);
 
 // void eliminar_paquete(t_paquete* paquete);
 // void liberar_conexion(int socket_cliente);
 
 #endif /* CONNECTION_H_ */
+
+
+		// paquete = serializar_newPokemon(newPokemon);
+		
+		// t_new_pokemon* pikachu = deserializar_newPokemon(paquete->buffer);
+		// printf("nombre del poke: %s", pikachu->nombre);
+		
+
+		// free(paquete->buffer->stream);
+		// free(paquete->buffer);
+		// free(paquete);
