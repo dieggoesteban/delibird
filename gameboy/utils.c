@@ -91,16 +91,13 @@
 // }
 
 
-uint32_t sizeOfArgumentos(int lengthArray, char* argumentos[], char* arrayTemp[]){
-	uint32_t size_buffer = 0;
+void cortarArgumentos(int lengthArray, char* argumentos[], char* arrayTemp[]){
 	uint32_t j = 0;
 
 	for(uint32_t i = 3; i < lengthArray; i++ ){
-		size_buffer += strlen(argumentos[i]) +1;
 		arrayTemp[j] = argumentos[i];
 		j++;
 	}
-	return size_buffer;
 }
 
 
@@ -137,7 +134,7 @@ void procesarComando(int argc, char* argv[]) {
 	if(strcmp(tipo_mensaje,"NEW_POKEMON") == 0) {
 		log_info(logger, "entro a new_pokemon");
 		
-		uint32_t sizeOfArgs = sizeOfArgumentos(argc, argv, arrayTemporal);
+		cortarArgumentos(argc, argv, arrayTemporal);
 		//REVISAR QUE HACER EXACTAMENTE CON ESTA FUNCION, ME DA PAJA AHORA
 
 		t_new_pokemon* newPokemon = malloc(sizeof(t_new_pokemon));
