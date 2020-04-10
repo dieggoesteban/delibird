@@ -103,6 +103,8 @@ t_catch_pokemon* deserializar_getPokemon(t_buffer* buffer);
 t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon);
 t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer);
 
+t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant);
+
 // void eliminar_paquete(t_paquete* paquete);
 // void liberar_conexion(int socket_cliente);
 

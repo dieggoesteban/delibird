@@ -125,7 +125,7 @@ t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon){
 	memcpy(stream + offset, &localizedPokemon->sizePokemon, sizeof(uint32_t));
 	offset += sizeof(uint32_t);
 	memcpy(stream + offset, &localizedPokemon->nombre, strlen(localizedPokemon->nombre)+1);
-	offset += sizeof(uint32_t);
+	offset += strlen(localizedPokemon->nombre)+1;
 	memcpy(stream + offset, &localizedPokemon->sizePosicion_cantidad, sizeof(uint32_t));
 	offset += sizeof(uint32_t);
 	memcpy(stream + offset, &localizedPokemon->posicion_cantidad, localizedPokemon->sizePosicion_cantidad);
@@ -134,7 +134,7 @@ t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon){
 
 	paquete = crear_paquete(LOCALIZED_POKEMON, buffer->size, buffer->stream);
 
-	printf("codigo de mensaje de serializar poke: %i", paquete->codigo_mensaje);
+	printf("codigo de mensaje de serializar poke: %i \n", paquete->codigo_mensaje);
 	return paquete;		
 }
 
@@ -263,4 +263,14 @@ t_catch_pokemon* deserializar_getPokemon(t_buffer* buffer){
 
 void liberar_conexion(int socket_cliente) {
 	close(socket_cliente);
+}
+
+t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant) {
+	t_posicion_cantidad* position = malloc(sizeof(t_posicion_cantidad));
+
+	position->posicion_x = x;
+	position->posicion_y = y;
+	position->cantidad = cant;
+
+	return position;
 }
