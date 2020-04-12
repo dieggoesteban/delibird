@@ -38,6 +38,9 @@ int crear_conexion(char *ip, char* puerto) {
 	return socket_cliente;
 }
 
+void liberar_conexion(int socket_cliente) {
+	close(socket_cliente);
+}
 
 t_buffer* crear_buffer(uint32_t sizeStream, void* stream){
 	t_buffer* buffer = malloc(sizeof(t_buffer));
@@ -328,41 +331,6 @@ t_get_pokemon* deserializar_getPokemon(t_buffer* buffer){
     return pokemon;
 }
 
-
-
-// char* recibir_mensaje(int socket_cliente) {
-// 	t_paquete* paquete = malloc(sizeof(paquete));
-// 	void* mensaje;
-// 	int cod_op;
-// 	int buffer_size;
-// 	void* buffer;
-
-
-// 	recv(socket_cliente, &cod_op, sizeof(int), MSG_WAITALL);
-
-// 	// recv(socket_cliente, &(paquete->codigo_operacion), sizeof(uint8_t),0);
-// 	recv(socket_cliente, &buffer_size, sizeof(int), 0);
-	
-
-// 	printf("codigo de op: %d", cod_op);
-
-// 	switch(cod_op){
-// 	case MENSAJE:
-
-// 		mensaje = malloc(buffer_size); 
-
-// 		recv(socket_cliente, mensaje, buffer_size, 0);
-// 		// printf("recibi esto %s", (char*)mensaje);
-// 		return mensaje;
-// 		break;
-// 	}
-// 	return "este es el return";
-// }
-
-void liberar_conexion(int socket_cliente) {
-	close(socket_cliente);
-}
-
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant) {
 	t_posicion_cantidad* position = malloc(sizeof(t_posicion_cantidad));
 
@@ -449,13 +417,121 @@ t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre){
 	return getPokemon;
 }
 
+t_paquete* crearPaquete(char* arrayArgumentos[], char* tipo_mensaje)
+{
+
+	t_paquete *paquete = malloc(sizeof(t_paquete));
+	paquete->buffer = malloc(sizeof(t_buffer));
+	if (strcmp(tipo_mensaje, "NEW_POKEMON") == 0)
+	{
+		log_info(logger, "entro a new_pokemon");
+
+		t_new_pokemon *newPokemon = malloc(sizeof(t_new_pokemon));
+		t_posicion_cantidad *posCant = malloc(sizeof(t_posicion_cantidad));
+
+		posCant->posicion_x = (uint32_t)atoi(arrayArgumentos[1]); //se usa el atoi para pasar de char* a int, despues casteo a uint32_t ya que todos nuestros datos son de ese tipo
+		posCant->posicion_y = (uint32_t)atoi(arrayArgumentos[2]);
+		posCant->cantidad = (uint32_t)atoi(arrayArgumentos[3]);
+
+		newPokemon->ID_mensaje_recibido = 1234;
+		newPokemon->nombre = arrayArgumentos[0];
+		newPokemon->sizeNombre = strlen(newPokemon->nombre) + 1;
+		newPokemon->posicionCantidad = posCant;
+
+		paquete = serializar_newPokemon(newPokemon);
+
+		free(posCant);
+		free(newPokemon);
+	}
+	else if (strcmp(tipo_mensaje, "APPEARED_POKEMON") == 0)
+	{
+		log_info(logger, "entro a appeared_pokemon");
+		t_posicion* posicion = crearPosicion((uint32_t)atoi(arrayArgumentos[1]),(uint32_t)atoi(arrayArgumentos[2]));
+		t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(8483, arrayArgumentos[0], posicion);
+
+		paquete = serializar_appearedPokemon(appearedPokemon);
+
+		free(posicion);
+		free(appearedPokemon);
+
+	}
+	else if (strcmp(tipo_mensaje, "CATCH_POKEMON") == 0)
+	{
+		log_info(logger, "entro a catch_pokemon");
+		t_posicion* posicion = crearPosicion((uint32_t)atoi(arrayArgumentos[1]),(uint32_t)atoi(arrayArgumentos[2]));
+		t_catch_pokemon* catchPokemon = crearCatchPokemon(12312, arrayArgumentos[0], posicion);
+
+		paquete = serializar_catchPokemon(catchPokemon);
+
+		free(posicion);
+		free(catchPokemon);
+	}
+	else if (strcmp(tipo_mensaje, "CAUGHT_POKEMON") == 0)
+	{
+		log_info(logger, "entro a caught_pokemon");
+
+		t_caught_pokemon* pokemon = malloc(sizeof(t_caught_pokemon));
+
+		pokemon->ID_mensaje_recibido = 1234;
+		pokemon->ID_mensaje_original = (uint32_t)atoi(arrayArgumentos[0]);
+		pokemon->catchStatus = (uint32_t)atoi(arrayArgumentos[1]);
+
+		paquete = serializar_caughtPokemon(pokemon);
+
+		free(pokemon);
+	}
+	else if (strcmp(tipo_mensaje, "GET_POKEMON") == 0)
+	{
+		log_info(logger, "entro a get_pokemon");
+		t_get_pokemon* getPokemon = crearGetPokemon(1234, arrayArgumentos[0]);
+
+		paquete = serializar_getPokemon(getPokemon);
+
+		free(getPokemon);
+
+	}
+	else if (strcmp(tipo_mensaje, "LOCALIZED_POKEMON") == 0)
+	{ //ESTE AL FINAL NO LO HACE GAMEBOY, PARECE SER LA UNICA MQ QUE NO -> PERO LO DEJO IGUAL ASI PRUEBO LA SERIALIZACION Y LA DESERIALIZACION (DESPUES SACAR THO)
+		log_info(logger, "entro a localized_pokemon");
+
+		t_localized_pokemon *localizedPokemon = malloc(sizeof(t_localized_pokemon));
+
+		t_posicion_cantidad *posCant1 = crearPosicionCantidad(5, 10, 6);
+		t_posicion_cantidad *posCant2 = crearPosicionCantidad(8, 11, 6);
+
+		t_list *listPosCant = list_create();
+		list_add(listPosCant, posCant1);
+		list_add(listPosCant, posCant2);
+
+		localizedPokemon->ID_mensaje_recibido = 23411;
+		localizedPokemon->ID_mensaje_original = 12342;
+		localizedPokemon->nombre = "lucario";
+		localizedPokemon->sizeNombre = strlen(localizedPokemon->nombre) + 1;
+		localizedPokemon->sizePosicion_cantidad = list_size(listPosCant) * sizeof(t_posicion_cantidad);
+		localizedPokemon->posicion_cantidad = listPosCant;
+
+		paquete = serializar_localizedPokemon(localizedPokemon); //COMENTADO PORQUE OBVIO QUE LA SERIALIZACION DE LA LISTA ROMPE TODO
+
+		free(posCant1);
+		free(posCant2);
+		free(listPosCant);
+		free(localizedPokemon);
+	}
+
+	return paquete;
+}
+
 void liberarPaquete(t_paquete* paquete){
 	free(paquete->buffer->stream);
 	free(paquete->buffer);	
 	free(paquete);
 }
 
-
+void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente) {
+	uint32_t sizePaquete = paquete->buffer->size + 2 * sizeof(uint32_t);
+	send(socket_cliente,paquete,sizePaquete,0);
+	liberarPaquete(paquete);
+}
 
 
 

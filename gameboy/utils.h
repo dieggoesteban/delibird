@@ -19,13 +19,7 @@ t_log* logger;
 t_config* config;
 
 
-// int crear_conexion(char* ip, char* puerto);
-// void enviar_mensaje(char* mensaje, int socket_cliente);
-// char* recibir_mensaje(int socket_cliente);
-// void eliminar_paquete(t_paquete* paquete);
-// void liberar_conexion(int socket_cliente);
-
-void procesarComando(int argc, char* argv[]);
+uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_mensaje);
 void cortarArgumentos(int lengthArray, char *argumentos[], char *arrayTemp[]);
 uint32_t perteneceAlArray(char* val, char* arr[], uint32_t size);
 

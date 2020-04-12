@@ -90,9 +90,11 @@ typedef struct{
 
 //METODOS DE CONEXION
 int crear_conexion(char* ip, char* puerto);
-void enviar_mensaje(char* mensaje, int socket_cliente);
+void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente);
 char* recibir_mensaje(int socket_cliente);
+t_paquete* crearPaquete(char* arrayArgumentos[], char* tipo_mensaje);
 void liberarPaquete(t_paquete* paquete);
+void liberar_conexion(int socket_cliente);
 
 //SERIALIZACION Y DESERIALIZACION
 t_new_pokemon* deserializar_newPokemon(t_buffer* buffer);
@@ -119,18 +121,4 @@ t_caught_pokemon* crearCaughtPokemon(uint32_t IDMensajeRecibido, uint32_t IDMens
 t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre);
 
 
-// void eliminar_paquete(t_paquete* paquete);
-// void liberar_conexion(int socket_cliente);
-
 #endif /* CONNECTION_H_ */
-
-
-		// paquete = serializar_newPokemon(newPokemon);
-		
-		// t_new_pokemon* pikachu = deserializar_newPokemon(paquete->buffer);
-		// printf("nombre del poke: %s", pikachu->nombre);
-		
-
-		// free(paquete->buffer->stream);
-		// free(paquete->buffer);
-		// free(paquete);

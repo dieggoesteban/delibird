@@ -250,3 +250,8 @@
 [INFO] 23:14:10:54 gameboy/(8613:8613): 127.0.0.3
 [INFO] 23:14:10:55 gameboy/(8613:8613): 5001
 [INFO] 23:14:10:56 gameboy/(8613:8613): entro a get_pokemon
+[INFO] 17:27:22:786 gameboy/(9202:9202): entro a new_pokemon
+[INFO] 17:28:56:252 gameboy/(9311:9311): entro a new_pokemon
+[INFO] 17:30:31:567 gameboy/(9358:9358): entro a new_pokemon
+[INFO] 17:30:42:380 gameboy/(9386:9386): entro a new_pokemon
+[INFO] 17:31:12:668 gameboy/(9414:9414): entro a new_pokemon
