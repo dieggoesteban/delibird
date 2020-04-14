@@ -13,7 +13,6 @@
 #include<sys/socket.h>
 #include<netdb.h>
 #include<string.h>
-#include "connection.h"
 
 t_log* logger;
 t_config* config;

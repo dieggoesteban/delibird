@@ -34,3 +34,17 @@ int main(int argc, char* argv[])
     }
     return 0;
 }
+
+
+/*
+
+    TEAM 1 --> CATCH PIKACHU
+    TEAM 2 --> CATCH PIKACHU
+
+    BROKER --> RECIBO, PONGO ID Y ENVIAR EL ID QUE SE LE PUSO <-> ES DE TEAM
+
+    BROKER --> GESTION DE IDs
+
+    TEAM 1 Y 2 --> SE BLOQUEA EL HILO A LA ESPERA DE LA RESPUESTA CON EL ID ASIGNADO
+
+*/

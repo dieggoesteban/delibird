@@ -9,6 +9,7 @@
 #include<readline/readline.h>
 
 #include "utils.h"
+#include "sockets.h"
 
 void terminar_programa(int, t_log*, t_config*);
 
