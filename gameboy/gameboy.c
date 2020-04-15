@@ -15,11 +15,14 @@ int main(int argc, char* argv[])
         char *ip;
 	    char *puerto;
         char *arrayArgumentos[argc - 3];
-        uint32_t conexion = crear_conexion(ip,puerto);
+        printf("%s",tipo_mensaje);
 	    cortarArgumentos(argc, argv, arrayArgumentos);
+       
+        
 
         uint32_t isValid = procesarComando(&ip,&puerto,proceso,tipo_mensaje);
-        
+        uint32_t conexion = crear_conexion(ip,puerto);
+        printf("%i\n",conexion);
         if(isValid == 1) {
             log_info(logger,ip);
 	        log_info(logger,puerto);
