@@ -27,7 +27,9 @@ int main(int argc, char* argv[])
             log_info(logger,ip);
 	        log_info(logger,puerto);
             t_paquete* paquete = crearPaquete(arrayArgumentos,tipo_mensaje);
+            printf("el size del buffer es: %i", paquete->buffer->size);
             enviarMensaje(paquete,conexion);
+
         } else {
             printf("El comando no es valido para el proceso %s",proceso);
         }

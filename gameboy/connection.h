@@ -97,6 +97,7 @@ typedef struct{
 //PAQUETES
 t_paquete* crearPaquete(char* arrayArgumentos[], char* tipo_mensaje);
 void liberarPaquete(t_paquete* paquete);
+void* serializar_paquete(t_paquete* paquete, int bytes);
 
 //SERIALIZACION Y DESERIALIZACION
 t_new_pokemon* deserializar_newPokemon(t_buffer* buffer);
