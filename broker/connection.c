@@ -74,7 +74,8 @@ void deserializar_newPokemon(t_buffer* buffer){
 	stream += sizeof(uint32_t);
 	memcpy(&(newPokemon->sizeNombre), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
-	memcpy(&(newPokemon->nombre), stream, newPokemon->sizeNombre);
+	newPokemon->nombre = malloc(newPokemon->sizeNombre);
+	memcpy(newPokemon->nombre, stream, newPokemon->sizeNombre);
 	stream += newPokemon->sizeNombre;
 	printf("sizenombre: %i", newPokemon->sizeNombre);
 	printf("nombre: %s", newPokemon->nombre);
