@@ -99,8 +99,8 @@ t_paquete* crearPaquete(char* arrayArgumentos[], char* tipo_mensaje);
 void liberarPaquete(t_paquete* paquete);
 
 //SERIALIZACION Y DESERIALIZACION
-void deserializar_newPokemon(t_buffer* buffer);
-// t_new_pokemon* deserializar_newPokemon(t_buffer* buffer);
+// void deserializar_newPokemon(t_buffer* buffer);
+t_new_pokemon* deserializar_newPokemon(t_buffer* buffer);
 t_paquete* serializar_newPokemon(t_new_pokemon* newPokemon);
 t_paquete* serializar_appearedPokemon(t_appeared_pokemon* pokemon);
 t_appeared_pokemon* deserializar_appearedPokemon(t_buffer* buffer);

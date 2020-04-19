@@ -99,37 +99,37 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd) {
 		case NEW_POKEMON:
 			{
 				log_info(logger, "SIZE BUFFER EN NEW: %i", buffer->size);	
-				deserializar_newPokemon(buffer);
-				log_info(logger,"despues del new");
-				// t_new_pokemon* newPoke = deserializar_newPokemon(buffer);
-				// printf("nombre del poke new: %s", newPoke->nombre);
-
-				// free(newPoke);
-				// free(buffer->stream);
-				// free(buffer);
+				// deserializar_newPokemon(buffer);
+				// log_info(logger,"despues del new");
+				t_new_pokemon* newPoke = deserializar_newPokemon(buffer);
+				printf("nombre del poke new: %s", newPoke->nombre);
+				log_info(logger, newPoke->nombre);
+				free(newPoke);
+				free(buffer->stream);
+				free(buffer);
 				break;
 			}
 		case APPEARED_POKEMON:
 			{
 				log_info(logger, "SIZE BUFFER EN NEW: %i", buffer->size);
-				deserializar_appearedPokemon(buffer);
-				// t_appeared_pokemon* appearedPoke = deserializar_appearedPokemon(buffer);
-				// printf("nombre del poke appeared: %s\n", appearedPoke->nombre);
-				// printf("pos x de poke: %i", appearedPoke->posicion->posicion_x);
+				// deserializar_appearedPokemon(buffer);
+				t_appeared_pokemon* appearedPoke = deserializar_appearedPokemon(buffer);
+				printf("pos x de poke: %i", appearedPoke->posicion->posicion_x);
+				log_info(logger, appearedPoke->nombre);
 
-				// free(appearedPoke);
-				// free(buffer->stream);
-				// free(buffer);
+				free(appearedPoke);
+				free(buffer->stream);
+				free(buffer);
 				break;
 			}
 		case CATCH_POKEMON:
 			{
-				// t_catch_pokemon* catchPoke = deserializar_catchPokemon(buffer);
-				// printf("nombre del poke appeared: %s\n", catchPoke->nombre);
+				t_catch_pokemon* catchPoke = deserializar_catchPokemon(buffer);
+				log_info(logger, catchPoke->nombre);
 
-				// free(catchPoke);
-				// free(buffer->stream);
-				// free(buffer);
+				free(catchPoke);
+				free(buffer->stream);
+				free(buffer);
 				break;
 			}
 		case CAUGHT_POKEMON:
@@ -142,8 +142,6 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd) {
 					printf(" no se pudo capturar\n");
 				}
 
-				
-
 				free(caughtPoke);
 				free(buffer->stream);
 				free(buffer);
@@ -151,12 +149,12 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd) {
 			}
 		case GET_POKEMON:
 			{
-				// t_get_pokemon* getPoke = deserializar_getPokemon(buffer);
-				// printf("nombre del poke get: %s\n", getPoke->nombre);
+				t_get_pokemon* getPoke = deserializar_getPokemon(buffer);
+				log_info(logger, getPoke->nombre);
 
-				// free(getPoke);
-				// free(buffer->stream);
-				// free(buffer);
+				free(getPoke);
+				free(buffer->stream);
+				free(buffer);
 				break;
 			}
 		case 0:
