@@ -1,5 +1,5 @@
-#ifndef CONNECTION_H_
-#define CONNECTION_H_
+#ifndef SERIALIZADOR_H_
+#define SERIALIZADOR_H_
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -124,4 +124,4 @@ t_caught_pokemon* crearCaughtPokemon(uint32_t IDMensajeRecibido, uint32_t IDMens
 t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre);
 
 
-#endif /* CONNECTION_H_ */
+#endif /* SERIALIZADOR_H_ */

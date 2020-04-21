@@ -1,5 +1,5 @@
-#ifndef CONNECTION_H_
-#define CONNECTION_H_
+#ifndef SERIALIZADOR_H_
+#define SERIALIZADOR_H_
 
 #include<stdio.h>
 #include<stdlib.h>

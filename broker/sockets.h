@@ -14,7 +14,7 @@
 #include<netdb.h>
 #include<string.h>
 #include<pthread.h>
-#include "connection.h"
+#include "serializador.h"
 
 t_log* logger;
 t_config* config;

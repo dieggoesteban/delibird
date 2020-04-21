@@ -13,7 +13,7 @@
 #include<sys/socket.h>
 #include<netdb.h>
 #include<string.h>
-#include "connection.h"
+#include "serializador.h"
 
 t_log* logger;
 t_config* config;
