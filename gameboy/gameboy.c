@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
         if(isValid == 1) {
             log_info(logger,ip);
 	        log_info(logger,puerto);
-            t_paquete* paquete = crearPaquete(arrayArgumentos,tipo_mensaje);
+            t_paquete* paquete = getPaquete(arrayArgumentos,tipo_mensaje);
             printf("el size del buffer es: %i", paquete->buffer->size);
             enviarMensaje(paquete,conexion);
 

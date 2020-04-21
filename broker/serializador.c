@@ -388,7 +388,7 @@ t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre){
 	return getPokemon;
 }
 
-t_paquete* crearPaquete(char* arrayArgumentos[], char* tipo_mensaje)
+t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 {
 
 	t_paquete *paquete = malloc(sizeof(t_paquete));

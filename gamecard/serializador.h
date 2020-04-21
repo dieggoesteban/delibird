@@ -95,7 +95,7 @@ typedef struct{
 // void liberar_conexion(int socket_cliente);
 
 //PAQUETES
-t_paquete* crearPaquete(char* arrayArgumentos[], char* tipo_mensaje);
+t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje);
 void liberarPaquete(t_paquete* paquete);
 
 //SERIALIZACION Y DESERIALIZACION
