@@ -14660,3 +14660,26 @@
 [INFO] 22:14:54:104 broker/(4483:4483): a ver
 [INFO] 22:15:26:55 broker/(4483:4534): SIZE BUFFER EN NEW: 28
 [INFO] 22:15:26:56 broker/(4483:4534): PIKACHU
+[INFO] 23:08:10:739 broker/(15285:15285): a ver
+[INFO] 23:18:16:403 broker/(15741:15741): a ver
+[INFO] 23:45:15:648 broker/(16079:16079): a ver
+[INFO] 23:46:56:888 broker/(16143:16143): a ver
+[INFO] 23:47:35:816 broker/(16178:16178): a ver
+[INFO] 23:48:26:651 broker/(16220:16220): a ver
+[INFO] 23:52:40:292 broker/(16374:16374): a ver
+[INFO] 00:00:20:15 broker/(4289:4289): a ver
+[INFO] 00:03:25:899 broker/(4656:4656): a ver
+[INFO] 00:03:25:902 broker/(4656:4656): en socket inicio
+[INFO] 00:03:25:903 broker/(4656:4656): pos esperando
+[INFO] 00:04:41:381 broker/(4724:4724): a ver
+[INFO] 00:04:41:384 broker/(4724:4724): en socket inicio
+[INFO] 00:04:41:385 broker/(4724:4724): pos esperando
+[INFO] 00:06:12:516 broker/(4835:4835): a ver
+[INFO] 00:06:12:518 broker/(4835:4835): en socket inicio
+[INFO] 00:06:12:520 broker/(4835:4835): pos esperando
+[INFO] 00:07:02:177 broker/(4877:4877): a ver
+[INFO] 00:07:02:178 broker/(4877:4877): en socket inicio
+[INFO] 00:07:02:180 broker/(4877:4877): pos esperando
+[INFO] 00:08:47:432 broker/(5146:5146): a ver
+[INFO] 00:09:24:351 broker/(5146:5275): SIZE BUFFER EN NEW: 28
+[INFO] 00:09:24:352 broker/(5146:5275): LUCARIO
