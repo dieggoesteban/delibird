@@ -41,6 +41,7 @@
 *.su
 *.idb
 *.pdb
+*.log
 
 # Prerequisites
 *.d
