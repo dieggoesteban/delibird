@@ -80,6 +80,7 @@ void esperar_cliente(uint32_t socket_servidor)
 
 	pthread_create(&thread,NULL,(void*)serve_client,&socket_cliente);
 	pthread_join(thread, NULL);
+	
 
 }
 
