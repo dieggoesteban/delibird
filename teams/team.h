@@ -8,11 +8,12 @@
 #include<commons/config.h>
 #include<readline/readline.h>
 
-#include "utils.h"
 #include "sockets.h"
+#include "utils.h"
 
 char* IP;
 char* PUERTO;
+char* LOG;
 
 void terminar_programa(int, t_log*, t_config*);
 

@@ -8,7 +8,12 @@
 #include<sys/socket.h>
 #include<netdb.h>
 #include<string.h>
-#include "utils.h"
+#include<commons/config.h>
+#include<commons/log.h>
+#include<commons/collections/list.h>
+
+t_log* logger;
+t_config* config;
 
 typedef enum
 {

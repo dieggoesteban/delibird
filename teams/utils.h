@@ -14,13 +14,30 @@
 #include<netdb.h>
 #include<string.h>
 
+#include "serializador.h"
+
 t_log* logger;
 t_config* config;
 
 
-uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_mensaje);
-void cortarArgumentos(int lengthArray, char *argumentos[], char *arrayTemp[]);
-uint32_t perteneceAlArray(char* val, char* arr[], uint32_t size);
+typedef struct
+{
+    char* nombre;
+    t_posicion* posicion;
+} t_pokemon;
 
+typedef struct
+{
+	uint32_t id;
+	t_posicion* posicion;
+    t_list* pokemonCapturados;
+    t_list* pokemonObjetivo;
+    t_pokemon* pokemonPlanificado;
+    int deadlock; // 0 y 1 por ahora, es solo un mockup
+} t_entrenador;
+
+uint32_t perteneceAlArray(char* val, char* arr[], uint32_t size);
+t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* pokemon);
+t_list* inicializarEntrenadores();
 
 #endif /* UTILS_H_ */
