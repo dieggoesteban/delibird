@@ -84,9 +84,10 @@ t_list* inicializarEntrenadores() {
 t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* pokemon) {
     t_entrenador* entrenador = malloc(sizeof(t_entrenador));
 
-    entrenador->id = 69;
-    entrenador->pokemonCapturados = pokemon;
-    entrenador->pokemonObjetivo = objetivos;
+    entrenador->id = getNuevoPid();
+	entrenador->posicion = posicion;
+    entrenador->pokemonCapturados = list_duplicate(pokemon);
+    entrenador->pokemonObjetivo = list_duplicate(objetivos);
     entrenador->pokemonPlanificado = NULL;
     entrenador->deadlock = 0;
 

@@ -11,13 +11,17 @@ int main(void)
     PUERTO = config_get_string_value(config,"PUERTO_TEAM");
     LOG = config_get_string_value(config,"LOG_FILE");
 
+    inicializarPid();
+
     t_list* entrenadores = inicializarEntrenadores();
 
-    t_entrenador* entrenador = (t_entrenador *)list_get(entrenadores,0);
+    t_entrenador* entrenador0 = (t_entrenador *)list_get(entrenadores,0);
+    t_entrenador* entrenador1 = (t_entrenador *)list_get(entrenadores,1);
+    t_entrenador* entrenador2 = (t_entrenador *)list_get(entrenadores,2);
 
-    t_list* lista = (t_list*)entrenador->pokemonCapturados;
-
-    printf("soy del team %s\n", (char*)list_get(lista,0));
+    printf("El entrenador 0 tiene el id: %i\n", (uint32_t)entrenador0->id);
+    printf("El entrenador 1 tiene el id: %i\n", (uint32_t)entrenador1->id);
+    printf("El entrenador 2 tiene el id: %i\n", (uint32_t)entrenador2->id);
 
 	logger = log_create(LOG,"team",true,LOG_LEVEL_INFO);
     // log_info(logger, "a ver");
