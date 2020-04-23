@@ -26,6 +26,8 @@ t_list* inicializarEntrenadores() {
 	uint32_t sizeTotal = size/2;
 	uint32_t j=0; uint32_t k=0;	uint32_t l=0;
 
+	uint32_t sizeAux = 0;
+
 	printf("Size total: %i\n",sizeTotal);
 
 	for(uint32_t i=0; i < sizeTotal; i++) {
@@ -47,7 +49,11 @@ t_list* inicializarEntrenadores() {
 			}
 			list_add(objetivos, string_substring(objetivosEntrenadores[j], 0, strlen(objetivosEntrenadores[j])-1));
 		}
+		printf("este poke es el ultimo de la lista del entrenador %i, con j %i, y nombre %s\n", i, j, string_substring(objetivosEntrenadores[j], 0, strlen(objetivosEntrenadores[j])-1));
 		j++;
+
+		uint32_t sizeObjetivos = j - sizeAux;
+		sizeAux = j;
 
 
 		if((string_starts_with(pokemonEntrenadores[l],"[") == 1) && (string_ends_with(pokemonEntrenadores[l],"]") == 1)) {
@@ -64,7 +70,7 @@ t_list* inicializarEntrenadores() {
 		}
 		l++;
 
-		t_entrenador* entrenador = crearEntrenador(posicion, objetivos, pokemon);
+		t_entrenador* entrenador = crearEntrenador(posicion, objetivos, pokemon, sizeObjetivos);
 
 
 		list_add(entrenadores, entrenador);
@@ -81,7 +87,22 @@ t_list* inicializarEntrenadores() {
 	return entrenadores;	
 }
 
-t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* pokemon) {
+void setObjetivoGlobal(t_list* entrenadores){
+	t_list* pokemonesObjetivos = list_create();
+
+
+
+	for(uint32_t i = 0; i < list_size(entrenadores);i++){
+		list_add_all(pokemonesObjetivos, ((t_entrenador*)list_get(entrenadores, i))->pokemonObjetivo);
+	}
+	printf("el size de este bicho: %i ", list_size(pokemonesObjetivos));
+
+	for(uint32_t j = 0; j < list_size(pokemonesObjetivos); j++){
+		printf("El nombre del pokemon %i es %s\n", j, (char*)list_get(pokemonesObjetivos, j));
+	}
+}
+
+t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* pokemon, uint32_t cantObjetivos) {
     t_entrenador* entrenador = malloc(sizeof(t_entrenador));
 
     entrenador->id = getNuevoPid();
@@ -89,6 +110,7 @@ t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* p
     entrenador->pokemonCapturados = list_duplicate(pokemon);
     entrenador->pokemonObjetivo = list_duplicate(objetivos);
     entrenador->pokemonPlanificado = NULL;
+	entrenador->cantidadObjetivo = cantObjetivos;
     entrenador->deadlock = 0;
 
     return entrenador;

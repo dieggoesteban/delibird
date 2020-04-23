@@ -20,7 +20,8 @@ t_log* logger;
 t_config* config;
 
 uint32_t perteneceAlArray(char* val, char* arr[], uint32_t size);
-t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* pokemon);
+t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* pokemon, uint32_t cantidadObjetivo);
 t_list* inicializarEntrenadores();
+void setObjetivoGlobal(t_list* entrenadores);
 
 #endif /* UTILS_H_ */
