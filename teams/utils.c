@@ -58,7 +58,7 @@ t_list* inicializarEntrenadores() {
 
 		if((string_starts_with(pokemonEntrenadores[l],"[") == 1) && (string_ends_with(pokemonEntrenadores[l],"]") == 1)) {
 			char* pokemonAlone = string_substring(pokemonEntrenadores[l], 1, strlen(pokemonEntrenadores[l]));
-			list_add(objetivos, string_substring(pokemonAlone, 0, strlen(pokemonAlone)-1));
+			list_add(pokemon, string_substring(pokemonAlone, 0, strlen(pokemonAlone)-1));
 		} else {
 			list_add(pokemon, string_substring(pokemonEntrenadores[l], 1, strlen(pokemonEntrenadores[l])));
 			l++;
