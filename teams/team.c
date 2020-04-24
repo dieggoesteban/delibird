@@ -19,7 +19,6 @@ int main(void)
     t_entrenador* entrenador1 = (t_entrenador *)list_get(entrenadores,1);
     t_entrenador* entrenador2 = (t_entrenador *)list_get(entrenadores,2);
 
-    setObjetivoGlobal(entrenadores);
 
     printf("El entrenador 0 tiene el id: %i\n", (uint32_t)entrenador0->id);
     printf("El entrenador 1 tiene el id: %i\n", (uint32_t)entrenador1->id);
@@ -30,7 +29,9 @@ int main(void)
     printf("El entrenador 2 puede capturar esta cantidad de pokemones: %i\n", (uint32_t)entrenador2->cantidadObjetivo);
     printf("El entrenador 2 tiene esta cantidad de pokes objetivos: %i\n", list_size(entrenador2->pokemonObjetivo));
 
-	logger = log_create(LOG,"team",true,LOG_LEVEL_INFO);
+    setObjetivoGlobal(entrenadores);
+	
+    logger = log_create(LOG,"team",true,LOG_LEVEL_INFO);
     // log_info(logger, "a ver");
 
     //iniciar_servidor();
