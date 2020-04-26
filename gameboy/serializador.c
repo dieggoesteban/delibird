@@ -83,11 +83,10 @@ t_new_pokemon* deserializar_newPokemon(t_buffer* buffer){
 
 
 t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon){
-	t_paquete* paquete = malloc(sizeof(t_paquete));
 	t_buffer* buffer = malloc(sizeof(t_buffer));
 	buffer->size = sizeof(uint32_t)*3 //ID_mensaje_recibido + ID_mensaje_original + sizePokemon
 					+ strlen(localizedPokemon->nombre)+1 //nombre pokemon
-					+ sizeof(t_posicion_cantidad)* list_size(localizedPokemon->posicion_cantidad); // se le multiplica la cantidad de items de la lista por su size en bytes
+					+ sizeof(t_posicion)* list_size(localizedPokemon->posicion); // se le multiplica la cantidad de items de la lista por su size en bytes
 
 	void* stream = malloc(buffer->size);
 	int offset = 0;
@@ -100,13 +99,13 @@ t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon){
 	offset += sizeof(uint32_t);
 	memcpy(stream + offset, localizedPokemon->nombre, strlen(localizedPokemon->nombre)+1);
 	offset += strlen(localizedPokemon->nombre)+1;
-	memcpy(stream + offset, &localizedPokemon->sizePosicion_cantidad, sizeof(uint32_t));
+	memcpy(stream + offset, &localizedPokemon->sizePosicion, sizeof(uint32_t));
 	offset += sizeof(uint32_t);
-	memcpy(stream + offset, &localizedPokemon->posicion_cantidad, localizedPokemon->sizePosicion_cantidad);
+	memcpy(stream + offset, localizedPokemon->posicion, localizedPokemon->sizePosicion);
 
 	buffer->stream = stream;
 
-	paquete = crear_paquete(LOCALIZED_POKEMON, buffer->size, buffer->stream);
+	t_paquete* paquete = crear_paquete(LOCALIZED_POKEMON, buffer->size, buffer->stream);
 
 	printf("codigo de mensaje de serializar poke: %i \n", paquete->codigo_mensaje);
 	return paquete;		
@@ -126,9 +125,9 @@ t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer){
 	localizedPokemon->nombre = malloc(localizedPokemon->sizeNombre);
 	memcpy(localizedPokemon->nombre, stream, localizedPokemon->sizeNombre);
 	stream += localizedPokemon->sizeNombre;
-	memcpy(&(localizedPokemon->sizePosicion_cantidad), stream, sizeof(uint32_t));
+	memcpy(&(localizedPokemon->sizePosicion), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
-	memcpy(&(localizedPokemon->posicion_cantidad), stream, localizedPokemon->sizePosicion_cantidad); //HABIA QUE VER SI ESTO NO GENERA PROBLEMAS COMO EL CHAR* QUE NO SE ENVIABA
+	memcpy(localizedPokemon->posicion, stream, localizedPokemon->sizePosicion); //HABIA QUE VER SI ESTO NO GENERA PROBLEMAS COMO EL CHAR* QUE NO SE ENVIABA
 
 	return localizedPokemon;
 }
@@ -335,15 +334,15 @@ t_new_pokemon* crearNewPokemon(uint32_t IDMensajeRecibido, char* nombre, t_posic
 	return newPokemon;
 }
 
-t_localized_pokemon* crearLocalizedPokemon(uint32_t IDMensajeRecibido,uint32_t IDMensajeOriginal, char* nombre, uint32_t sizePosicionCantidad, t_list* posicion_cantidad){
+t_localized_pokemon* crearLocalizedPokemon(uint32_t IDMensajeRecibido,uint32_t IDMensajeOriginal, char* nombre, uint32_t sizePosicion, t_list* posicion){
 	t_localized_pokemon* localizedPokemon = malloc(sizeof(t_localized_pokemon));
 
 	localizedPokemon->ID_mensaje_recibido = IDMensajeRecibido;
 	localizedPokemon->ID_mensaje_original = IDMensajeOriginal;
 	localizedPokemon->sizeNombre = strlen(nombre)+1;
 	localizedPokemon->nombre = nombre;
-	localizedPokemon->sizePosicion_cantidad = sizePosicionCantidad;
-	localizedPokemon->posicion_cantidad = posicion_cantidad;
+	localizedPokemon->sizePosicion = sizePosicion;
+	list_add_all(localizedPokemon->posicion,posicion);
 
 	return localizedPokemon;
 }
@@ -472,25 +471,25 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 
 		t_localized_pokemon *localizedPokemon = malloc(sizeof(t_localized_pokemon));
 
-		t_posicion_cantidad *posCant1 = crearPosicionCantidad(5, 10, 6);
-		t_posicion_cantidad *posCant2 = crearPosicionCantidad(8, 11, 6);
+		t_posicion *pos1 = crearPosicion(5, 10);
+		t_posicion *pos2 = crearPosicion(8, 11);
 
-		t_list *listPosCant = list_create();
-		list_add(listPosCant, posCant1);
-		list_add(listPosCant, posCant2);
+		t_list *listPos = list_create();
+		list_add(listPos, pos1);
+		list_add(listPos, pos2);
 
 		localizedPokemon->ID_mensaje_recibido = 23411;
 		localizedPokemon->ID_mensaje_original = 12342;
 		localizedPokemon->nombre = "lucario";
 		localizedPokemon->sizeNombre = strlen(localizedPokemon->nombre) + 1;
-		localizedPokemon->sizePosicion_cantidad = list_size(listPosCant) * sizeof(t_posicion_cantidad);
-		localizedPokemon->posicion_cantidad = listPosCant;
+		localizedPokemon->sizePosicion = list_size(listPos) * sizeof(t_posicion);
+		localizedPokemon->posicion = list_duplicate(listPos);
+		
+		paquete = serializar_localizedPokemon(localizedPokemon); 
 
-		paquete = serializar_localizedPokemon(localizedPokemon); //COMENTADO PORQUE OBVIO QUE LA SERIALIZACION DE LA LISTA ROMPE TODO
-
-		free(posCant1);
-		free(posCant2);
-		free(listPosCant);
+		free(pos1);
+		free(pos2);
+		free(listPos);
 		free(localizedPokemon);
 	}
 

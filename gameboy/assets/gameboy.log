@@ -715,3 +715,60 @@
 [INFO] 20:51:07:64 gameboy/(6952:6952): 127.0.0.2
 [INFO] 20:51:07:65 gameboy/(6952:6952): 5002
 [INFO] 20:51:07:68 gameboy/(6952:6952): entro a appeared_pokemon
+[INFO] 15:41:34:766 gameboy/(9305:9305): Se va a conectar en TEAM
+[INFO] 15:43:07:731 gameboy/(9325:9325): Se va a conectar en TEAM
+[INFO] 15:44:33:746 gameboy/(9384:9384): Se va a conectar en TEAM
+[INFO] 15:45:07:212 gameboy/(9400:9400): Se va a conectar en TEAM
+[INFO] 15:46:51:627 gameboy/(9462:9462): Se va a conectar en TEAM
+[INFO] 15:46:51:628 gameboy/(9462:9462): 127.0.0.2
+[INFO] 15:46:51:629 gameboy/(9462:9462): 5002
+[INFO] 15:46:51:630 gameboy/(9462:9462): entro a localized_pokemon
+[INFO] 15:47:34:250 gameboy/(9489:9489): Se va a conectar en TEAM
+[INFO] 15:47:34:251 gameboy/(9489:9489): 127.0.0.2
+[INFO] 15:47:34:253 gameboy/(9489:9489): 5002
+[INFO] 15:47:34:254 gameboy/(9489:9489): entro a localized_pokemon
+[INFO] 15:47:34:255 gameboy/(9489:9489): hola
+[INFO] 15:47:45:520 gameboy/(9512:9512): Se va a conectar en TEAM
+[INFO] 15:47:45:521 gameboy/(9512:9512): 127.0.0.2
+[INFO] 15:47:45:523 gameboy/(9512:9512): 5002
+[INFO] 15:47:45:524 gameboy/(9512:9512): entro a localized_pokemon
+[INFO] 15:47:45:525 gameboy/(9512:9512): hola
+[INFO] 15:47:56:331 gameboy/(9530:9530): Se va a conectar en TEAM
+[INFO] 15:47:56:333 gameboy/(9530:9530): 127.0.0.2
+[INFO] 15:47:56:334 gameboy/(9530:9530): 5002
+[INFO] 15:47:56:335 gameboy/(9530:9530): entro a localized_pokemon
+[INFO] 15:47:56:336 gameboy/(9530:9530): hola
+[INFO] 15:48:05:447 gameboy/(9547:9547): Se va a conectar en TEAM
+[INFO] 15:48:05:448 gameboy/(9547:9547): 127.0.0.2
+[INFO] 15:48:05:450 gameboy/(9547:9547): 5002
+[INFO] 15:48:05:451 gameboy/(9547:9547): entro a localized_pokemon
+[INFO] 15:48:49:445 gameboy/(9583:9583): Se va a conectar en TEAM
+[INFO] 15:48:49:446 gameboy/(9583:9583): 127.0.0.2
+[INFO] 15:48:49:447 gameboy/(9583:9583): 5002
+[INFO] 15:48:49:447 gameboy/(9583:9583): entro a localized_pokemon
+[INFO] 15:48:49:447 gameboy/(9583:9583): hola
+[INFO] 15:49:36:129 gameboy/(9650:9650): Se va a conectar en TEAM
+[INFO] 15:49:36:130 gameboy/(9650:9650): 127.0.0.2
+[INFO] 15:49:36:131 gameboy/(9650:9650): 5002
+[INFO] 15:49:36:131 gameboy/(9650:9650): entro a localized_pokemon
+[INFO] 15:49:36:131 gameboy/(9650:9650): hola
+[INFO] 15:49:50:56 gameboy/(9669:9669): Se va a conectar en TEAM
+[INFO] 15:49:50:58 gameboy/(9669:9669): 127.0.0.2
+[INFO] 15:49:50:59 gameboy/(9669:9669): 5002
+[INFO] 15:49:50:60 gameboy/(9669:9669): entro a localized_pokemon
+[INFO] 15:49:50:61 gameboy/(9669:9669): hola
+[INFO] 15:50:41:226 gameboy/(9694:9694): Se va a conectar en TEAM
+[INFO] 15:50:41:228 gameboy/(9694:9694): 127.0.0.2
+[INFO] 15:50:41:229 gameboy/(9694:9694): 5002
+[INFO] 15:50:41:230 gameboy/(9694:9694): entro a localized_pokemon
+[INFO] 15:50:41:231 gameboy/(9694:9694): hola
+[INFO] 15:51:13:686 gameboy/(9719:9719): Se va a conectar en TEAM
+[INFO] 15:51:13:687 gameboy/(9719:9719): 127.0.0.2
+[INFO] 15:51:13:689 gameboy/(9719:9719): 5002
+[INFO] 15:51:13:690 gameboy/(9719:9719): entro a localized_pokemon
+[INFO] 15:51:13:691 gameboy/(9719:9719): hola
+[INFO] 15:52:17:849 gameboy/(9749:9749): Se va a conectar en TEAM
+[INFO] 15:52:17:851 gameboy/(9749:9749): 127.0.0.2
+[INFO] 15:52:17:852 gameboy/(9749:9749): 5002
+[INFO] 15:52:17:854 gameboy/(9749:9749): entro a localized_pokemon
+[INFO] 15:52:17:854 gameboy/(9749:9749): lucario

@@ -16,9 +16,7 @@ int main(int argc, char* argv[])
 	    char *puerto;
         char *arrayArgumentos[argc - 3];
         printf("%s",tipo_mensaje);
-	    cortarArgumentos(argc, argv, arrayArgumentos);
-       
-        
+	    cortarArgumentos(argc, argv, arrayArgumentos);        
 
         uint32_t isValid = procesarComando(&ip,&puerto,proceso,tipo_mensaje);
         uint32_t conexion = crear_conexion(ip,puerto);
