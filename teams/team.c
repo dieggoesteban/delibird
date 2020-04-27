@@ -34,7 +34,7 @@ int main(void)
     logger = log_create(LOG,"team",true,LOG_LEVEL_INFO);
     // log_info(logger, "a ver");
 
-    //iniciar_servidor();
+    iniciar_servidor();
 
     return 0;
 }
