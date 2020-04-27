@@ -167,6 +167,15 @@ t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* p
     return entrenador;
 }
 
+t_pokemon* crearPokemonPosicion(char* nombre, t_posicion* posicion){
+	t_pokemon* pokemon = malloc(sizeof(t_pokemon));
+
+	pokemon->nombre = nombre;
+	pokemon->posicion = posicion;
+
+	return pokemon;
+}
+
 t_pokemon_cantidad* setPokemonCantidad(char* nombre, uint32_t cantidad) {
 	t_pokemon_cantidad* pokemon = malloc(sizeof(t_pokemon_cantidad));
 

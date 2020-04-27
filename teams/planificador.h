@@ -36,6 +36,7 @@ typedef struct
     uint32_t deadlock; // 0 y 1 por ahora, es solo un mockup
 } t_entrenador;
 
+//INICIALIZACION HILOS
 void inicializarPid();
 uint32_t getNuevoPid();
 
