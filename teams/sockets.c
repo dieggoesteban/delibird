@@ -35,6 +35,17 @@ void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente) {
 	liberarPaquete(paquete);
 }
 
+// void sendGET() {
+// 	char* ipBroker = config_get_string_value(config, "IP_BROKER");
+// 	char* puertoBroker = config_get_string_value(config, "PUERTO_BROKER");
+
+// 	t_list* conexiones = create_list();
+
+// 	for(uint32_t i = 0; i < list_size(objetivoGlobal); i++) {
+		
+// 	}
+// }
+
 /*SERVER SIDE*/
 
 void iniciar_servidor(void)

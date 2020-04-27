@@ -22,12 +22,15 @@ pthread_t thread;
 char* IP;
 char* PUERTO;
 
+t_list* objetivoGlobal;
 
 //CLIENTE
 int crear_conexion(char* ip, char* puerto);
 void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente);
 void* recibir_paquete(int socket_cliente);
 void liberar_conexion(uint32_t socket_cliente);
+
+void sendGET();
 
 //SERVER
 void iniciar_servidor(void);

@@ -19,13 +19,23 @@
 t_log* logger;
 t_config* config;
 
+t_list* colaNEW;
+t_list* colaREADY;
+t_list* colaEXEC;
+t_list* colaBLOCKED;
+t_list* colaEXIT;
+
+t_list* objetivoGlobal;
+
+uint32_t arraySize(void* arr[]);
+t_list* arrayToList(void* arr[]);
+
 uint32_t perteneceAlArray(char* val, char* arr[], uint32_t size);
 uint32_t perteneceALista(char *val, t_list* lista);
 uint32_t perteneceAListaContador(char *val, t_list* lista);
 t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* pokemon, uint32_t cantidadObjetivo);
-t_list* inicializarEntrenadores();
-void setObjetivoGlobal(t_list* entrenadores);
-u_int32_t getCantidadEntrenadores();
+void inicializarEntrenadores();
+void setObjetivoGlobal();
 t_pokemon_cantidad* setPokemonCantidad(char* nombre, uint32_t cantidad);
 
 
