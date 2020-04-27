@@ -400,8 +400,8 @@ t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre){
 t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 {
 
-	t_paquete *paquete = malloc(sizeof(t_paquete));
-	paquete->buffer = malloc(sizeof(t_buffer));
+	t_paquete *paquete;
+	// paquete->buffer;
 	if (strcmp(tipo_mensaje, "NEW_POKEMON") == 0)
 	{
 		log_info(logger, "entro a new_pokemon");
@@ -417,6 +417,9 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 		newPokemon->nombre = arrayArgumentos[0];
 		newPokemon->sizeNombre = strlen(newPokemon->nombre) + 1;
 		newPokemon->posicionCantidad = posCant;
+
+		printf("nombre del poke: %s", newPokemon->nombre);
+
 
 		paquete = serializar_newPokemon(newPokemon);
 

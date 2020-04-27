@@ -14,11 +14,19 @@
 
 uint32_t pid;
 
+t_list* colaNEW;
+t_list* colaREADY;
+t_list* colaEXEC;
+t_list* colaBLOCKED;
+t_list* colaEXIT;
+
+t_list* objetivoGlobal;
+
 typedef struct
 {
     char* nombre;
     t_posicion* posicion;
-} t_pokemon;
+} t_pokemon_posicion;
 
 typedef struct{
     char* nombre;
@@ -32,18 +40,14 @@ typedef struct
     t_list* pokemonCapturados;
     t_list* pokemonObjetivo;
     uint32_t cantidadObjetivo;
-    t_pokemon* pokemonPlanificado;
+    t_pokemon_posicion* pokemonPlanificado;
     uint32_t deadlock; // 0 y 1 por ahora, es solo un mockup
 } t_entrenador;
 
 //INICIALIZACION HILOS
 void inicializarPid();
 uint32_t getNuevoPid();
+t_entrenador* getEntrenadorMejorPosicionado(t_pokemon_posicion* pokemon);
 
-//METODOS DE CONEXION
-// int crear_conexion(char* ip, char* puerto);
-// void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente);
-// char* recibir_mensaje(int socket_cliente);
-// void liberar_conexion(int socket_cliente);
 
 #endif /* PLANIFICADOR_H_ */

@@ -22,6 +22,7 @@ t_list* colaEXEC;
 t_list* colaBLOCKED;
 t_list* colaEXIT;
 
+void inicializarTeam();
 void terminar_programa(int, t_log*, t_config*);
 
 #endif /* TEAM_H_ */

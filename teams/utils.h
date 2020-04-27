@@ -16,22 +16,35 @@
 
 #include "planificador.h"
 
+//GLOBAL
 t_log* logger;
 t_config* config;
+t_list* objetivoGlobal;
 
 //INICIALIZACION
-t_list* inicializarEntrenadores();
-void setObjetivoGlobal(t_list* entrenadores);
 u_int32_t getCantidadEntrenadores();
+void inicializarEntrenadores();
+void setObjetivoGlobal();
 
 //CREAR
-t_pokemon* crearPokemonPosicion(char* nombre, t_posicion* posicion);
+t_pokemon_posicion* crearPokemonPosicion(char* nombre, t_posicion* posicion);
 t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* pokemon, uint32_t cantidadObjetivo);
 t_pokemon_cantidad* setPokemonCantidad(char* nombre, uint32_t cantidad);
 
-//PERTENECE
+//COLAS
+t_list* colaNEW;
+t_list* colaREADY;
+t_list* colaEXEC;
+t_list* colaBLOCKED;
+t_list* colaEXIT;
+
+//UTILIDADES ARRAYS/LISTS
+uint32_t arraySize(void* arr[]);
+t_list* arrayToList(void* arr[]);
 uint32_t perteneceAlArray(char* val, char* arr[], uint32_t size);
 uint32_t perteneceALista(char *val, t_list* lista);
 uint32_t perteneceAListaContador(char *val, t_list* lista);
+
+
 
 #endif /* UTILS_H_ */
