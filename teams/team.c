@@ -12,6 +12,8 @@ int main(void)
     LOG = config_get_string_value(config,"LOG_FILE");
 
     colaNEW = list_create();
+    colaREADY = list_create();
+    colaBLOCKED = list_create();
 
     inicializarTeam();
 	

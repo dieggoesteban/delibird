@@ -22,6 +22,44 @@ uint32_t perteneceALista(char *val, t_list* lista) {
 	return 0;
 }
 
+uint32_t pokemonCantidadPerteneceALista(t_pokemon_cantidad* pokemon, t_list* lista){
+	for(uint32_t i = 0; i < list_size(lista); i++){
+		if(strcmp(((t_pokemon_cantidad*)list_get(lista, i))->nombre,pokemon->nombre) == 0){
+			return i;
+		}
+	}
+	return -1;
+}
+
+uint32_t pokemonPosicionPerteneceALista(t_pokemon_posicion* pokemon, t_list* lista){
+	for(uint32_t i = 0; i < list_size(lista); i++){
+		if(strcmp(((t_pokemon_posicion*)list_get(lista, i))->nombre,pokemon->nombre) == 0){
+			return i;
+		}
+	}
+	return -1;
+}
+
+uint32_t entrenadorPerteneceALista(t_entrenador* entrenador, t_list* lista){
+	for(uint32_t i = 0; i < list_size(lista); i++){
+		if(entrenador->id == (((t_entrenador*)list_get(lista,i))->id))
+			return i;
+	}
+	return -1;
+}
+
+t_list* obtenerEntrenadoresSinDeadlock(){
+	t_list* entrenadoresSinDeadlock = list_create();
+	for(uint32_t i = 0; i < list_size(colaBLOCKED); i++){
+		if(((t_entrenador*)list_get(colaBLOCKED, i))->deadlock == 0){
+			list_add(entrenadoresSinDeadlock, (t_entrenador*)list_get(colaBLOCKED, i));
+			return entrenadoresSinDeadlock;
+		}
+	}
+	return entrenadoresSinDeadlock;
+}
+
+
 uint32_t perteneceAListaContador(char *val, t_list* lista) {
 	uint32_t counter = 0;
 	for (uint32_t i = 0; i < list_size(lista); i++) {

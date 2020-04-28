@@ -45,6 +45,13 @@ uint32_t perteneceAlArray(char* val, char* arr[], uint32_t size);
 uint32_t perteneceALista(char *val, t_list* lista);
 uint32_t perteneceAListaContador(char *val, t_list* lista);
 
+//STRUCTS PERTENECEN A LISTA
+uint32_t pokemonCantidadPerteneceALista(t_pokemon_cantidad* pokemon, t_list* lista);
+uint32_t pokemonPosicionPerteneceALista(t_pokemon_posicion* pokemon, t_list* lista);
+uint32_t entrenadorPerteneceALista(t_entrenador* entrenador, t_list* lista);
+
+//OBTENER DE LISTA
+t_list* obtenerEntrenadoresSinDeadlock(); //obtiene de colaBlocked
 
 
 #endif /* UTILS_H_ */
