@@ -70,7 +70,6 @@ t_list* obtenerEntrenadoresSinDeadlock(){
 	return entrenadoresSinDeadlock;
 }
 
-
 uint32_t perteneceAListaContador(char *val, t_list* lista) {
 	uint32_t counter = 0;
 	for (uint32_t i = 0; i < list_size(lista); i++) {
@@ -158,6 +157,7 @@ t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* p
     entrenador->pokemonObjetivo = list_duplicate(objetivos);
     entrenador->pokemonPlanificado = NULL;
 	entrenador->cantidadObjetivo = cantObjetivos;
+	entrenador->enEspera = false;
 	entrenador->deadlock = entrenadorEnDeadlock(entrenador);
 
     return entrenador;
@@ -181,10 +181,33 @@ t_pokemon_cantidad* setPokemonCantidad(char* nombre, uint32_t cantidad) {
 	return pokemon;
 }
 
-uint32_t entrenadorEnDeadlock(t_entrenador* entrenador){
-	 if(entrenador->cantidadObjetivo < list_size(entrenador->pokemonObjetivo)){
-		 return 0;
-	 }else{
-		 return 1;
-	 }
+bool list_equals(t_list* list1, t_list* list2) {
+	if(list_size(list1) == list_size(list2)) {
+		for(uint32_t i = 0; i < list_size(list1); i++) {
+			if(strcmp(list_get(list1,i),list_get(list1,2)) != 0) {
+				return false;
+			}
+		}
+		return true;
+	} else return false;
+}
+
+bool entrenadorEnDeadlock(t_entrenador* entrenador){
+	if(!entrenadorCumplioObjetivo(entrenador) && entrenador->cantidadObjetivo == list_size(entrenador->pokemonCapturados)) {
+		return true;
+	}
+	return false;
+}
+
+bool entrenadorCumplioObjetivo(t_entrenador* entrenador) {
+	if(list_equals(entrenador->pokemonObjetivo,entrenador->pokemonCapturados)) {
+		return true;
+	}
+	return false;
+}
+
+bool entrenadorPuedeCapturar(void* entrenador) {
+	t_entrenador* trainer = (t_entrenador*) entrenador;
+
+	return (!entrenadorEnDeadlock(trainer) && !trainer->enEspera);
 }

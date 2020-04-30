@@ -3,8 +3,10 @@
 t_entrenador *getEntrenadorMejorPosicionado(t_pokemon_posicion *pokemon)
 {
 
-    t_list *entrenadores = list_duplicate(colaNEW);
-    list_add_all(entrenadores, colaBLOCKED);
+    t_list* entrenadores = list_duplicate(colaNEW);
+    t_list* blocked = list_filter(colaBLOCKED, entrenadorPuedeCapturar);
+    printf("%i", list_size(blocked));
+    list_add_all(entrenadores, blocked);
 
     t_entrenador *entrenadorMejorPosicionado = list_get(entrenadores, 0);
 
@@ -28,33 +30,34 @@ t_entrenador *getEntrenadorMejorPosicionado(t_pokemon_posicion *pokemon)
         }
         free(trainer);
     }
+
     list_destroy(entrenadores);
 
     return entrenadorMejorPosicionado;
 }
 
-
+//BOOL(uda)
 void asignarPokemonAEntrenador(t_pokemon_posicion *pokemon)
 {
     t_entrenador *entrenadorMP = getEntrenadorMejorPosicionado(pokemon);
     entrenadorMP->pokemonPlanificado = pokemon;
 
-        uint32_t sePudo = moverEntrenadorDeCola(colaNEW, colaREADY, entrenadorMP);
-        if (sePudo == -1)
-        {
-            moverEntrenadorDeCola(colaBLOCKED, colaREADY, entrenadorMP);
-        }
-    
+    uint32_t sePudo = moverEntrenadorDeCola(colaNEW, colaREADY, entrenadorMP);
+    if (sePudo != 0)
+    {
+        moverEntrenadorDeCola(colaBLOCKED, colaREADY, entrenadorMP);
+    }
 }
 
+//BOOL(uda)
 uint32_t moverEntrenadorDeCola(t_list *colaEmisora, t_list *colaReceptora, t_entrenador *entrenador)
 {
     uint32_t indexExiste = entrenadorPerteneceALista(entrenador, colaEmisora);
-    printf("index Existe: %i\n", indexExiste);
     if (indexExiste != -1)
     {
         list_add(colaReceptora, (t_entrenador *)list_remove(colaEmisora, indexExiste));
         return 0;
     }
-    return -1;
+    return 1;
 }
+

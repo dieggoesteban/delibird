@@ -99,6 +99,7 @@ typedef struct
     t_list* pokemonObjetivo;
     uint32_t cantidadObjetivo;
     t_pokemon_posicion* pokemonPlanificado;
+	bool enEspera;
     uint32_t deadlock; // 0 y 1 por ahora, es solo un mockup
 } t_entrenador;
 

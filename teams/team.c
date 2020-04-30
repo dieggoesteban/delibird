@@ -23,9 +23,7 @@ int main(void)
 
     t_pokemon_posicion* pokemon = crearPokemonPosicion("Pitochu", crearPosicion(1,1));
 
-    t_entrenador* entrenadorMP = getEntrenadorMejorPosicionado(pokemon);
-
-    printf("El entrenador mejor posicionado se encuentra en la posicion %i:%i\n", entrenadorMP->posicion->posicion_x, entrenadorMP->posicion->posicion_y);
+    list_add(colaBLOCKED,list_get(colaNEW,0));
 
     t_posicion* pos1 = crearPosicion(4,7);
     t_pokemon_posicion* poke1 = crearPokemonPosicion("Pikachu", pos1);
@@ -39,9 +37,15 @@ int main(void)
     list_add(pokemonesEnMapa, poke2);
     list_add(pokemonesEnMapa, poke3);
 
-    
+    asignarPokemonAEntrenador(pokemon);
+    asignarPokemonAEntrenador(poke1);
 
+    t_entrenador* entrenadorAsignado = list_get(colaREADY,0);
+    t_entrenador* entrenadorAsignado2 = list_get(colaREADY,1);
 
+    printf("El entrenador asignado se encuentra en la posicion %i:%i \n", entrenadorAsignado->posicion->posicion_x, entrenadorAsignado->posicion->posicion_y);
+
+    printf("El entrenador asignado se encuentra en la posicion %i:%i \n", entrenadorAsignado2->posicion->posicion_x, entrenadorAsignado2->posicion->posicion_y);
 
     return 0;
 }

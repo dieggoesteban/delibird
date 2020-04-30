@@ -50,6 +50,7 @@ t_list* arrayToList(void* arr[]);
 uint32_t perteneceAlArray(char* val, char* arr[], uint32_t size);
 uint32_t perteneceALista(char *val, t_list* lista);
 uint32_t perteneceAListaContador(char *val, t_list* lista);
+bool list_equals(t_list* list1, t_list* list2);
 
 //STRUCTS PERTENECEN A LISTA
 uint32_t pokemonCantidadPerteneceALista(t_pokemon_cantidad* pokemon, t_list* lista);
@@ -59,8 +60,8 @@ uint32_t entrenadorPerteneceALista(t_entrenador* entrenador, t_list* lista);
 //OBTENER DE LISTA
 t_list* obtenerEntrenadoresSinDeadlock(); //obtiene de colaBlocked
 
-uint32_t entrenadorEnDeadlock(t_entrenador* entrenador);
-
-
+bool entrenadorEnDeadlock(t_entrenador* entrenador);
+bool entrenadorCumplioObjetivo(t_entrenador* entrenador);
+bool entrenadorPuedeCapturar(void* entrenador);
 
 #endif /* UTILS_H_ */
