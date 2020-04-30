@@ -15,18 +15,33 @@ int main(void)
     colaREADY = list_create();
     colaBLOCKED = list_create();
 
+    pokemonesEnMapa = list_create();
+
     inicializarTeam();
 	
     logger = log_create(LOG,"team",true,LOG_LEVEL_INFO);
 
-    t_pokemon_posicion* pokemon = malloc(sizeof(t_pokemon_posicion));
-
-    pokemon->nombre = "Pitochu";
-    pokemon->posicion = crearPosicion(1,1);
+    t_pokemon_posicion* pokemon = crearPokemonPosicion("Pitochu", crearPosicion(1,1));
 
     t_entrenador* entrenadorMP = getEntrenadorMejorPosicionado(pokemon);
 
     printf("El entrenador mejor posicionado se encuentra en la posicion %i:%i\n", entrenadorMP->posicion->posicion_x, entrenadorMP->posicion->posicion_y);
+
+    t_posicion* pos1 = crearPosicion(4,7);
+    t_pokemon_posicion* poke1 = crearPokemonPosicion("Pikachu", pos1);
+    t_posicion* pos2 = crearPosicion(5,9);
+    t_pokemon_posicion* poke2 = crearPokemonPosicion("Squirtle", pos2);
+    t_posicion* pos3 = crearPosicion(8,12);
+    t_pokemon_posicion* poke3 = crearPokemonPosicion("Pikachu", pos3);
+
+    list_add(pokemonesEnMapa, pokemon);
+    list_add(pokemonesEnMapa, poke1);
+    list_add(pokemonesEnMapa, poke2);
+    list_add(pokemonesEnMapa, poke3);
+
+    
+
+
 
     return 0;
 }

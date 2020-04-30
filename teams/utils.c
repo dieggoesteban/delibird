@@ -2,6 +2,17 @@
 #include "utils.h"
 
 
+void inicializarPid() {
+    pid = 0;
+}
+
+uint32_t getNuevoPid() {
+    uint32_t nuevoPid = pid++;
+
+    return nuevoPid;
+}
+
+
 uint32_t perteneceAlArray(char *val, char *arr[], uint32_t size)
 {
 	for (uint32_t i = 0; i < size; i++)
@@ -147,7 +158,7 @@ t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* p
     entrenador->pokemonObjetivo = list_duplicate(objetivos);
     entrenador->pokemonPlanificado = NULL;
 	entrenador->cantidadObjetivo = cantObjetivos;
-    entrenador->deadlock = 0;
+	entrenador->deadlock = entrenadorEnDeadlock(entrenador);
 
     return entrenador;
 }
@@ -168,4 +179,12 @@ t_pokemon_cantidad* setPokemonCantidad(char* nombre, uint32_t cantidad) {
 	pokemon->cantidad = cantidad;
 
 	return pokemon;
+}
+
+uint32_t entrenadorEnDeadlock(t_entrenador* entrenador){
+	 if(entrenador->cantidadObjetivo < list_size(entrenador->pokemonObjetivo)){
+		 return 0;
+	 }else{
+		 return 1;
+	 }
 }

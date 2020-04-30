@@ -14,15 +14,21 @@
 #include<netdb.h>
 #include<string.h>
 
-#include "planificador.h"
+#include "models.h"
+#include "serializador.h"
+// #include "planificador.h"
 
 //GLOBAL
 t_log* logger;
 t_config* config;
 t_list* objetivoGlobal;
+t_list* pokemonesEnMapa;
+uint32_t pid;
 
 //INICIALIZACION
 u_int32_t getCantidadEntrenadores();
+void inicializarPid();
+uint32_t getNuevoPid();
 void inicializarEntrenadores();
 void setObjetivoGlobal();
 
@@ -52,6 +58,9 @@ uint32_t entrenadorPerteneceALista(t_entrenador* entrenador, t_list* lista);
 
 //OBTENER DE LISTA
 t_list* obtenerEntrenadoresSinDeadlock(); //obtiene de colaBlocked
+
+uint32_t entrenadorEnDeadlock(t_entrenador* entrenador);
+
 
 
 #endif /* UTILS_H_ */

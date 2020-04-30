@@ -11,10 +11,15 @@
 
 #include "sockets.h"
 #include "utils.h"
+#include "models.h"
+#include "planificador.h"
 
 char* IP;
 char* PUERTO;
 char* LOG;
+
+t_list* objetivoGlobal;
+t_list* pokemonesEnMapa;
 
 t_list* colaNEW;
 t_list* colaREADY;

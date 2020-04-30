@@ -15,6 +15,7 @@
 #include<string.h>
 #include<pthread.h>
 #include "serializador.h"
+#include "models.h"
 
 t_log* logger;
 t_config* config;
