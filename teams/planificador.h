@@ -20,13 +20,14 @@ t_list* colaEXEC;
 t_list* colaBLOCKED;
 t_list* colaEXIT;
 
-t_list* pokemonesEnMapa;
-t_list* objetivoGlobal;
+t_list* pokemonesEnMapa; // lucario pikachu pikachu pikachu squirtle
+t_list* objetivoGlobal; //3 lucario 1 pikachu 2 squirtle
 
 //INICIALIZACION HILOS
 
-t_entrenador* getEntrenadorMejorPosicionado(t_pokemon_posicion* pokemon);
+t_entrenador *getEntrenadorMejorPosicionado(t_pokemon_posicion *pokemon, t_list* entrenadores);
 uint32_t moverEntrenadorDeCola(t_list* colaReceptora, t_list* colaEmisora, t_entrenador* entrenador);
-void asignarPokemonAEntrenador(t_pokemon_posicion* pokemon);
+bool asignarPokemonAEntrenador();
+bool pokemonEnObjetivoGlobal(t_pokemon_posicion* pokemon);
 
 #endif /* PLANIFICADOR_H_ */

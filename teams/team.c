@@ -23,29 +23,33 @@ int main(void)
 
     t_pokemon_posicion* pokemon = crearPokemonPosicion("Pitochu", crearPosicion(1,1));
 
-    list_add(colaBLOCKED,list_get(colaNEW,0));
 
     t_posicion* pos1 = crearPosicion(4,7);
     t_pokemon_posicion* poke1 = crearPokemonPosicion("Pikachu", pos1);
     t_posicion* pos2 = crearPosicion(5,9);
     t_pokemon_posicion* poke2 = crearPokemonPosicion("Squirtle", pos2);
     t_posicion* pos3 = crearPosicion(8,12);
-    t_pokemon_posicion* poke3 = crearPokemonPosicion("Pikachu", pos3);
+    t_pokemon_posicion* poke3 = crearPokemonPosicion("Charmander", pos3);
 
-    list_add(pokemonesEnMapa, pokemon);
-    list_add(pokemonesEnMapa, poke1);
-    list_add(pokemonesEnMapa, poke2);
     list_add(pokemonesEnMapa, poke3);
+    list_add(pokemonesEnMapa, poke2);
+    list_add(pokemonesEnMapa, poke1);
+    list_add(pokemonesEnMapa, pokemon);
 
-    asignarPokemonAEntrenador(pokemon);
-    asignarPokemonAEntrenador(poke1);
+    while(list_size(pokemonesEnMapa) > 0) {
+        printf("hola entre ");
+        bool res = asignarPokemonAEntrenador();
+        printf("%i\n", res);
+        if (!res) {
+            break;
+        }
+    }
 
-    t_entrenador* entrenadorAsignado = list_get(colaREADY,0);
-    t_entrenador* entrenadorAsignado2 = list_get(colaREADY,1);
+    printf("%i\n",list_size(colaNEW));
 
-    printf("El entrenador asignado se encuentra en la posicion %i:%i \n", entrenadorAsignado->posicion->posicion_x, entrenadorAsignado->posicion->posicion_y);
-
-    printf("El entrenador asignado se encuentra en la posicion %i:%i \n", entrenadorAsignado2->posicion->posicion_x, entrenadorAsignado2->posicion->posicion_y);
+    for(uint32_t i = 0; i < list_size(colaREADY); i++) {
+        printf("El entrenador asignado se encuentra en la posicion %i:%i \n", ((t_entrenador*)list_get(colaREADY,i))->posicion->posicion_x, ((t_entrenador*)list_get(colaREADY,i))->posicion->posicion_y);
+    }
 
     return 0;
 }
@@ -55,7 +59,8 @@ void inicializarTeam() {
     inicializarPid();
     inicializarEntrenadores();
     setObjetivoGlobal();
-    //asignar pokes por posicion cercana
+    //asignar pokes por posicion cercana LISTO
+
     //hacer los algoritmos de planificacion (FIFO)
     //iniciar thread planificador
 

@@ -1,6 +1,8 @@
 #ifndef MODELS_H_
 #define MODELS_H_
 
+#define ERROR -1
+
 typedef enum
 {
 	NEW_POKEMON = 1,
