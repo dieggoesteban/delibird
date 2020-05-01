@@ -39,7 +39,7 @@ uint32_t pokemonCantidadPerteneceALista(t_pokemon_cantidad* pokemon, t_list* lis
 			return i;
 		}
 	}
-	return -1;
+	return ERROR;
 }
 
 uint32_t pokemonPosicionPerteneceALista(t_pokemon_posicion* pokemon, t_list* lista){
@@ -48,7 +48,7 @@ uint32_t pokemonPosicionPerteneceALista(t_pokemon_posicion* pokemon, t_list* lis
 			return i;
 		}
 	}
-	return -1;
+	return ERROR;
 }
 
 uint32_t entrenadorPerteneceALista(t_entrenador* entrenador, t_list* lista){
@@ -56,7 +56,7 @@ uint32_t entrenadorPerteneceALista(t_entrenador* entrenador, t_list* lista){
 		if(entrenador->id == (((t_entrenador*)list_get(lista,i))->id))
 			return i;
 	}
-	return -1;
+	return ERROR;
 }
 
 t_list* obtenerEntrenadoresSinDeadlock(){

@@ -31,19 +31,13 @@ bool asignarPokemonAEntrenador() {
     list_add_all(entrenadores, blocked);
     bool resultado = false;
 
-    printf("hola\n");
-
-    printf("pokes en el mapa %i\n", list_size(pokemonesEnMapa));
-
     if(list_size(pokemonesEnMapa) > 0) {
         t_pokemon_posicion *pokemon;
         while (list_size(pokemonesEnMapa) > 0) {
             pokemon = (t_pokemon_posicion*)list_remove(pokemonesEnMapa,0);
             if(pokemonEnObjetivoGlobal(pokemon)){
-                printf("toy en el objetivo global\n");
                 break;
             } else {
-                printf("no toy en el objetivo global\n");
                 free(pokemon);
             }
         }
@@ -57,11 +51,7 @@ bool asignarPokemonAEntrenador() {
                 }
                 resultado = true;
             }
-        } else {
-            printf("no hay mas pokes que cumplan el obj global\n");
         }
-    } else {
-        printf("no hay mas pokes en el mapa\n");
     }
 
     list_destroy(blocked);
@@ -73,7 +63,7 @@ bool asignarPokemonAEntrenador() {
 //BOOL(uda)
 uint32_t moverEntrenadorDeCola(t_list *colaEmisora, t_list *colaReceptora, t_entrenador *entrenador) {
     uint32_t indexExiste = entrenadorPerteneceALista(entrenador, colaEmisora);
-    if (indexExiste != -1) {
+    if (indexExiste != ERROR) {
         list_add(colaReceptora, (t_entrenador *)list_remove(colaEmisora, indexExiste));
         return 0;
     }

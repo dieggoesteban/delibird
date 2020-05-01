@@ -37,15 +37,9 @@ int main(void)
     list_add(pokemonesEnMapa, pokemon);
 
     while(list_size(pokemonesEnMapa) > 0) {
-        printf("hola entre ");
-        bool res = asignarPokemonAEntrenador();
-        printf("%i\n", res);
-        if (!res) {
+        if (!asignarPokemonAEntrenador())
             break;
-        }
     }
-
-    printf("%i\n",list_size(colaNEW));
 
     for(uint32_t i = 0; i < list_size(colaREADY); i++) {
         printf("El entrenador asignado se encuentra en la posicion %i:%i \n", ((t_entrenador*)list_get(colaREADY,i))->posicion->posicion_x, ((t_entrenador*)list_get(colaREADY,i))->posicion->posicion_y);
