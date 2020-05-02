@@ -22,6 +22,16 @@ pthread_t thread;
 char* IP;
 char* PUERTO;
 
+typedef struct {
+    uint32_t mq_cod;
+    t_list* mensajes;
+    t_list* suscribers;
+    t_list* publishers;
+} t_message_queue;
+
+t_message_queue* newPokemonMessageQueue;
+t_message_queue* appearedPokemonMessageQueue;
+
 
 //CLIENTE
 int crear_conexion(char* ip, char* puerto);
@@ -35,5 +45,8 @@ void esperar_cliente(uint32_t socket_servidor);
 void serve_client(uint32_t* socket);
 void process_request(uint32_t cod_op, uint32_t cliente_fd);
 t_buffer* recibir_buffer(uint32_t socket_cliente);
+
+//MESSAGE QUEUE MANAGER
+t_message_queue* getMessageQueueById(mq_cod id);
 
 #endif /* SOCKETS_H_ */

@@ -90,20 +90,39 @@ void serve_client(uint32_t* socket)
 	uint32_t cod_op;
 	if(recv(*socket, &cod_op, sizeof(int), MSG_WAITALL) == -1)
 		cod_op = -1;
-	printf("codigo de op: %i", cod_op);
+	printf("\nCodigo de op: %i\n", cod_op);
 	process_request(cod_op, *socket);
 }
 
 void process_request(uint32_t cod_op, uint32_t cliente_fd) {
 	t_buffer* buffer = recibir_buffer(cliente_fd);
 	switch (cod_op) {
+		case REGISTER:
+				log_info(logger, "SIZE BUFFER EN REGISTER: %i\n", buffer->size);
+				t_register_module* registerModule = deserializar_registerModule(buffer);
+				printf("RoleToSwitch: %i\n", registerModule->role);
+				switch (registerModule->role)
+				{
+					case SUSCRIBER:
+						list_add(getMessageQueueById(registerModule->messageQueue)->suscribers, (void*)registerModule->idModuleToRegister);
+						t_message_queue* testQueue = getMessageQueueById(registerModule->messageQueue);
+						uint32_t idFirstSuscriber = (uint32_t)list_get(testQueue->suscribers, 0);
+						free(testQueue);
+						break;
+					case PUBLISHER:
+						list_add(getMessageQueueById(registerModule->messageQueue)->publishers, (void*)registerModule->idModuleToRegister);
+						break;
+				}
+				printf("Se registro un modulo (id: %i) a la cola %i con el rol de %i\n",registerModule->idModuleToRegister, registerModule->messageQueue, registerModule->role);
+				free(registerModule);
+				free(buffer->stream);
+				free(buffer);
+			break;
 		case NEW_POKEMON:
 			{
-				log_info(logger, "SIZE BUFFER EN NEW: %i", buffer->size);	
-				// deserializar_newPokemon(buffer);
-				// log_info(logger,"despues del new");
+				log_info(logger, "SIZE BUFFER EN NEW: %i\n", buffer->size);	
 				t_new_pokemon* newPoke = deserializar_newPokemon(buffer);
-				printf("nombre del poke new: %s", newPoke->nombre);
+				printf("Nombre del poke new: %s\n", newPoke->nombre);
 				log_info(logger, newPoke->nombre);
 				free(newPoke);
 				free(buffer->stream);
@@ -171,13 +190,25 @@ t_buffer* recibir_buffer(uint32_t socket_cliente)
 	int size;
     
     recv(socket_cliente, &size, sizeof(int), MSG_WAITALL);
-	printf("size buffer: %d", size);
+	printf("Buffer size: %d\n", size);
     buffer->size = size;
 	buffer->stream = malloc(buffer->size);
 	recv(socket_cliente, buffer->stream, buffer->size, MSG_WAITALL);
 
 	return buffer;
 }
+
+//Devuelve la cola de mensajes dado un id
+t_message_queue* getMessageQueueById(uint32_t id) //TODO: Agregar las otras colas
+{
+    switch(id)
+    {
+        case NEW_POKEMON:
+            return newPokemonMessageQueue;
+            break;
+    }
+}
+
 
 // recv(socket_cliente, &size, sizeof(int), MSG_WAITALL);
 // 		mensaje = malloc(size);

@@ -64,19 +64,17 @@ t_new_pokemon* deserializar_newPokemon(t_buffer* buffer){
 	t_new_pokemon* newPokemon = malloc(sizeof(t_new_pokemon));
 	newPokemon->posicionCantidad = malloc(sizeof(t_posicion_cantidad));
 
-	printf("hola");
-
 	void* stream = buffer->stream;
 	memcpy(&(newPokemon->ID_mensaje_recibido), stream, sizeof(uint32_t));
-	printf("ID MENSAJE RECIBIDO: %i", newPokemon->ID_mensaje_recibido);
+	printf("ID MENSAJE RECIBIDO: %i\n", newPokemon->ID_mensaje_recibido);
 	stream += sizeof(uint32_t);
 	memcpy(&(newPokemon->sizeNombre), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
 	newPokemon->nombre = malloc(newPokemon->sizeNombre);
 	memcpy(newPokemon->nombre, stream, newPokemon->sizeNombre);
 	stream += newPokemon->sizeNombre;
-	printf("sizenombre: %i", newPokemon->sizeNombre);
-	printf("nombre: %s", newPokemon->nombre);
+	printf("sizeNombre: %i\n", newPokemon->sizeNombre);
+	printf("nombre: %s\n", newPokemon->nombre);
 	memcpy(&(newPokemon->posicionCantidad->posicion_x), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
 	memcpy(&(newPokemon->posicionCantidad->posicion_y), stream, sizeof(uint32_t));
@@ -112,7 +110,7 @@ t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon){
 
 	t_paquete* paquete = crear_paquete(LOCALIZED_POKEMON, buffer->size, buffer->stream);
 
-	printf("codigo de mensaje de serializar poke: %i \n", paquete->codigo_mensaje);
+	printf("Codigo de mensaje de serializar poke: %i \n", paquete->codigo_mensaje);
 	return paquete;		
 }
 
@@ -160,7 +158,7 @@ t_paquete* serializar_appearedPokemon(t_appeared_pokemon* pokemon){
 
 	t_paquete* paquete = crear_paquete(APPEARED_POKEMON, pokemon_buffer->size, pokemon_buffer->stream);
 
-	printf("codigo de mensaje en serialziar poke: %i", paquete->codigo_mensaje);
+	printf("Codigo de mensaje en serialziar poke: %i\n", paquete->codigo_mensaje);
     return paquete;
 }
 
@@ -201,7 +199,7 @@ t_paquete* serializar_caughtPokemon(t_caught_pokemon* pokemon){
 
     t_paquete* paquete = crear_paquete(CAUGHT_POKEMON, pokemon_buffer->size, pokemon_buffer->stream);
 
-    printf("codigo de mensaje en serialziar poke: %i", paquete->codigo_mensaje);
+    printf("Codigo de mensaje en serialziar poke: %i\n", paquete->codigo_mensaje);
     return paquete;
 }
 
@@ -242,7 +240,7 @@ t_paquete* serializar_catchPokemon(t_catch_pokemon* pokemon){
 
     t_paquete* paquete = crear_paquete(CATCH_POKEMON, pokemon_buffer->size, pokemon_buffer->stream);
 
-    printf("codigo de mensaje en serializar poke: %i", paquete->codigo_mensaje);
+    printf("Codigo de mensaje en serializar poke: %i\n", paquete->codigo_mensaje);
     return paquete;
 }
 
@@ -283,7 +281,7 @@ t_paquete* serializar_getPokemon(t_get_pokemon* pokemon) {
     getPokemonBuffer->stream = stream;
     t_paquete* paquete = crear_paquete(GET_POKEMON, getPokemonBuffer->size, getPokemonBuffer->stream);
 
-    printf("Codigo mensaje, serializar_getPokemon: %i", paquete->codigo_mensaje);
+    printf("Codigo mensaje, serializar_getPokemon: %i\n", paquete->codigo_mensaje);
     return paquete;
 }
 
@@ -301,6 +299,52 @@ t_get_pokemon* deserializar_getPokemon(t_buffer* buffer){
 
     return pokemon;
 }
+
+//Register Module serialization
+t_paquete* serializar_registerModule(t_register_module* registerModule)
+{
+	printf("Entro a serializar_registerModule\n");
+
+	t_buffer* registerModuleBuffer = malloc(sizeof(t_buffer));
+	registerModuleBuffer->size = 3 * sizeof(uint32_t);
+	void* stream = malloc(sizeof(registerModuleBuffer->size));
+	int offset = 0;
+
+	memcpy(stream + offset, &(registerModule->idModuleToRegister), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+	memcpy(stream + offset, &(registerModule->messageQueue), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+	memcpy(stream + offset, &(registerModule->role), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+
+	registerModuleBuffer->stream = stream;
+	t_paquete* paquete = crear_paquete(REGISTER, registerModuleBuffer->size, registerModuleBuffer->stream);
+
+	printf("Codigo mensaje, serializar_registerModule: %i\n", paquete->codigo_mensaje);
+}
+
+//Register Module deserialization
+t_register_module* deserializar_registerModule(t_buffer* buffer)
+{
+	printf("Entro a deserializar_registerModule\n");
+	t_register_module* registerModule = malloc(sizeof(t_register_module));
+
+	void* stream = buffer->stream;
+	printf("Buffer size: %i\n", buffer->size);
+
+	memcpy(&(registerModule->idModuleToRegister), stream, sizeof(uint32_t));
+	printf("idModuleToRegister: %i\n", registerModule->idModuleToRegister);
+	stream += sizeof(uint32_t);
+	memcpy(&(registerModule->messageQueue), stream, sizeof(uint32_t));
+	printf("messageQueue: %i\n", registerModule->messageQueue);
+	stream += sizeof(uint32_t);
+	memcpy(&(registerModule->role), stream, sizeof(uint32_t));
+	printf("role: %i\n", registerModule->role);
+	stream += sizeof(uint32_t);
+
+	return registerModule;
+}
+
 
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant) {
 	t_posicion_cantidad* position = malloc(sizeof(t_posicion_cantidad));
@@ -388,6 +432,7 @@ t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre){
 	return getPokemon;
 }
 
+
 t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 {
 
@@ -395,7 +440,7 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 	paquete->buffer = malloc(sizeof(t_buffer));
 	if (strcmp(tipo_mensaje, "NEW_POKEMON") == 0)
 	{
-		log_info(logger, "entro a new_pokemon");
+		log_info(logger, "Entro a new_pokemon\n");
 
 		t_new_pokemon *newPokemon = malloc(sizeof(t_new_pokemon));
 		t_posicion_cantidad *posCant = malloc(sizeof(t_posicion_cantidad));
@@ -416,7 +461,7 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 	}
 	else if (strcmp(tipo_mensaje, "APPEARED_POKEMON") == 0)
 	{
-		log_info(logger, "entro a appeared_pokemon");
+		log_info(logger, "Entro a appeared_pokemon\n");
 		t_posicion* posicion = crearPosicion((uint32_t)atoi(arrayArgumentos[1]),(uint32_t)atoi(arrayArgumentos[2]));
 		t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(8483, arrayArgumentos[0], posicion);
 
@@ -428,7 +473,7 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 	}
 	else if (strcmp(tipo_mensaje, "CATCH_POKEMON") == 0)
 	{
-		log_info(logger, "entro a catch_pokemon");
+		log_info(logger, "Entro a catch_pokemon\n");
 		t_posicion* posicion = crearPosicion((uint32_t)atoi(arrayArgumentos[1]),(uint32_t)atoi(arrayArgumentos[2]));
 		t_catch_pokemon* catchPokemon = crearCatchPokemon(12312, arrayArgumentos[0], posicion);
 
@@ -439,7 +484,7 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 	}
 	else if (strcmp(tipo_mensaje, "CAUGHT_POKEMON") == 0)
 	{
-		log_info(logger, "entro a caught_pokemon");
+		log_info(logger, "Entro a caught_pokemon\n");
 
 		t_caught_pokemon* pokemon = malloc(sizeof(t_caught_pokemon));
 
@@ -453,7 +498,7 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 	}
 	else if (strcmp(tipo_mensaje, "GET_POKEMON") == 0)
 	{
-		log_info(logger, "entro a get_pokemon");
+		log_info(logger, "Entro a get_pokemon\n");
 		t_get_pokemon* getPokemon = crearGetPokemon(1234, arrayArgumentos[0]);
 
 		paquete = serializar_getPokemon(getPokemon);
@@ -463,7 +508,7 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 	}
 	else if (strcmp(tipo_mensaje, "LOCALIZED_POKEMON") == 0)
 	{ //ESTE AL FINAL NO LO HACE GAMEBOY, PARECE SER LA UNICA MQ QUE NO -> PERO LO DEJO IGUAL ASI PRUEBO LA SERIALIZACION Y LA DESERIALIZACION (DESPUES SACAR THO)
-		log_info(logger, "entro a localized_pokemon");
+		log_info(logger, "Entro a localized_pokemon\n");
 
 		t_localized_pokemon *localizedPokemon = malloc(sizeof(t_localized_pokemon));
 
@@ -476,7 +521,7 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 
 		localizedPokemon->ID_mensaje_recibido = 23411;
 		localizedPokemon->ID_mensaje_original = 12342;
-		localizedPokemon->nombre = "lucario";
+		localizedPokemon->nombre = "lucario"; //TODO: Harcodeado
 		localizedPokemon->sizeNombre = strlen(localizedPokemon->nombre) + 1;
 		localizedPokemon->sizePosicion = list_size(listPos) * sizeof(t_posicion);
 		localizedPokemon->posicion = list_duplicate(listPos);

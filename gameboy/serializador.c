@@ -303,6 +303,47 @@ t_get_pokemon* deserializar_getPokemon(t_buffer* buffer){
     return pokemon;
 }
 
+//Register Module serialization
+t_paquete* serializar_registerModule(t_register_module* registerModule)
+{
+	t_buffer* registerModuleBuffer = malloc(sizeof(t_buffer));
+	registerModuleBuffer->size = 3 * sizeof(uint32_t);
+	void* stream = malloc(sizeof(registerModuleBuffer->size));
+	int offset = 0;
+
+	memcpy(stream + offset, &(registerModule->idModuleToRegister), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+	memcpy(stream + offset, &(registerModule->messageQueue), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+	memcpy(stream + offset, &(registerModule->role), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+
+	registerModuleBuffer->stream = stream;
+	t_paquete* paquete = crear_paquete(REGISTER, registerModuleBuffer->size, registerModuleBuffer->stream);
+	printf("Codigo mensaje, serializar_registerModule: %i\n", paquete->codigo_mensaje);
+
+	return paquete;
+}
+
+//Register Module deserialization
+t_register_module* deserializar_registerModule(t_buffer* buffer)
+{
+	t_register_module* registerModule = malloc(sizeof(t_register_module));
+
+	void* stream = buffer->stream;
+
+	memcpy(&(registerModule->idModuleToRegister), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
+	memcpy(&(registerModule->messageQueue), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
+	memcpy(&(registerModule->role), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
+
+	return registerModule;
+}
+
+
+
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant) {
 	t_posicion_cantidad* position = malloc(sizeof(t_posicion_cantidad));
 
@@ -394,6 +435,20 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 
 	t_paquete *paquete;
 	// paquete->buffer;
+	if (strcmp(tipo_mensaje, "REGISTER") == 0)
+	{
+		log_info(logger, "Entro a Register\n");
+
+		t_register_module* registerModule = malloc(sizeof(t_register_module));
+
+		registerModule->idModuleToRegister = 22;
+		registerModule->messageQueue = 1;
+		registerModule->role = 1;
+
+		paquete = serializar_registerModule(registerModule);
+
+		free(registerModule);
+	}
 	if (strcmp(tipo_mensaje, "NEW_POKEMON") == 0)
 	{
 		log_info(logger, "entro a new_pokemon");

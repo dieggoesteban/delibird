@@ -14,6 +14,8 @@
 char* IP;
 char* PUERTO;
 
+
+t_message_queue* crearMessageQueue(uint32_t mq_cod);
 void terminar_programa(int, t_log*, t_config*);
 
 #endif /* BROKER_H_ */

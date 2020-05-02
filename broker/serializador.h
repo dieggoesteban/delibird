@@ -17,8 +17,22 @@ typedef enum
 	CATCH_POKEMON = 3,
 	CAUGHT_POKEMON = 4,
 	GET_POKEMON = 5,
-	LOCALIZED_POKEMON = 6
+	LOCALIZED_POKEMON = 6,
+	REGISTER = 7
 } mq_cod;
+
+typedef enum
+{
+	SUSCRIBER = 1,
+	PUBLISHER = 2
+} registration_role;
+
+typedef struct 
+{
+	uint32_t idModuleToRegister;
+	uint32_t messageQueue;
+	registration_role role;
+} t_register_module;
 
 typedef struct
 {
@@ -112,6 +126,9 @@ t_paquete* serializar_getPokemon(t_get_pokemon* pokemon);
 t_get_pokemon* deserializar_getPokemon(t_buffer* buffer);
 t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon);
 t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer);
+
+t_paquete* serializar_registerModule(t_register_module* registerModule);
+t_register_module* deserializar_registerModule(t_buffer* buffer);
 
 //CREACION DE LOS STRUCTS
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant);
