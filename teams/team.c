@@ -10,10 +10,13 @@ int main(void)
     IP = config_get_string_value(config,"IP_TEAM");
     PUERTO = config_get_string_value(config,"PUERTO_TEAM");
     LOG = config_get_string_value(config,"LOG_FILE");
+    cicloCPU = (uint32_t)config_get_int_value(config,"RETARDO_CICLO_CPU");
 
     colaNEW = list_create();
     colaREADY = list_create();
     colaBLOCKED = list_create();
+    colaEXEC = list_create();
+    colaEXIT = list_create();
 
     pokemonesEnMapa = list_create();
 
@@ -45,6 +48,8 @@ int main(void)
         printf("El entrenador asignado se encuentra en la posicion %i:%i \n", ((t_entrenador*)list_get(colaREADY,i))->posicion->posicion_x, ((t_entrenador*)list_get(colaREADY,i))->posicion->posicion_y);
     }
 
+    planificarFIFO();
+
     return 0;
 }
 
@@ -55,7 +60,7 @@ void inicializarTeam() {
     setObjetivoGlobal();
     //asignar pokes por posicion cercana LISTO
 
-    //hacer los algoritmos de planificacion (FIFO)
+    //hacer los algoritmos de planificacion (FIFO) EN ESO
     //iniciar thread planificador
 
     //sendGET();

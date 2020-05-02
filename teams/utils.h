@@ -10,6 +10,7 @@
 #include<commons/config.h>
 #include<commons/log.h>
 #include<commons/collections/list.h>
+#include<commons/collections/queue.h>
 #include<sys/socket.h>
 #include<netdb.h>
 #include<string.h>
@@ -24,6 +25,7 @@ t_config* config;
 t_list* objetivoGlobal;
 t_list* pokemonesEnMapa;
 uint32_t pid;
+uint32_t cicloCPU;
 
 //INICIALIZACION
 u_int32_t getCantidadEntrenadores();
@@ -44,13 +46,14 @@ t_list* colaEXEC;
 t_list* colaBLOCKED;
 t_list* colaEXIT;
 
-//UTILIDADES ARRAYS/LISTS
+//UTILIDADES ARRAYS/LISTS/QUEUE
 uint32_t arraySize(void* arr[]);
 t_list* arrayToList(void* arr[]);
-uint32_t perteneceAlArray(char* val, char* arr[], uint32_t size);
-uint32_t perteneceALista(char *val, t_list* lista);
+bool perteneceAlArray(char* val, char* arr[], uint32_t size);
+bool perteneceALista(char *val, t_list* lista);
 uint32_t perteneceAListaContador(char *val, t_list* lista);
 bool list_equals(t_list* list1, t_list* list2);
+t_queue* listToQueue(t_list* lista);
 
 //STRUCTS PERTENECEN A LISTA
 uint32_t pokemonCantidadPerteneceALista(t_pokemon_cantidad* pokemon, t_list* lista);
@@ -60,8 +63,10 @@ uint32_t entrenadorPerteneceALista(t_entrenador* entrenador, t_list* lista);
 //OBTENER DE LISTA
 t_list* obtenerEntrenadoresSinDeadlock(); //obtiene de colaBlocked
 
+//DE ENTRENADOR
 bool entrenadorEnDeadlock(t_entrenador* entrenador);
 bool entrenadorCumplioObjetivo(t_entrenador* entrenador);
 bool entrenadorPuedeCapturar(void* entrenador);
-
+uint32_t turnosHastaPokemon(t_pokemon_posicion* pokemon, t_entrenador* entrenador);
+t_entrenador* cambiarPosicionEntrenador(t_entrenador* entrenador, uint32_t posX, uint32_t posY);
 #endif /* UTILS_H_ */

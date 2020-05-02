@@ -13,25 +13,34 @@ uint32_t getNuevoPid() {
 }
 
 
-uint32_t perteneceAlArray(char *val, char *arr[], uint32_t size)
+bool perteneceAlArray(char *val, char *arr[], uint32_t size)
 {
 	for (uint32_t i = 0; i < size; i++)
 	{
 		if (strcmp(arr[i], val) == 0)
-			return 1;
+			return true;
 	}
-	return 0;
+	return false;
 }
 
-uint32_t perteneceALista(char *val, t_list* lista) {
+bool perteneceALista(char *val, t_list* lista) {
 	for (uint32_t i = 0; i < list_size(lista); i++) {
 		char* word = list_get(lista, i);
 		if (strcmp(word, val) == 0) {
-			return 1;
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }
+
+t_queue* listToQueue(t_list* lista){
+	t_queue* queue = queue_create();
+	for(uint32_t i = 0; i < list_size(lista); i++){
+		queue_push(queue, list_get(lista, i));
+	}
+	return queue;
+}
+
 
 uint32_t pokemonCantidadPerteneceALista(t_pokemon_cantidad* pokemon, t_list* lista){
 	for(uint32_t i = 0; i < list_size(lista); i++){
@@ -62,7 +71,7 @@ uint32_t entrenadorPerteneceALista(t_entrenador* entrenador, t_list* lista){
 t_list* obtenerEntrenadoresSinDeadlock(){
 	t_list* entrenadoresSinDeadlock = list_create();
 	for(uint32_t i = 0; i < list_size(colaBLOCKED); i++){
-		if(((t_entrenador*)list_get(colaBLOCKED, i))->deadlock == 0){
+		if(((t_entrenador*)list_get(colaBLOCKED, i))->deadlock == false){
 			list_add(entrenadoresSinDeadlock, (t_entrenador*)list_get(colaBLOCKED, i));
 			return entrenadoresSinDeadlock;
 		}
@@ -211,3 +220,14 @@ bool entrenadorPuedeCapturar(void* entrenador) {
 
 	return (!entrenadorEnDeadlock(trainer) && !trainer->enEspera);
 }
+
+t_entrenador* cambiarPosicionEntrenador(t_entrenador* entrenador, uint32_t posX, uint32_t posY){
+	entrenador->posicion->posicion_x = posX;
+	entrenador->posicion->posicion_y = posY;
+	return entrenador;
+}
+
+uint32_t turnosHastaPokemon(t_pokemon_posicion* pokemon, t_entrenador* entrenador){
+	return abs(pokemon->posicion->posicion_x - entrenador->posicion->posicion_x) + abs(pokemon->posicion->posicion_y - entrenador->posicion->posicion_y);
+}
+

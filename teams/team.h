@@ -18,6 +18,7 @@ char* IP;
 char* PUERTO;
 char* LOG;
 
+//GLOBALES
 t_list* objetivoGlobal;
 t_list* pokemonesEnMapa;
 
@@ -27,6 +28,10 @@ t_list* colaEXEC;
 t_list* colaBLOCKED;
 t_list* colaEXIT;
 
+uint32_t cicloCPU;
+
+
+//INICIALIZACION Y TERMINACION DEL MODULO
 void inicializarTeam();
 void terminar_programa(int, t_log*, t_config*);
 

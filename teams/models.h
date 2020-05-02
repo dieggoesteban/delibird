@@ -102,7 +102,7 @@ typedef struct
     uint32_t cantidadObjetivo;
     t_pokemon_posicion* pokemonPlanificado;
 	bool enEspera;
-    uint32_t deadlock; // 0 y 1 por ahora, es solo un mockup
+    bool deadlock; 
 } t_entrenador;
 
 #endif /* MODELS_H_ */
