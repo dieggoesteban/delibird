@@ -22,7 +22,6 @@ t_entrenador *getEntrenadorMejorPosicionado(t_pokemon_posicion *pokemon, t_list*
     return entrenadorMejorPosicionado;
 }
 
-
 bool asignarPokemonAEntrenador() {
 
     t_list* entrenadores = list_duplicate(colaNEW);
@@ -85,8 +84,19 @@ void planificarFIFO(){
 
         ejecutarEntrenador(entrenador);
     }
-
 }
+
+// t_entrenador* FIFO(bool desalojo) {
+//     t_entrenador* entrenador = list_take_and_remove(colaREADY, 0);
+//     desalojo = false;
+
+//     return entrenador;
+// }
+
+// void planificador(t_entrenador*(* plani)(bool)) {
+//     bool desalojo;
+//     t_entrenador* entrenador = plani(&desalojo);
+// }
 
 //LA FUNCION DE ASIGANR EL POKEMON MAS CERCANO AL FINAL CREO QUE RE DEBERIA SER como deciamos de que si esta al lado el pokemon que se agarre ese, no importa el "orden de llegada del pokemon", porque primero llegan todos los pokes con el get, y despues deberiamos empezar a asignar los entrenadores 
 void ejecutarEntrenador(t_entrenador* entrenador){ //aunque no esta contemplando el tema del deadblock por ahora
@@ -125,6 +135,7 @@ void ejecutarEntrenador(t_entrenador* entrenador){ //aunque no esta contemplando
 
         }   
         //SE MANDA EL CATCH
+        
         //SE PONE AL ENTRENADOR EN ESPERA
         entrenador->enEspera = true;
         moverEntrenadorDeCola(colaREADY,colaBLOCKED,entrenador);

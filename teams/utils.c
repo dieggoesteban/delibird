@@ -106,6 +106,26 @@ t_list* arrayToList(void* arr[]) {
 	return list;
 }
 
+bool ordenarEntrenador(void* a, void* b) {
+	t_entrenador* tr1 = (t_entrenador*) a;
+	t_entrenador* tr2 = (t_entrenador*) b;
+
+	if((tr1->posicion->posicion_x == tr2->posicion->posicion_x)) {
+		return (tr1->posicion->posicion_y < tr2->posicion->posicion_y);
+	} else 
+		return (tr1->posicion->posicion_x < tr2->posicion->posicion_x);
+}
+
+bool ordenarPokemon(void* a, void* b) {
+	t_pokemon_posicion* pk1 = (t_pokemon_posicion*) a;
+	t_pokemon_posicion* pk2 = (t_pokemon_posicion*) b;
+
+	if((pk1->posicion->posicion_x == pk2->posicion->posicion_x)) {
+		return (pk1->posicion->posicion_y < pk2->posicion->posicion_y);
+	} else 
+		return (pk1->posicion->posicion_x < pk2->posicion->posicion_x);
+}
+
 void inicializarEntrenadores() {
 	char** objetivosEntrenadores = config_get_array_value(config,"OBJETIVOS_ENTRENADORES"); //Obtiene el array desde config, pero mal. Labura como un split de un string, separa por comas y eso es un elemento del array que genera. Por eso mismo el algoritmo feo de abajo
 	char** pokemonEntrenadores = config_get_array_value(config,"POKEMON_ENTRENADORES");

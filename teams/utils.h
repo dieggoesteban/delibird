@@ -67,6 +67,8 @@ t_list* obtenerEntrenadoresSinDeadlock(); //obtiene de colaBlocked
 bool entrenadorEnDeadlock(t_entrenador* entrenador);
 bool entrenadorCumplioObjetivo(t_entrenador* entrenador);
 bool entrenadorPuedeCapturar(void* entrenador);
+bool ordenarEntrenador(void* a, void* b);
+bool ordenarPokemon(void* a, void* b);
 uint32_t turnosHastaPokemon(t_pokemon_posicion* pokemon, t_entrenador* entrenador);
 t_entrenador* cambiarPosicionEntrenador(t_entrenador* entrenador, uint32_t posX, uint32_t posY);
 #endif /* UTILS_H_ */

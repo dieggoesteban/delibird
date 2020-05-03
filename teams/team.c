@@ -26,12 +26,11 @@ int main(void)
 
     t_pokemon_posicion* pokemon = crearPokemonPosicion("Pitochu", crearPosicion(1,1));
 
-
     t_posicion* pos1 = crearPosicion(4,7);
     t_pokemon_posicion* poke1 = crearPokemonPosicion("Pikachu", pos1);
     t_posicion* pos2 = crearPosicion(5,9);
     t_pokemon_posicion* poke2 = crearPokemonPosicion("Squirtle", pos2);
-    t_posicion* pos3 = crearPosicion(8,12);
+    t_posicion* pos3 = crearPosicion(8,10);
     t_pokemon_posicion* poke3 = crearPokemonPosicion("Charmander", pos3);
 
     list_add(pokemonesEnMapa, poke3);
