@@ -13,6 +13,7 @@
 #include<sys/socket.h>
 #include<netdb.h>
 #include<string.h>
+#include "models.h"
 
 t_log* logger;
 t_config* config;

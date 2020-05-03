@@ -10,6 +10,7 @@
 
 #include "utils.h"
 #include "sockets.h"
+#include "models.h"
 
 char* IP;
 char* PUERTO;
