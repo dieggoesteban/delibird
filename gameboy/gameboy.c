@@ -11,23 +11,22 @@ int main(int argc, char* argv[])
 
     if(argc > 2) {
         char *proceso = argv[1];
+        printf("Proceso: %s\n", argv[1]);
 	    char *tipo_mensaje = argv[2];
+        printf("Tipo Mensaje: %s\n", argv[2]);
         char *ip;
 	    char *puerto;
         char *arrayArgumentos[argc - 3];
-        printf("%s",tipo_mensaje);
-	    cortarArgumentos(argc, argv, arrayArgumentos);
-       
-        
+	    cortarArgumentos(argc, argv, arrayArgumentos);        
 
         uint32_t isValid = procesarComando(&ip,&puerto,proceso,tipo_mensaje);
         uint32_t conexion = crear_conexion(ip,puerto);
-        printf("%i\n",conexion);
         if(isValid == 1) {
             log_info(logger,ip);
 	        log_info(logger,puerto);
             t_paquete* paquete = getPaquete(arrayArgumentos,tipo_mensaje);
             printf("el size del buffer es: %i", paquete->buffer->size);
+            
             enviarMensaje(paquete,conexion);
 
         } else {

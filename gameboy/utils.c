@@ -23,7 +23,7 @@ uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_men
 	{
 		ipAux = config_get_string_value(config, "IP_BROKER");
 		puertoAux = config_get_string_value(config, "PUERTO_BROKER");
-		log_info(logger,"Se va a conectar en BROKER");
+		log_info(logger,"Se va a conectar en BROKER\n");
 		if (perteneceAlArray(tipo_mensaje, brokerCommands, 5) == 1)
 		{
 			isValid = 1;
@@ -54,7 +54,6 @@ uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_men
 	*puerto = malloc(strlen(puertoAux));
 	strcpy(*ip, ipAux);
 	strcpy(*puerto, puertoAux);
-
 	return isValid;
 }
 
