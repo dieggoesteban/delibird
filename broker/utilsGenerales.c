@@ -55,7 +55,7 @@ t_list* arrayToList(void* arr[]) {
 bool list_equals(t_list* list1, t_list* list2) {
 	if(list_size(list1) == list_size(list2)) {
 		for(uint32_t i = 0; i < list_size(list1); i++) {
-			if(strcmp(list_get(list1,i),list_get(list1,2)) != 0) {
+			if(strcmp(list_get(list1,i),list_get(list2,i)) != 0) {
 				return false;
 			}
 		}
