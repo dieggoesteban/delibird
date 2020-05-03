@@ -13,7 +13,7 @@
 
 #include "models.h"
 #include "utils.h"
-// #include "serializador.h"
+#include "sockets.h"
 
 //GLOBALES
 t_list* colaNEW;
@@ -35,5 +35,6 @@ bool asignarPokemonAEntrenador();
 bool pokemonEnObjetivoGlobal(t_pokemon_posicion* pokemon);
 void planificarFIFO();
 void ejecutarEntrenador(t_entrenador* entrenador);
+void mandarCATCH(t_entrenador* entrenador);
 
 #endif /* PLANIFICADOR_H_ */

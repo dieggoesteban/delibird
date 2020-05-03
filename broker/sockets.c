@@ -126,8 +126,10 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd) {
 		case CATCH_POKEMON:
 			{
 				t_catch_pokemon* catchPoke = deserializar_catchPokemon(buffer);
-				log_info(logger, catchPoke->nombre);
 
+				printf("pos x de poke: %i", catchPoke->posicion->posicion_x);
+				
+				log_info(logger, catchPoke->nombre);
 				free(catchPoke);
 				free(buffer->stream);
 				free(buffer);

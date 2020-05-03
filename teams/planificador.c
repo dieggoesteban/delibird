@@ -93,11 +93,26 @@ void planificarFIFO(){
 //     return entrenador;
 // }
 
-// void planificador(t_entrenador*(* plani)(bool)) {
-//     bool desalojo;
-//     t_entrenador* entrenador = plani(&desalojo);
-// }
+/*
+void planificador(t_entrenador*(* plani)(bool)) {
+    bool desalojo;
+    t_entrenador* entrenador = plani(&desalojo);
+    ejecutarEntrenador(desalojo, entrenador)
 
+}
+
+void ejecutarEntrenador {  
+    if(desalojo) {
+        moverEntrenador(entrenador);
+        return;
+    } else {
+        while {
+            moverEntrenador(entrenador);
+        }
+    }
+}
+
+*/
 //LA FUNCION DE ASIGANR EL POKEMON MAS CERCANO AL FINAL CREO QUE RE DEBERIA SER como deciamos de que si esta al lado el pokemon que se agarre ese, no importa el "orden de llegada del pokemon", porque primero llegan todos los pokes con el get, y despues deberiamos empezar a asignar los entrenadores 
 void ejecutarEntrenador(t_entrenador* entrenador){ //aunque no esta contemplando el tema del deadblock por ahora
     if(list_size(colaEXEC) == 0){ //solo puede haber uno ejecutando en colaEXEC
@@ -136,6 +151,8 @@ void ejecutarEntrenador(t_entrenador* entrenador){ //aunque no esta contemplando
         }   
         //SE MANDA EL CATCH
         
+        mandarCATCH(entrenador);
+
         //SE PONE AL ENTRENADOR EN ESPERA
         entrenador->enEspera = true;
         moverEntrenadorDeCola(colaREADY,colaBLOCKED,entrenador);
@@ -143,6 +160,22 @@ void ejecutarEntrenador(t_entrenador* entrenador){ //aunque no esta contemplando
     }
 }
 
+void mandarCATCH(t_entrenador* entrenador) {
+    
+    t_catch_pokemon* catchPokemon = crearCatchPokemon(-1, entrenador->pokemonPlanificado->nombre, entrenador->pokemonPlanificado->posicion);
+    t_paquete* paquete = serializar_catchPokemon(catchPokemon);
+
+    free(catchPokemon);
+
+    char* ip = config_get_string_value(config, "IP_BROKER");
+    char* puerto = config_get_string_value(config, "PUERTO_BROKER");
+    uint32_t conexion = crear_conexion(ip, puerto);
+
+    enviarMensaje(paquete, conexion);
+
+    liberar_conexion(conexion);
+
+}
 
 
 
