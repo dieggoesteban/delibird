@@ -47,6 +47,10 @@ int main(void)
         printf("El entrenador asignado se encuentra en la posicion %i:%i \n", ((t_entrenador*)list_get(colaREADY,i))->posicion->posicion_x, ((t_entrenador*)list_get(colaREADY,i))->posicion->posicion_y);
     }
 
+
+    
+
+
     planificarFIFO();
 
     return 0;

@@ -31,8 +31,10 @@ void liberar_conexion(uint32_t socket_cliente) {
 
 void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente) {
 	uint32_t sizePaquete = paquete->buffer->size + 2 * sizeof(uint32_t);
-	send(socket_cliente,paquete,sizePaquete,0);
+	void* stream = serializar_paquete(paquete, sizePaquete);
+	send(socket_cliente,stream,sizePaquete,0);
 	liberarPaquete(paquete);
+	free(stream);
 }
 
 // void sendGET() {

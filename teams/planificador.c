@@ -162,8 +162,15 @@ void ejecutarEntrenador(t_entrenador* entrenador){ //aunque no esta contemplando
 
 void mandarCATCH(t_entrenador* entrenador) {
     
+    // printf("hola antes de crear catch\n");
     t_catch_pokemon* catchPokemon = crearCatchPokemon(-1, entrenador->pokemonPlanificado->nombre, entrenador->pokemonPlanificado->posicion);
+    // printf("hola antes de serializar\n");
     t_paquete* paquete = serializar_catchPokemon(catchPokemon);
+    // printf("hola antes de deserializar\n");
+    t_catch_pokemon* catchPokemon2 = deserializar_catchPokemon(paquete->buffer);
+
+    printf("el nombre del poke deserializado: %s\n", catchPokemon2->nombre);
+
 
     free(catchPokemon);
 
