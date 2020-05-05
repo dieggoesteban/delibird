@@ -97,26 +97,14 @@ void serve_client(uint32_t* socket)
 void process_request(uint32_t cod_op, uint32_t cliente_fd) {
 	t_buffer* buffer = recibir_buffer(cliente_fd);
 	switch (cod_op) {
-		case REGISTER:
+		case SUSCRIBE:
 				log_info(logger, "SIZE BUFFER EN REGISTER: %i\n", buffer->size);
 				t_register_module* registerModule = deserializar_registerModule(buffer);
-				printf("RoleToSwitch: %i\n", registerModule->role);
-				switch (registerModule->role)
-				{
-					case SUSCRIBER:
-						list_add(getMessageQueueById(registerModule->messageQueue)->suscribers, (void*)registerModule->idModuleToRegister);
-						t_message_queue* testQueue = getMessageQueueById(registerModule->messageQueue);
-						uint32_t idFirstSuscriber = (uint32_t)list_get(testQueue->suscribers, 0);
-						free(testQueue);
-						break;
-					case PUBLISHER:
-						list_add(getMessageQueueById(registerModule->messageQueue)->publishers, (void*)registerModule->idModuleToRegister);
-						break;
-				}
-				printf("Se registro un modulo (id: %i) a la cola %i con el rol de %i\n",registerModule->idModuleToRegister, registerModule->messageQueue, registerModule->role);
+				list_add(getMessageQueueById(registerModule->messageQueue)->suscribers, (void*)cliente_fd);
+				printf("Se registro un modulo (id: %i) a la cola %i\n",cliente_fd, registerModule->messageQueue);
 				free(registerModule);
 				free(buffer->stream);
-				free(buffer);
+				free(buffer); 
 			break;
 		case NEW_POKEMON:
 			{
@@ -208,6 +196,8 @@ t_message_queue* getMessageQueueById(uint32_t id) //TODO: Agregar las otras cola
         case NEW_POKEMON:
             return newPokemonMessageQueue;
             break;
+		default:
+			return appearedPokemonMessageQueue;
     }
 }
 

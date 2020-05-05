@@ -23,12 +23,11 @@ pthread_t thread;
 char* IP;
 char* PUERTO;
 
-typedef struct {
-    uint32_t mq_cod;
-    t_list* mensajes;
-    t_list* suscribers;
-    t_list* publishers;
-} t_message_queue;
+// typedef struct {
+//     uint32_t mq_cod;
+//     t_list* mensajes;
+//     t_list* suscribers;
+// } t_message_queue;
 
 t_message_queue* newPokemonMessageQueue;
 t_message_queue* appearedPokemonMessageQueue;

@@ -10,17 +10,11 @@
 #include<string.h>
 #include "utils.h"
 
-typedef enum
-{
-	SUSCRIBER = 1,
-	PUBLISHER = 2
-} registration_role;
 
 typedef struct 
 {
 	uint32_t idModuleToRegister;
 	uint32_t messageQueue;
-	registration_role role;
 } t_register_module;
 
 
@@ -32,7 +26,7 @@ typedef enum
 	CAUGHT_POKEMON = 4,
 	GET_POKEMON = 5,
 	LOCALIZED_POKEMON = 6,
-	REGISTER = 7
+	SUSCRIBE = 7
 } mq_cod;
 
 typedef struct
@@ -111,6 +105,7 @@ typedef struct{
 
 //PAQUETES
 t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje);
+t_paquete* modoSuscriptor(char* tipo_mensaje);
 void liberarPaquete(t_paquete* paquete);
 void* serializar_paquete(t_paquete* paquete, int bytes);
 

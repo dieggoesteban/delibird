@@ -58,8 +58,6 @@ uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_men
 	return isValid;
 }
 
-
-
 uint32_t perteneceAlArray(char *val, char *arr[], uint32_t size)
 {
 	for (uint32_t i = 0; i < size; i++)
@@ -69,4 +67,3 @@ uint32_t perteneceAlArray(char *val, char *arr[], uint32_t size)
 	}
 	return 0;
 }
-

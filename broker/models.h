@@ -12,20 +12,18 @@ typedef enum
 	CAUGHT_POKEMON = 4,
 	GET_POKEMON = 5,
 	LOCALIZED_POKEMON = 6,
-    REGISTER = 7
+    SUSCRIBE = 7
 } mq_cod;
 
-typedef enum
-{
-	SUSCRIBER = 1,
-	PUBLISHER = 2
-} registration_role;
+typedef struct {
+    uint32_t mq_cod;
+    t_list* mensajes;
+    t_list* suscribers;
+} t_message_queue;
 
 typedef struct 
 {
-	uint32_t idModuleToRegister;
 	uint32_t messageQueue;
-	registration_role role;
 } t_register_module;
 
 typedef struct

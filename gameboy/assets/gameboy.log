@@ -1002,3 +1002,16 @@
 [INFO] 00:14:28:557 gameboy/(6116:6116): 5003
 [INFO] 00:14:28:558 gameboy/(6116:6116): Entro a Register
 
+[INFO] 00:49:21:169 gameboy/(7153:7153): Se va a conectar en BROKER
+
+[INFO] 00:49:21:192 gameboy/(7153:7153): 127.0.0.1
+[INFO] 00:49:21:193 gameboy/(7153:7153): 5003
+[INFO] 00:49:21:193 gameboy/(7153:7153): entro a new_pokemon
+[INFO] 00:51:27:822 gameboy/(7184:7184): Se va a conectar en BROKER
+
+[INFO] 01:08:41:171 gameboy/(7856:7856): Se va a conectar en BROKER
+
+[INFO] 01:08:41:173 gameboy/(7856:7856): 127.0.0.1
+[INFO] 01:08:41:174 gameboy/(7856:7856): 5003
+[INFO] 01:08:41:175 gameboy/(7856:7856): Entro a modoSuscriptor
+

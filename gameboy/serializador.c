@@ -306,37 +306,34 @@ t_get_pokemon* deserializar_getPokemon(t_buffer* buffer){
 //Register Module serialization
 t_paquete* serializar_registerModule(t_register_module* registerModule)
 {
+	printf("Entro a serializar_registerModule\n");
+
 	t_buffer* registerModuleBuffer = malloc(sizeof(t_buffer));
-	registerModuleBuffer->size = 3 * sizeof(uint32_t);
+	registerModuleBuffer->size = sizeof(uint32_t);
 	void* stream = malloc(sizeof(registerModuleBuffer->size));
 	int offset = 0;
 
-	memcpy(stream + offset, &(registerModule->idModuleToRegister), sizeof(uint32_t));
-	offset += sizeof(uint32_t);
 	memcpy(stream + offset, &(registerModule->messageQueue), sizeof(uint32_t));
-	offset += sizeof(uint32_t);
-	memcpy(stream + offset, &(registerModule->role), sizeof(uint32_t));
 	offset += sizeof(uint32_t);
 
 	registerModuleBuffer->stream = stream;
-	t_paquete* paquete = crear_paquete(REGISTER, registerModuleBuffer->size, registerModuleBuffer->stream);
-	printf("Codigo mensaje, serializar_registerModule: %i\n", paquete->codigo_mensaje);
+	t_paquete* paquete = crear_paquete(SUSCRIBE, registerModuleBuffer->size, registerModuleBuffer->stream);
 
+	printf("Codigo mensaje, serializar_registerModule: %i\n", paquete->codigo_mensaje);
 	return paquete;
 }
 
 //Register Module deserialization
 t_register_module* deserializar_registerModule(t_buffer* buffer)
 {
+	printf("Entro a deserializar_registerModule\n");
 	t_register_module* registerModule = malloc(sizeof(t_register_module));
 
 	void* stream = buffer->stream;
+	printf("Buffer size: %i\n", buffer->size);
 
-	memcpy(&(registerModule->idModuleToRegister), stream, sizeof(uint32_t));
-	stream += sizeof(uint32_t);
 	memcpy(&(registerModule->messageQueue), stream, sizeof(uint32_t));
-	stream += sizeof(uint32_t);
-	memcpy(&(registerModule->role), stream, sizeof(uint32_t));
+	printf("messageQueue: %i\n", registerModule->messageQueue);
 	stream += sizeof(uint32_t);
 
 	return registerModule;
@@ -435,15 +432,14 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 
 	t_paquete *paquete;
 	// paquete->buffer;
-	if (strcmp(tipo_mensaje, "REGISTER") == 0)
+	if (strcmp(tipo_mensaje, "SUSCRIBE") == 0)
 	{
-		log_info(logger, "Entro a Register\n");
+		log_info(logger, "Entro a Suscribe\n");
 
 		t_register_module* registerModule = malloc(sizeof(t_register_module));
 
-		registerModule->idModuleToRegister = 22;
+		registerModule->idModuleToRegister = 22; //TODO: Deshardcodear
 		registerModule->messageQueue = 1;
-		registerModule->role = 1;
 
 		paquete = serializar_registerModule(registerModule);
 
@@ -460,7 +456,7 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 		posCant->posicion_y = (uint32_t)atoi(arrayArgumentos[2]);
 		posCant->cantidad = (uint32_t)atoi(arrayArgumentos[3]);
 
-		newPokemon->ID_mensaje_recibido = 1234;
+		newPokemon->ID_mensaje_recibido = 1234; //TODO: Deshardcodear
 		newPokemon->nombre = arrayArgumentos[0];
 		newPokemon->sizeNombre = strlen(newPokemon->nombre) + 1;
 		newPokemon->posicionCantidad = posCant;
@@ -557,6 +553,21 @@ void liberarPaquete(t_paquete* paquete){
 	free(paquete);
 }
 
+t_paquete* modoSuscriptor(char* tipo_mensaje) 
+{
+	t_paquete *paquete;
+	log_info(logger, "Entro a modoSuscriptor\n");
+
+	t_register_module* registerModule = malloc(sizeof(t_register_module));
+
+	//TODO: Deshardcodear
+	registerModule->messageQueue = 1;
+
+	paquete = serializar_registerModule(registerModule);
+
+	free(registerModule);
+	return paquete;
+}
 
 
 

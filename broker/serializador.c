@@ -310,19 +310,15 @@ t_paquete* serializar_registerModule(t_register_module* registerModule)
 	printf("Entro a serializar_registerModule\n");
 
 	t_buffer* registerModuleBuffer = malloc(sizeof(t_buffer));
-	registerModuleBuffer->size = 3 * sizeof(uint32_t);
+	registerModuleBuffer->size = sizeof(uint32_t);
 	void* stream = malloc(sizeof(registerModuleBuffer->size));
 	int offset = 0;
 
-	memcpy(stream + offset, &(registerModule->idModuleToRegister), sizeof(uint32_t));
-	offset += sizeof(uint32_t);
 	memcpy(stream + offset, &(registerModule->messageQueue), sizeof(uint32_t));
-	offset += sizeof(uint32_t);
-	memcpy(stream + offset, &(registerModule->role), sizeof(uint32_t));
 	offset += sizeof(uint32_t);
 
 	registerModuleBuffer->stream = stream;
-	t_paquete* paquete = crear_paquete(REGISTER, registerModuleBuffer->size, registerModuleBuffer->stream);
+	t_paquete* paquete = crear_paquete(SUSCRIBE, registerModuleBuffer->size, registerModuleBuffer->stream);
 
 	printf("Codigo mensaje, serializar_registerModule: %i\n", paquete->codigo_mensaje);
 }
@@ -336,14 +332,8 @@ t_register_module* deserializar_registerModule(t_buffer* buffer)
 	void* stream = buffer->stream;
 	printf("Buffer size: %i\n", buffer->size);
 
-	memcpy(&(registerModule->idModuleToRegister), stream, sizeof(uint32_t));
-	printf("idModuleToRegister: %i\n", registerModule->idModuleToRegister);
-	stream += sizeof(uint32_t);
 	memcpy(&(registerModule->messageQueue), stream, sizeof(uint32_t));
 	printf("messageQueue: %i\n", registerModule->messageQueue);
-	stream += sizeof(uint32_t);
-	memcpy(&(registerModule->role), stream, sizeof(uint32_t));
-	printf("role: %i\n", registerModule->role);
 	stream += sizeof(uint32_t);
 
 	return registerModule;

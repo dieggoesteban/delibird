@@ -25,10 +25,8 @@ int main(int argc, char* argv[])
 t_message_queue* crearMessageQueue(uint32_t mq_cod)
 {
     t_message_queue* newMessageQueue = (t_message_queue*)malloc(sizeof(t_message_queue));
-
     newMessageQueue->mq_cod = mq_cod;
     newMessageQueue->mensajes = list_create();
     newMessageQueue->suscribers = list_create();
-    newMessageQueue->publishers = list_create();
     return newMessageQueue;
 }
