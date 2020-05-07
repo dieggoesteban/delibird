@@ -1,5 +1,5 @@
 #include "sockets.h"
-
+#include "messageQueue.h"
 /*CLIENT SIDE*/
 
 int crear_conexion(char *ip, char* puerto) {
@@ -80,13 +80,10 @@ void esperar_cliente(uint32_t socket_servidor)
 
 	pthread_create(&thread,NULL,(void*)serve_client,&socket_cliente);
 	pthread_join(thread, NULL);
-	
-
 }
 
 void serve_client(uint32_t* socket)
 {
-	
 	uint32_t cod_op;
 	if(recv(*socket, &cod_op, sizeof(int), MSG_WAITALL) == -1)
 		cod_op = -1;
@@ -98,14 +95,16 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd) {
 	t_buffer* buffer = recibir_buffer(cliente_fd);
 	switch (cod_op) {
 		case SUSCRIBE:
-				log_info(logger, "SIZE BUFFER EN REGISTER: %i\n", buffer->size);
-				t_register_module* registerModule = deserializar_registerModule(buffer);
-				list_add(getMessageQueueById(registerModule->messageQueue)->suscribers, (void*)cliente_fd);
-				printf("Se registro un modulo (id: %i) a la cola %i\n",cliente_fd, registerModule->messageQueue);
-				free(registerModule);
-				free(buffer->stream);
-				free(buffer); 
+		{
+			log_info(logger, "SIZE BUFFER EN REGISTER: %i\n", buffer->size);
+			t_register_module* registerModule = deserializar_registerModule(buffer);
+			list_add(getMessageQueueById(registerModule->messageQueue)->suscribers, (void*)cliente_fd);
+			printf("Se registro un modulo (id: %i) a la cola %i\n",cliente_fd, registerModule->messageQueue);
+			free(registerModule);
+			free(buffer->stream);
+			free(buffer); 
 			break;
+		}
 		case NEW_POKEMON:
 			{
 				log_info(logger, "SIZE BUFFER EN NEW: %i\n", buffer->size);	
@@ -131,17 +130,35 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd) {
 				break;
 			}
 		case CATCH_POKEMON:
-			{
-				t_catch_pokemon* catchPoke = deserializar_catchPokemon(buffer);
+		{
+			t_catch_pokemon* catchPoke = deserializar_catchPokemon(buffer);
+			//if(catchPoke->ID_mensaje_recibido == -1)
+				catchPoke->ID_mensaje_recibido = asignarMessageId();			
 
-				printf("pos x de poke: %i", catchPoke->posicion->posicion_x);
-				
-				log_info(logger, catchPoke->nombre);
-				free(catchPoke);
-				free(buffer->stream);
-				free(buffer);
-				break;
+			list_add(catchPokemonMessageQueue->mensajes, catchPoke);
+			//Enviar akcsfjhdfment a remitente
+			t_akc* akc = malloc(sizeof(t_akc));
+			akc->AKC = catchPoke->ID_mensaje_recibido;					
+
+
+			printf("AKC list count: %i\n\n", list_size(catchPokemonMessageQueue->mensajes));
+
+			uint32_t i = 0;
+			while (list_get(catchPokemonMessageQueue->mensajes, i)!= NULL)
+			{
+			    t_catch_pokemon* forDebug = list_get(catchPokemonMessageQueue->mensajes, i);
+				printf("Pos %i: %i - %s\n", i, forDebug->ID_mensaje_recibido, forDebug->nombre);
+				i++;
 			}
+
+			//printf("Pos x de poke: %i\n", catchPoke->posicion->posicion_x);
+			
+			log_info(logger, catchPoke->nombre);
+			free(buffer->stream);
+			free(buffer);
+			free(akc);
+			break;
+		}
 		case CAUGHT_POKEMON:
 			{
 				t_caught_pokemon* caughtPoke = deserializar_caughtPokemon(buffer);
@@ -196,8 +213,23 @@ t_message_queue* getMessageQueueById(uint32_t id) //TODO: Agregar las otras cola
         case NEW_POKEMON:
             return newPokemonMessageQueue;
             break;
-		default:
+		case APPEARED_POKEMON:
 			return appearedPokemonMessageQueue;
+			break;
+		case GET_POKEMON:
+			return getPokemonMessageQueue;
+			break;
+		case CAUGHT_POKEMON:
+			return caughtPokemonMessageQueue;
+			break;
+		case LOCALIZED_POKEMON:
+			return localizedPokemonMessageQueue;
+			break;
+		case CATCH_POKEMON:
+			return catchPokemonMessageQueue;
+			break;
+		default:
+			return NULL;
     }
 }
 

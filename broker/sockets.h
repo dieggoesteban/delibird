@@ -31,6 +31,10 @@ char* PUERTO;
 
 t_message_queue* newPokemonMessageQueue;
 t_message_queue* appearedPokemonMessageQueue;
+t_message_queue* catchPokemonMessageQueue;
+t_message_queue* getPokemonMessageQueue;
+t_message_queue* localizedPokemonMessageQueue;
+t_message_queue* caughtPokemonMessageQueue;
 
 
 //CLIENTE

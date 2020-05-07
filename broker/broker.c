@@ -3,7 +3,6 @@
 t_log* logger;
 t_config* config;
 
-//
 int main(int argc, char* argv[])
 {
     config = config_create("./assets/broker.config");
@@ -15,7 +14,13 @@ int main(int argc, char* argv[])
 
     //Instanciación de las MQ
     newPokemonMessageQueue = crearMessageQueue(NEW_POKEMON);
-   
+    appearedPokemonMessageQueue = crearMessageQueue(APPEARED_POKEMON);
+    catchPokemonMessageQueue = crearMessageQueue(CATCH_POKEMON);
+    getPokemonMessageQueue = crearMessageQueue(GET_POKEMON);
+    localizedPokemonMessageQueue = crearMessageQueue(LOCALIZED_POKEMON);
+    caughtPokemonMessageQueue = crearMessageQueue(CAUGHT_POKEMON);
+    inicializarCounterMessageId();
+
     iniciar_servidor();
 
     return 0;

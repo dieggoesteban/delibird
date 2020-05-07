@@ -1,20 +1,21 @@
-#ifndef BROKER_H_
-#define BROKER_H_
+#ifndef MESSAGEQUEUE_H_
+#define MESSAGEQUEUE_H_
 
 #include<stdio.h>
 #include<stdlib.h>
-#include<commons/log.h>
+#include<signal.h>
+#include<unistd.h>
 #include<commons/string.h>
 #include<commons/config.h>
-#include<readline/readline.h>
-
-#include "utils.h"
-#include "sockets.h"
+#include<commons/log.h>
+#include<commons/collections/list.h>
+#include<sys/socket.h>
+#include<netdb.h>
+#include<string.h>
 #include "models.h"
-#include "messageQueue.h"
+#include "sockets.h"
 
-char* IP;
-char* PUERTO;
+uint32_t counterMessageId;
 
 t_message_queue* newPokemonMessageQueue;
 t_message_queue* appearedPokemonMessageQueue;
@@ -23,7 +24,7 @@ t_message_queue* getPokemonMessageQueue;
 t_message_queue* localizedPokemonMessageQueue;
 t_message_queue* caughtPokemonMessageQueue;
 
-t_message_queue* crearMessageQueue(uint32_t mq_cod);
-void terminar_programa(int, t_log*, t_config*);
+void inicializarCounterMessageId();
+uint32_t asignarMessageId();
 
-#endif /* BROKER_H_ */
+#endif /*MESSAGEQUEUE*/

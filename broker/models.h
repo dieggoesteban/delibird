@@ -21,6 +21,10 @@ typedef struct {
     t_list* suscribers;
 } t_message_queue;
 
+typedef struct {
+	uint32_t AKC;
+} t_akc;
+
 typedef struct 
 {
 	uint32_t messageQueue;

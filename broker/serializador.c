@@ -321,6 +321,7 @@ t_paquete* serializar_registerModule(t_register_module* registerModule)
 	t_paquete* paquete = crear_paquete(SUSCRIBE, registerModuleBuffer->size, registerModuleBuffer->stream);
 
 	printf("Codigo mensaje, serializar_registerModule: %i\n", paquete->codigo_mensaje);
+	return paquete;
 }
 
 //Register Module deserialization
@@ -339,6 +340,38 @@ t_register_module* deserializar_registerModule(t_buffer* buffer)
 	return registerModule;
 }
 
+t_paquete* serializar_akc(t_akc* akc)
+{
+	printf("Entro a serializar_akc\n");
+
+	t_buffer* akcBuffer = malloc(sizeof(t_buffer));
+	akcBuffer->size = sizeof(uint32_t);
+	void* stream = malloc(sizeof(akcBuffer->size));
+	int offset = 0;
+
+	memcpy(stream + offset, &(akc->AKC), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+
+	akcBuffer->stream = stream;
+	t_paquete* paquete = crear_paquete(SUSCRIBE, akcBuffer->size, akcBuffer->stream);
+
+	printf("AKC, serializar_akc: %i\n", paquete->codigo_mensaje);
+	return paquete;
+}
+
+t_akc* deserializar_akc(t_buffer* buffer)
+{
+	printf("Entro a deserializar_akc\n");
+	t_akc* akc = malloc(sizeof(t_akc));
+
+	void* stream = buffer->stream;
+	printf("Buffer size: %i\n", buffer->size);
+
+	memcpy(&(akc->AKC), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
+
+	return akc;
+}
 
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant) {
 	t_posicion_cantidad* position = malloc(sizeof(t_posicion_cantidad));
