@@ -29,11 +29,20 @@ typedef enum
 	SUSCRIBE = 7
 } mq_cod;
 
+typedef enum
+{
+	ACKNOWLEDGEMENT = 8
+} acciones;
+
 typedef struct
 {
 	int size;
 	void* stream;
 } t_buffer;
+
+typedef struct {
+	uint32_t AKC;
+} t_akc;
 
 typedef struct
 {
@@ -125,6 +134,9 @@ t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer);
 
 t_paquete* serializar_registerModule(t_register_module* registerModule);
 t_register_module* deserializar_registerModule(t_buffer* buffer);
+
+t_paquete* serializar_akc(t_akc* akc);
+t_akc* deserializar_akc(t_buffer* buffer);
 
 //CREACION DE LOS STRUCTS
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant);

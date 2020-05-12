@@ -353,7 +353,7 @@ t_paquete* serializar_akc(t_akc* akc)
 	offset += sizeof(uint32_t);
 
 	akcBuffer->stream = stream;
-	t_paquete* paquete = crear_paquete(SUSCRIBE, akcBuffer->size, akcBuffer->stream);
+	t_paquete* paquete = crear_paquete(ACKNOWLEDGEMENT, akcBuffer->size, akcBuffer->stream);
 
 	printf("AKC, serializar_akc: %i\n", paquete->codigo_mensaje);
 	return paquete;
@@ -457,6 +457,14 @@ t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre){
 	getPokemon->nombre = nombre;
 
 	return getPokemon;
+}
+
+t_message* crearMessage(void* mensajeRecibido){
+	t_message* mensajeStruct = malloc(sizeof(t_message));
+	mensajeStruct->mensaje = mensajeRecibido;
+	mensajeStruct->suscriptoresConfirmados = list_create();
+
+	return mensajeStruct;
 }
 
 

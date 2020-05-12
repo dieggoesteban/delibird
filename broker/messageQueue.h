@@ -27,4 +27,4 @@ t_message_queue* caughtPokemonMessageQueue;
 void inicializarCounterMessageId();
 uint32_t asignarMessageId();
 
-#endif /*MESSAGEQUEUE*/
+#endif /*MESSAGEQUEUE_H_*/

@@ -15,11 +15,21 @@ typedef enum
     SUSCRIBE = 7
 } mq_cod;
 
+typedef enum
+{
+	ACKNOWLEDGEMENT = 8
+} acciones;
+
 typedef struct {
     uint32_t mq_cod;
     t_list* mensajes;
     t_list* suscribers;
 } t_message_queue;
+
+typedef struct{
+	t_list* suscriptoresConfirmados; //los suscriptores a los que se les envio el mensaje y tiraron un acknowledgement 
+	void* mensaje; //el struct que toque
+} t_message;
 
 typedef struct {
 	uint32_t AKC;

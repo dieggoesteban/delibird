@@ -112,6 +112,7 @@
 //PAQUETES
 t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje);
 void liberarPaquete(t_paquete* paquete);
+void* serializar_paquete(t_paquete* paquete, int bytes);
 
 //SERIALIZACION Y DESERIALIZACION
 // void deserializar_newPokemon(t_buffer* buffer);
@@ -143,6 +144,7 @@ t_appeared_pokemon* crearAppearedPokemon(uint32_t IDMensajeRecibido, char* nombr
 t_catch_pokemon* crearCatchPokemon(uint32_t ID_mensaje_recibido, char* nombre, t_posicion* posicion);
 t_caught_pokemon* crearCaughtPokemon(uint32_t IDMensajeRecibido, uint32_t IDMensajeOriginal, uint32_t catchStatus);
 t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre);
+t_message* crearMessage(void* mensajeRecibido);
 
 
 #endif /* CONNECTION_H_ */
