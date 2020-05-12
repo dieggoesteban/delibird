@@ -182,17 +182,20 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd)
 		t_akc *akc = malloc(sizeof(t_akc));
 		akc->AKC = caughtPoke->ID_mensaje_recibido;
 
-		printf("AKC list count: %i\n\n", list_size(caughtPokemonMessageQueue->mensajes));
+		t_paquete* paquete = serializar_caughtPokemon(caughtPoke);
+		dispatchMessage(CAUGHT_POKEMON, paquete);
 
-		uint32_t i = 0;
-		while (list_get(catchPokemonMessageQueue->mensajes, i) != NULL)
-		{
-			t_catch_pokemon *forDebug = ((t_message *)list_get(caughtPokemonMessageQueue->mensajes, i))->mensaje;
-			printf("Pos %i: %i - %s\n", i, forDebug->ID_mensaje_recibido, forDebug->nombre);
-			i++;
-		}
+		// printf("AKC list count: %i\n\n", list_size(caughtPokemonMessageQueue->mensajes));
 
-		
+		// uint32_t i = 0;
+		// while (list_get(catchPokemonMessageQueue->mensajes, i) != NULL)
+		// {
+		// 	t_catch_pokemon *forDebug = ((t_message *)list_get(caughtPokemonMessageQueue->mensajes, i))->mensaje;
+		// 	printf("Pos %i: %i - %s\n", i, forDebug->ID_mensaje_recibido, forDebug->nombre);
+		// 	i++;
+		// }
+
+
 
 
 

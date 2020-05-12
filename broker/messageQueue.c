@@ -36,6 +36,15 @@ t_list* suscriptoresCola(uint32_t mq_cod){
 // }
 
 
+void dispatchMessage(uint32_t mq_cod, t_paquete* paquete){
+    t_list* suscriptores = suscriptoresCola(mq_cod);
+    for(uint32_t i = 0; i < list_size(suscriptores); i++){
+        enviarMensaje(paquete, (uint32_t)list_get(suscriptores,i));
+    }
+
+}
+
+
 
 
 //Aplica el ID al mensaje y lo prepara para enviar

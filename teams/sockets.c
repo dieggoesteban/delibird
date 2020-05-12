@@ -158,3 +158,10 @@ t_buffer* recibir_buffer(uint32_t socket_cliente)
 	return buffer;
 }
 
+uint32_t escuchaBroker(){
+	char* IP_BROKER = config_get_string_value(config,"IP_BROKER");
+    char* PUERTO_BROKER = config_get_string_value(config,"PUERTO_BROKER");
+
+	return crear_conexion(IP_BROKER, PUERTO_BROKER);
+}
+
