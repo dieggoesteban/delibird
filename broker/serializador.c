@@ -273,7 +273,7 @@ t_paquete* serializar_getPokemon(t_get_pokemon* pokemon) {
     t_buffer* getPokemonBuffer = malloc(sizeof(t_buffer));
 
     getPokemonBuffer->size = 2 * sizeof(uint32_t) + strlen(pokemon->nombre) + 1;
-    void* stream = malloc(sizeof(getPokemonBuffer->size));
+    void* stream = malloc(getPokemonBuffer->size);
     int offset = 0;
 
     memcpy(stream + offset, &(pokemon->ID_mensaje_recibido), sizeof(uint32_t));
@@ -311,7 +311,7 @@ t_paquete* serializar_registerModule(t_register_module* registerModule)
 
 	t_buffer* registerModuleBuffer = malloc(sizeof(t_buffer));
 	registerModuleBuffer->size = sizeof(uint32_t);
-	void* stream = malloc(sizeof(registerModuleBuffer->size));
+	void* stream = malloc(registerModuleBuffer->size);
 	int offset = 0;
 
 	memcpy(stream + offset, &(registerModule->messageQueue), sizeof(uint32_t));
@@ -346,7 +346,7 @@ t_paquete* serializar_akc(t_akc* akc)
 
 	t_buffer* akcBuffer = malloc(sizeof(t_buffer));
 	akcBuffer->size = sizeof(uint32_t);
-	void* stream = malloc(sizeof(akcBuffer->size));
+	void* stream = malloc(akcBuffer->size);
 	int offset = 0;
 
 	memcpy(stream + offset, &(akc->AKC), sizeof(uint32_t));
@@ -371,6 +371,44 @@ t_akc* deserializar_akc(t_buffer* buffer)
 	stream += sizeof(uint32_t);
 
 	return akc;
+}
+
+t_paquete* serializar_confirmacionMensaje(t_confirmacion_mensaje* confirmacion){
+	printf("Entro a serializar_confirmacionMensaje\n");
+	t_buffer* confirmacionBuffer = malloc(sizeof(t_buffer));
+	confirmacionBuffer->size = sizeof(uint32_t)*2 + sizeof(bool);
+	void* stream = malloc(confirmacionBuffer->size);
+	int offset = 0;
+
+	memcpy(stream + offset, &(confirmacion->ID_mensaje), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+	memcpy(stream + offset, &(confirmacion->MessageQueue), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+	memcpy(stream + offset, &(confirmacion->meLlego), sizeof(bool));
+	offset += sizeof(bool);
+
+	confirmacionBuffer->stream = stream;
+	t_paquete* paquete = crear_paquete(CONFIRMACION_MSJ, confirmacionBuffer->size, confirmacionBuffer->stream);
+
+	printf("Confirmacion, serializar_confirmacionMensaje");
+	return paquete;
+}
+
+t_confirmacion_mensaje* deserializar_confirmacionMensaje(t_buffer* buffer){
+	printf("ENtro a deserializar_confirmacion\n");
+	t_confirmacion_mensaje* confirmacion = malloc(sizeof(t_confirmacion_mensaje));
+
+	void* stream = buffer->stream;
+	printf("Buffer size: %i\n", buffer->size);
+
+	memcpy(&(confirmacion->ID_mensaje), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
+	memcpy(&(confirmacion->MessageQueue), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
+	memcpy(&(confirmacion->meLlego), stream, sizeof(bool));
+	stream += sizeof(bool);
+
+	return confirmacion;
 }
 
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant) {
@@ -465,6 +503,15 @@ t_message* crearMessage(void* mensajeRecibido){
 	mensajeStruct->suscriptoresConfirmados = list_create();
 
 	return mensajeStruct;
+}
+
+t_confirmacion_mensaje* crearConfirmacionMensaje(uint32_t ID_mensaje, uint32_t colaMensajes, bool meLlego){
+	t_confirmacion_mensaje* confirmacion = malloc(sizeof(t_confirmacion_mensaje));
+	confirmacion->ID_mensaje = ID_mensaje;
+	confirmacion->MessageQueue = colaMensajes;
+	confirmacion->meLlego = meLlego;
+
+	return confirmacion;
 }
 
 

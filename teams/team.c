@@ -32,15 +32,34 @@ int main(void)
         cod_op = -1;
     printf("\nCodigo de op: %i\n", cod_op);
     t_buffer *bufferRecibido = recibir_buffer(idConexionPermanente);
+    
     // t_akc* akc = deserializar_akc(bufferRecibido);
     // printf("el akc es: %i", akc->AKC);
 
     t_caught_pokemon *caughtPoke = deserializar_caughtPokemon(bufferRecibido);
+    if(cod_op != -1){
+        
+        t_confirmacion_mensaje* confirmacion = crearConfirmacionMensaje(caughtPoke->ID_mensaje_original, cod_op, true);
+        printf("confirmacion con ID Mensaje: %i y cod op: %i\n",caughtPoke->ID_mensaje_original, cod_op);
+        t_paquete* paqueteConfirmacion = serializar_confirmacionMensaje(confirmacion);
+        enviarMensaje(paqueteConfirmacion, idConexionPermanente);
+        // free(confirmacion);
+        // liberarPaquete(paqueteConfirmacion);
+
+    }   
+    else{
+        t_confirmacion_mensaje* confirmacion = crearConfirmacionMensaje(ERROR, cod_op, false);
+        t_paquete* paqueteConfirmacion = serializar_confirmacionMensaje(confirmacion);
+        enviarMensaje(paqueteConfirmacion, idConexionPermanente);
+        // free(confirmacion);
+        // liberarPaquete(paqueteConfirmacion);
+    }
 
     printf("lo pudo agarrar? %i", caughtPoke->catchStatus);
 
+
     inicializarTeam();
-    printf("idConexion: %i", idConexionPermanente);
+    printf("idConexion: %i\n", idConexionPermanente);
 
     logger = log_create(LOG, "team", true, LOG_LEVEL_INFO);
 
@@ -58,7 +77,7 @@ int main(void)
     list_add(pokemonesEnMapa, poke1);
     list_add(pokemonesEnMapa, pokemon);
 
-    //QUE PASA SI LLEGA UNO NUEVO CON NEW_POKEMON??
+    //QUE PASA SI LLEGA UNO NUEVO CON NEW_POKEMON?? - HILOS, hilos everywhere
     while (list_size(pokemonesEnMapa) > 0)
     {
         if (!asignarPokemonAEntrenador())

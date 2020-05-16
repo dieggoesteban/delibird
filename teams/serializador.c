@@ -350,6 +350,44 @@ t_register_module* deserializar_registerModule(t_buffer* buffer)
 	return registerModule;
 }
 
+t_paquete* serializar_confirmacionMensaje(t_confirmacion_mensaje* confirmacion){
+	printf("Entro a serializar_confirmacionMensaje\n");
+	t_buffer* confirmacionBuffer = malloc(sizeof(t_buffer));
+	confirmacionBuffer->size = sizeof(uint32_t)*2 + sizeof(bool);
+	void* stream = malloc(confirmacionBuffer->size);
+	int offset = 0;
+
+	memcpy(stream + offset, &(confirmacion->ID_mensaje), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+	memcpy(stream + offset, &(confirmacion->MessageQueue), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+	memcpy(stream + offset, &(confirmacion->meLlego), sizeof(bool));
+	offset += sizeof(bool);
+
+	confirmacionBuffer->stream = stream;
+	t_paquete* paquete = crear_paquete(CONFIRMACION_MSJ, confirmacionBuffer->size, confirmacionBuffer->stream);
+
+	printf("Confirmacion, serializar_confirmacionMensaje");
+	return paquete;
+}
+
+t_confirmacion_mensaje* deserializar_confirmacionMensaje(t_buffer* buffer){
+	printf("ENtro a deserializar_confirmacion\n");
+	t_confirmacion_mensaje* confirmacion = malloc(sizeof(t_confirmacion_mensaje));
+
+	void* stream = buffer->stream;
+	printf("Buffer size: %i\n", buffer->size);
+
+	memcpy(&(confirmacion->ID_mensaje), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
+	memcpy(&(confirmacion->MessageQueue), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
+	memcpy(&(confirmacion->meLlego), stream, sizeof(bool));
+	stream += sizeof(bool);
+
+	return confirmacion;
+}
+
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant) {
 	t_posicion_cantidad* position = malloc(sizeof(t_posicion_cantidad));
 
@@ -434,6 +472,15 @@ t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre){
 	getPokemon->nombre = nombre;
 
 	return getPokemon;
+}
+
+t_confirmacion_mensaje* crearConfirmacionMensaje(uint32_t ID_mensaje, uint32_t colaMensajes, bool meLlego){
+	t_confirmacion_mensaje* confirmacion = malloc(sizeof(t_confirmacion_mensaje));
+	confirmacion->ID_mensaje = ID_mensaje;
+	confirmacion->MessageQueue = colaMensajes;
+	confirmacion->meLlego = meLlego;
+
+	return confirmacion;
 }
 
 t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)

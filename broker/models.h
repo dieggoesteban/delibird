@@ -17,7 +17,8 @@ typedef enum
 
 typedef enum
 {
-	ACKNOWLEDGEMENT = 8
+	ACKNOWLEDGEMENT = 8,
+	CONFIRMACION_MSJ = 9
 } acciones;
 
 typedef struct {
@@ -25,6 +26,13 @@ typedef struct {
     t_list* mensajes;
     t_list* suscribers;
 } t_message_queue;
+
+//struct que se manda como confirmacion de recibo de mensaje por parte de los modulos hacia el broker
+typedef struct{
+	uint32_t ID_mensaje;
+	uint32_t MessageQueue;
+	bool meLlego;
+} t_confirmacion_mensaje;
 
 typedef struct{
 	t_list* suscriptoresConfirmados; //los suscriptores a los que se les envio el mensaje y tiraron un acknowledgement 

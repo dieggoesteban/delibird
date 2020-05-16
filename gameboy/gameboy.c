@@ -44,12 +44,9 @@ int main(int argc, char *argv[])
                 cod_op = -1;
             printf("\nCodigo de op: %i\n", cod_op);
             t_buffer* bufferRecibido = recibir_buffer(conexion);
-            // t_akc* akc = deserializar_akc(bufferRecibido);
-            // printf("el akc es: %i", akc->AKC);
+            t_akc* akc = deserializar_akc(bufferRecibido);
+            printf("el akc es: %i", akc->AKC);
 
-            t_caught_pokemon* caughtPoke = deserializar_caughtPokemon(bufferRecibido);
-
-            printf("lo pudo agarrar? %i", caughtPoke->catchStatus);
             
 
 

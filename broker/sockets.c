@@ -98,6 +98,7 @@ void serve_client(uint32_t *socket)
 
 void process_request(uint32_t cod_op, uint32_t cliente_fd)
 {
+	log_info(logger,"atendiendo al cliente %i", cliente_fd);
 	t_buffer *buffer = recibir_buffer(cliente_fd);
 	switch (cod_op)
 	{
@@ -108,8 +109,18 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd)
 		list_add(getMessageQueueById(registerModule->messageQueue)->suscribers, (void *)cliente_fd);
 		printf("Se registro un modulo (id: %i) a la cola %i\n", cliente_fd, registerModule->messageQueue);
 		free(registerModule);
-		free(buffer->stream);
-		free(buffer);
+		// free(buffer->stream);
+		// free(buffer);
+		break;
+	}
+	case CONFIRMACION_MSJ:
+	{
+		log_info(logger, "SIZE BUFFER EN CONFIRMACION MENSAJE: %i\n", buffer->size);
+		t_confirmacion_mensaje* confirmacion = deserializar_confirmacionMensaje(buffer);
+		printf("llego la confirmacion de mensaje del suscriptor: %i, del mensaje de ID: %i, para la cola: %i, con el resultado: %i\n", cliente_fd, confirmacion->ID_mensaje, confirmacion->MessageQueue, confirmacion->meLlego);
+		free(confirmacion);
+		// free(buffer->stream);
+		// free(buffer);
 		break;
 	}
 	case NEW_POKEMON:
@@ -119,8 +130,8 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd)
 		printf("Nombre del poke new: %s\n", newPoke->nombre);
 		log_info(logger, newPoke->nombre);
 		free(newPoke);
-		free(buffer->stream);
-		free(buffer);
+		// free(buffer->stream);
+		// free(buffer);
 		break;
 	}
 	case APPEARED_POKEMON:
@@ -132,8 +143,8 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd)
 		log_info(logger, appearedPoke->nombre);
 
 		free(appearedPoke);
-		free(buffer->stream);
-		free(buffer);
+		// free(buffer->stream);
+		// free(buffer);
 		break;
 	}
 	case CATCH_POKEMON:
@@ -165,8 +176,8 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd)
 		printf("Pos x de poke: %i\n", catchPoke->posicion->posicion_x);
 
 		log_info(logger, catchPoke->nombre);
-		free(buffer->stream);
-		free(buffer);
+		// free(buffer->stream);
+		// free(buffer);
 		free(akc);
 		break;
 	}
@@ -181,19 +192,14 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd)
 		//Enviar akcsfjhdfment a remitente
 		t_akc *akc = malloc(sizeof(t_akc));
 		akc->AKC = caughtPoke->ID_mensaje_recibido;
+		t_paquete* paqueteAKC = serializar_akc(akc);
+		//se le envia el id de mensaje como acknowledgement
+		enviarMensaje(paqueteAKC, cliente_fd);
 
 		t_paquete* paquete = serializar_caughtPokemon(caughtPoke);
+
 		dispatchMessage(CAUGHT_POKEMON, paquete);
 
-		// printf("AKC list count: %i\n\n", list_size(caughtPokemonMessageQueue->mensajes));
-
-		// uint32_t i = 0;
-		// while (list_get(catchPokemonMessageQueue->mensajes, i) != NULL)
-		// {
-		// 	t_catch_pokemon *forDebug = ((t_message *)list_get(caughtPokemonMessageQueue->mensajes, i))->mensaje;
-		// 	printf("Pos %i: %i - %s\n", i, forDebug->ID_mensaje_recibido, forDebug->nombre);
-		// 	i++;
-		// }
 
 
 
@@ -208,10 +214,11 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd)
 		{
 			printf(" no se pudo capturar\n");
 		}
+		// liberarPaquete(paquete);
 
 		free(caughtPoke);
-		free(buffer->stream);
-		free(buffer);
+		// free(buffer->stream);
+		// free(buffer);
 		break;
 	}
 	case GET_POKEMON:
@@ -229,6 +236,8 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd)
 	case -1:
 		pthread_exit(NULL);
 	}
+	free(buffer->stream);
+	free(buffer);
 }
 
 t_buffer *recibir_buffer(uint32_t socket_cliente)
@@ -237,6 +246,7 @@ t_buffer *recibir_buffer(uint32_t socket_cliente)
 	int size;
 
 	recv(socket_cliente, &size, sizeof(int), MSG_WAITALL);
+	printf("SOcket cliente: %i\n", socket_cliente);
 	printf("Buffer size: %d\n", size);
 	buffer->size = size;
 	buffer->stream = malloc(buffer->size);

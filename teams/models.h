@@ -16,8 +16,17 @@ typedef enum
 
 typedef enum
 {
-	ACKNOWLEDGEMENT = 8
+	ACKNOWLEDGEMENT = 8,
+	CONFIRMACION_MSJ = 9
 } acciones;
+
+//struct que se manda como confirmacion de recibo de mensaje por parte de los modulos hacia el broker
+typedef struct{
+	uint32_t ID_mensaje;
+	uint32_t MessageQueue;
+	bool meLlego;
+} t_confirmacion_mensaje;
+
 typedef struct {
 	uint32_t AKC;
 } t_akc;
