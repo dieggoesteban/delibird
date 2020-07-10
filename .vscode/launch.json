@@ -9,7 +9,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/gameboy/gameboy.o",
+            "program": "${workspaceFolder}/broker/broker",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

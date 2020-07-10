@@ -1,37 +1,45 @@
 #include "broker.h"
 
-t_log* logger;
-t_config* config;
+pthread_t serverThread;
+pthread_t dispatchMessagesThread;
+pthread_t cacheThread;
 
-int main(int argc, char* argv[])
+int main() 
 {
+    //Inicializar parámetros
     config = config_create("./assets/broker.config");
+	logger = log_create("./assets/broker.log", "broker", true, LOG_LEVEL_INFO);
+    broker_custom_logger = log_create("./assets/broker_custom.log", "broker", true, LOG_LEVEL_INFO);
+    IP = config_get_string_value(config, "IP_BROKER");
+    PUERTO = config_get_string_value(config, "PUERTO_BROKER");
+    
+    inicializarCounterMessageId();
 
-	logger = log_create("./assets/broker.log","broker",true,LOG_LEVEL_INFO);
-
-    IP = config_get_string_value(config,"IP_BROKER");
-    PUERTO = config_get_string_value(config,"PUERTO_BROKER");
-
-    //Instanciación de las MQ
+    //Instanciación de las colas de mensajes
     newPokemonMessageQueue = crearMessageQueue(NEW_POKEMON);
     appearedPokemonMessageQueue = crearMessageQueue(APPEARED_POKEMON);
     catchPokemonMessageQueue = crearMessageQueue(CATCH_POKEMON);
     getPokemonMessageQueue = crearMessageQueue(GET_POKEMON);
     localizedPokemonMessageQueue = crearMessageQueue(LOCALIZED_POKEMON);
     caughtPokemonMessageQueue = crearMessageQueue(CAUGHT_POKEMON);
-    inicializarCounterMessageId();
 
-    iniciar_servidor();
+    //Iniciar cache
+    pthread_create(&cacheThread, NULL, (void *)startCache, NULL);
 
-    return 0;
+    //Activar envio de mensajes en las colas
+    pthread_create(&dispatchMessagesThread, NULL, (void *)dispatchMessagesFromMQ, newPokemonMessageQueue);
+
+    //Iniciar servidor
+    pthread_create(&serverThread, NULL, (void *)iniciar_servidor, NULL);
+
+    pthread_join(serverThread, NULL);
+    pthread_join(cacheThread, NULL);
+    pthread_join(dispatchMessagesThread, NULL);
+
+    terminarPrograma();
 }
 
-//Instancia una MQ
-t_message_queue* crearMessageQueue(uint32_t mq_cod)
+void terminarPrograma()
 {
-    t_message_queue* newMessageQueue = (t_message_queue*)malloc(sizeof(t_message_queue));
-    newMessageQueue->mq_cod = mq_cod;
-    newMessageQueue->mensajes = list_create();
-    newMessageQueue->suscribers = list_create();
-    return newMessageQueue;
+
 }

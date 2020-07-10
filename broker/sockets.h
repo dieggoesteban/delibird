@@ -1,41 +1,14 @@
-
 #ifndef SOCKETS_H_
 #define SOCKETS_H_
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<signal.h>
-#include<unistd.h>
-#include<commons/string.h>
-#include<commons/config.h>
-#include<commons/log.h>
-#include<commons/collections/list.h>
-#include<sys/socket.h>
-#include<netdb.h>
-#include<string.h>
-#include<pthread.h>
-#include "serializador.h"
+#include "global-includes.h"
 #include "models.h"
+#include "serializador.h"
+#include "messageQueueManager.h"
 
-t_log* logger;
-t_config* config;
-pthread_t thread;
 char* IP;
 char* PUERTO;
-
-// typedef struct {
-//     uint32_t mq_cod;
-//     t_list* mensajes;
-//     t_list* suscribers;
-// } t_message_queue;
-
-t_message_queue* newPokemonMessageQueue;
-t_message_queue* appearedPokemonMessageQueue;
-t_message_queue* catchPokemonMessageQueue;
-t_message_queue* getPokemonMessageQueue;
-t_message_queue* localizedPokemonMessageQueue;
-t_message_queue* caughtPokemonMessageQueue;
-
+pthread_t serverThread;
 
 //CLIENTE
 int crear_conexion(char* ip, char* puerto);
@@ -49,8 +22,6 @@ void esperar_cliente(uint32_t socket_servidor);
 void serve_client(uint32_t* socket);
 void process_request(uint32_t cod_op, uint32_t cliente_fd);
 t_buffer* recibir_buffer(uint32_t socket_cliente);
-
-//MESSAGE QUEUE MANAGER
-t_message_queue* getMessageQueueById(mq_cod id);
+void enviar_mensaje(t_paquete* paquete, uint32_t socket_cliente);
 
 #endif /* SOCKETS_H_ */
