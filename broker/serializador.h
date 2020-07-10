@@ -5,6 +5,8 @@
 #include "models.h"
 
 #pragma region Serializacion y Deserializacion
+void* serializar_paquete(t_paquete* paquete, int bytes);
+
 t_paquete* serializar_registerModule(t_register_module* registerModule);
 t_register_module* deserializar_registerModule(t_buffer* buffer);
 
@@ -27,7 +29,7 @@ t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon);
 t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer);
 
 t_paquete* serializar_idMensajeRecibido(t_id_mensaje_recibido* idMensajeRecibido);
-t_id_mensaje_recibido deserializar_idMensajeRecibido(t_buffer* buffer);
+//t_id_mensaje_recibido deserializar_idMensajeRecibido(t_buffer* buffer);
 #pragma endregion
 
 #pragma region Creacion de Structs

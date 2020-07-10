@@ -29,7 +29,7 @@ t_list* getSuscriptoresByMessageQueueId(uint32_t id);
 void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cliente);
 void subscribeNewModule(uint32_t id, uint32_t mq_cod);
 void addMessageToMQ(t_message* message, t_message_queue* messageQueue);
-void sendMessage(t_message* message, uint32_t socket_cliente);
+void sendMessageFromQueue(t_message* message, uint32_t socket_cliente);
 void dispatchMessagesFromMQ(t_message_queue* messageQueue);
 void cacheMessage(t_message* message);
 

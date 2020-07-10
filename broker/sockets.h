@@ -14,6 +14,7 @@ pthread_t serverThread;
 int crear_conexion(char* ip, char* puerto);
 void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente);
 void* recibir_paquete(int socket_cliente);
+void liberarPaquete(t_paquete* paquete);
 void liberar_conexion(uint32_t socket_cliente);
 
 //SERVER
@@ -22,6 +23,5 @@ void esperar_cliente(uint32_t socket_servidor);
 void serve_client(uint32_t* socket);
 void process_request(uint32_t cod_op, uint32_t cliente_fd);
 t_buffer* recibir_buffer(uint32_t socket_cliente);
-void enviar_mensaje(t_paquete* paquete, uint32_t socket_cliente);
 
 #endif /* SOCKETS_H_ */

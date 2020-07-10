@@ -1,6 +1,21 @@
 #include "serializador.h"
 
 #pragma region Serializacion y Deserializacion
+void* serializar_paquete(t_paquete* paquete, int bytes) {
+	void * magic = malloc(bytes);
+	int desplazamiento = 0;
+
+	memcpy(magic + desplazamiento, &(paquete->codigo_mensaje), sizeof(int));
+	desplazamiento += sizeof(int);
+	memcpy(magic + desplazamiento, &(paquete->buffer->size), sizeof(int));
+	desplazamiento += sizeof(int);
+	memcpy(magic + desplazamiento, paquete->buffer->stream, paquete->buffer->size);
+	desplazamiento += paquete->buffer->size;
+
+	return magic;
+}
+
+
 t_paquete* serializar_registerModule(t_register_module* registerModule) {
 	t_buffer* registerModuleBuffer = malloc(sizeof(t_buffer));
 	registerModuleBuffer->size = sizeof(uint32_t);
@@ -295,9 +310,6 @@ t_paquete* serializar_idMensajeRecibido(t_id_mensaje_recibido* idMensajeRecibido
     t_paquete* paquete = crear_paquete(MENSAJE_RECIBIDO, buffer->size, buffer->stream);
 
     return paquete;
-}
-t_id_mensaje_recibido deserializar_idMensajeRecibido(t_buffer* buffer) {
-    //TODO: Implementar
 }
 
 #pragma endregion

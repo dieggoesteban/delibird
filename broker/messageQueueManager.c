@@ -81,7 +81,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 			//TODO: Probar si funciona
 			t_id_mensaje_recibido* idAsignado = crearIdMensajeRecibido(message->id);		
 			t_paquete* paquete = serializar_idMensajeRecibido(idAsignado);
-			enviar_mensaje(paquete, socket_cliente);
+			enviarMensaje(paquete, socket_cliente);
 
 			break;
 		}
@@ -222,7 +222,7 @@ void dispatchMessagesFromMQ(t_message_queue* messageQueue)
 			printf("Esperando mensajes para enviar en NEW POKEMON...\n");
 			continue;
 		}
-		sendMessage(list_get(messageQueue->mensajes, 0), 0); //TODO: Quitar esta linea
+		sendMessageFromQueue(list_get(messageQueue->mensajes, 0), 0); //TODO: Quitar esta linea
 		list_remove(messageQueue->mensajes, 0);
 		printf("Mensajes restantes: %i\n", list_size(messageQueue->mensajes));
 

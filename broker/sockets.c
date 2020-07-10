@@ -1,5 +1,22 @@
 #include "sockets.h"
 
+#pragma region Funciones de Cliente
+
+void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente) {
+	int sizePaquete = paquete->buffer->size + 2 * sizeof(int);
+	void* stream = serializar_paquete(paquete, sizePaquete);
+	send(socket_cliente,stream,sizePaquete,MSG_CONFIRM);
+	liberarPaquete(paquete);
+	free(stream);
+}
+void liberarPaquete(t_paquete* paquete){
+	free(paquete->buffer->stream);
+	free(paquete->buffer);	
+	free(paquete);
+}
+
+#pragma endregion
+
 #pragma region Funciones de Servidor
 void iniciar_servidor(void)
 {
@@ -57,7 +74,6 @@ void process_request(uint32_t operation_cod, uint32_t socket_cliente)
     t_buffer *buffer = recibir_buffer(socket_cliente);
 	processMessage(buffer, operation_cod, socket_cliente);
 }
-#pragma endregion
 
 t_buffer *recibir_buffer(uint32_t socket_cliente)
 {
@@ -71,11 +87,4 @@ t_buffer *recibir_buffer(uint32_t socket_cliente)
 
 	return buffer;
 }
-
-void enviar_mensaje(t_paquete* paquete, uint32_t socket_cliente) {
-	int sizePaquete = paquete->buffer->size + 2 * sizeof(int);
-	void* stream = serializar_paquete(paquete, sizePaquete);
-	send(socket_cliente, stream, sizePaquete, MSG_CONFIRM);
-	liberarPaquete(paquete);
-	free(stream);
-}
+#pragma endregion
