@@ -25,7 +25,7 @@ t_entrenador *getEntrenadorMejorPosicionado(t_pokemon_posicion *pokemon, t_list*
 bool asignarPokemonAEntrenador() {
 
     t_list* entrenadores = list_duplicate(colaNEW);
-    t_list* blocked = list_filter(colaBLOCKED, entrenadorPuedeCapturar);
+    t_list* blocked = list_filter(colaBLOCKED, entrenadorDisponible);
     list_add_all(entrenadores, blocked);
     bool resultado = false;
 
@@ -56,6 +56,28 @@ bool asignarPokemonAEntrenador() {
     list_destroy(entrenadores);
 
     return resultado;
+}
+
+t_entrenador* asignarAEntrenador(t_pokemon_posicion* pokemon) {
+
+    sem_wait(&mutexNEW);
+    t_list* entrenadores = list_duplicate(colaNEW);
+    sem_post(&mutexNEW);
+    sem_wait(&mutexBLOCKED);
+    t_list* blocked = list_filter(colaBLOCKED, entrenadorDisponible);
+    sem_post(&mutexBLOCKED);
+    list_add_all(entrenadores, blocked);
+    t_entrenador* entrenadorMP = NULL;
+
+    if(pokemonEnObjetivoGlobal(pokemon) && list_size(entrenadores) > 0) {
+        entrenadorMP = getEntrenadorMejorPosicionado(pokemon, entrenadores);
+        entrenadorMP->pokemonPlanificado = pokemon;
+    }
+
+    list_destroy(blocked);
+    list_destroy(entrenadores);
+
+    return entrenadorMP;
 }
 
 //BOOL(uda)
@@ -114,7 +136,7 @@ void ejecutarEntrenador {
 
 */
 //LA FUNCION DE ASIGANR EL POKEMON MAS CERCANO AL FINAL CREO QUE RE DEBERIA SER como deciamos de que si esta al lado el pokemon que se agarre ese, no importa el "orden de llegada del pokemon", porque primero llegan todos los pokes con el get, y despues deberiamos empezar a asignar los entrenadores 
-void ejecutarEntrenador(t_entrenador* entrenador){ //aunque no esta contemplando el tema del deadblock por ahora
+void ejecutarEntrenador(t_entrenador* entrenador){ //aunque no esta contemplando el tema del deadlock por ahora
     if(list_size(colaEXEC) == 0){ //solo puede haber uno ejecutando en colaEXEC
         list_add(colaEXEC, entrenador);
         uint32_t entrenadorPosX = entrenador->posicion->posicion_x; //las meto en variables porque es una re mil paja ver todo eso en el codigo
@@ -160,6 +182,7 @@ void ejecutarEntrenador(t_entrenador* entrenador){ //aunque no esta contemplando
     }
 }
 
+
 void mandarCATCH(t_entrenador* entrenador) {
     
     // printf("hola antes de crear catch\n");
@@ -184,5 +207,58 @@ void mandarCATCH(t_entrenador* entrenador) {
 
 }
 
+void planificadorREADY() {
+    while(1) {
+        sem_wait(&counterPokesEnMapa);
+        sem_wait(&mutexPokesEnMapa);
+        t_pokemon_posicion* poke = (t_pokemon_posicion*)list_remove(pokemonesEnMapa,0);
+        sem_post(&mutexPokesEnMapa);
+        t_entrenador* entrenador;
+        do {
+            entrenador = asignarAEntrenador(poke);
+        }
+        while(entrenador == NULL);
+        bool sePudo = moverEntrenadorDeCola(colaNEW, colaREADY, entrenador);
+        if (!sePudo) {
+            moverEntrenadorDeCola(colaBLOCKED, colaREADY, entrenador);
+        }
+    }
+}
 
-
+void planificadorEXEC(t_entrenador*(* alg)(t_entrenador*)) {
+    while(1) {
+        if(list_size(colaREADY) > 0) {
+            t_entrenador* entrenador;
+            //seria para el primer caso unicamente
+            if(list_size(colaEXEC) == 0) {
+                entrenador = alg(NULL);
+                moverEntrenadorDeCola(colaREADY, colaEXEC, entrenador);
+                sem_post(&entrenador->mutex);
+                moverEntrenadorAPokemon(entrenador);
+            }
+            //para todos los demas
+            else {
+                sem_wait(&mutexEXEC);
+                entrenador = (t_entrenador*)list_get(colaEXEC,0);
+                sem_post(&mutexEXEC);
+                if(desalojo) {
+                    t_entrenador* nuevoEntrenador = alg(entrenador);
+                    if(nuevoEntrenador->id != entrenador->id) {
+                        moverEntrenadorDeCola(colaEXEC, colaREADY, entrenador);
+                        moverEntrenadorDeCola(colaREADY, colaEXEC, nuevoEntrenador);
+                    }
+                    moverEntrenadorAPokemon(nuevoEntrenador);
+                }
+                else if(entrenadorPuedeCapturar(entrenador)) {
+                    t_entrenador* nuevoEntrenador = alg(NULL);
+                    moverEntrenadorDeCola(colaEXEC, colaBLOCKED, entrenador);
+                    moverEntrenadorDeCola(colaREADY, colaEXEC, nuevoEntrenador);
+                    moverEntrenadorAPokemon(nuevoEntrenador);
+                }
+                 else {
+                    moverEntrenadorAPokemon(entrenador);
+                }
+            }
+        }
+    }
+}

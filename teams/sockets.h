@@ -14,7 +14,9 @@
 #include<netdb.h>
 #include<string.h>
 #include<pthread.h>
+#include<semaphore.h>
 #include "serializador.h"
+#include "utils.h"
 #include "models.h"
 
 t_log* logger;
@@ -24,6 +26,10 @@ char* IP;
 char* PUERTO;
 
 t_list* objetivoGlobal;
+t_list* pokemonesEnMapa;
+
+sem_t counterPokesEnMapa;
+sem_t mutexPokesEnMapa;
 
 //CLIENTE
 int crear_conexion(char* ip, char* puerto);

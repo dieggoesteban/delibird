@@ -1,6 +1,8 @@
 #ifndef MODELS_H_
 #define MODELS_H_
 
+#include<semaphore.h>
+
 #define ERROR -1
 
 typedef enum
@@ -102,7 +104,8 @@ typedef struct
     uint32_t cantidadObjetivo;
     t_pokemon_posicion* pokemonPlanificado;
 	bool enEspera;
-    bool deadlock; 
+    bool deadlock;
+	sem_t mutex;
 } t_entrenador;
 
 #endif /* MODELS_H_ */

@@ -34,6 +34,10 @@ uint32_t getNuevoPid();
 void inicializarEntrenadores();
 void setObjetivoGlobal();
 
+//SEMAFOROS
+
+sem_t mutexEXEC;
+
 //CREAR
 t_pokemon_posicion* crearPokemonPosicion(char* nombre, t_posicion* posicion);
 t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* pokemon, uint32_t cantidadObjetivo);
@@ -66,9 +70,12 @@ t_list* obtenerEntrenadoresSinDeadlock(); //obtiene de colaBlocked
 //DE ENTRENADOR
 bool entrenadorEnDeadlock(t_entrenador* entrenador);
 bool entrenadorCumplioObjetivo(t_entrenador* entrenador);
+bool entrenadorDisponible(void* entrenador);
 bool entrenadorPuedeCapturar(void* entrenador);
+bool tardaMenos(void* trA, void* trB);
 bool ordenarEntrenador(void* a, void* b);
 bool ordenarPokemon(void* a, void* b);
 uint32_t turnosHastaPokemon(t_pokemon_posicion* pokemon, t_entrenador* entrenador);
 t_entrenador* cambiarPosicionEntrenador(t_entrenador* entrenador, uint32_t posX, uint32_t posY);
+t_entrenador* moverEntrenadorAPokemon(t_entrenador* entrenador);
 #endif /* UTILS_H_ */

@@ -1,5 +1,5 @@
-#ifndef TEAM_H_
-#define TEAM_H_
+#ifndef ALGORITMOS_H_
+#define ALGORITMOS_H_
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -11,15 +11,16 @@
 #include<readline/readline.h>
 #include<commons/collections/list.h>
 
-#include "sockets.h"
 #include "utils.h"
-#include "models.h"
-#include "planificador.h"
+
+typedef t_entrenador (*AlgoritmoFunc)(t_entrenador*);
 
 char* IP;
 char* PUERTO;
 char* LOG;
-char* ALGORITMO;
+
+uint32_t quantum;
+uint32_t currentQuantum;
 
 //GLOBALES
 t_list* objetivoGlobal;
@@ -31,7 +32,6 @@ t_list* colaEXEC;
 t_list* colaBLOCKED;
 t_list* colaEXIT;
 
-pthread_t threadREADY;
 pthread_t threadEXEC;
 
 sem_t mutexNEW;
@@ -39,16 +39,14 @@ sem_t mutexREADY;
 sem_t mutexEXEC;
 sem_t mutexBLOCKED;
 sem_t mutexEXIT;
-sem_t mutexPokesEnMapa;
 
-sem_t counterPokesEnMapa;
+t_entrenador* FIFO(t_entrenador* e);
+t_entrenador* SJF(t_entrenador* e);
+t_entrenador* RR(t_entrenador* e);
 
-uint32_t cicloCPU;
-uint32_t quantum;
-uint32_t currentQuantum;
+AlgoritmoFunc getAlgoritmo(char* config);
 
-//INICIALIZACION Y TERMINACION DEL MODULO
-void inicializarTeam();
-void terminar_programa(int, t_log*, t_config*);
+bool desalojo;
 
-#endif /* TEAM_H_ */
+#endif /* ALGORITMOS_H_ */
+

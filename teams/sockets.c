@@ -114,7 +114,12 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd) {
 				log_info(logger, "SIZE BUFFER EN NEW: %i", buffer->size);
 				// deserializar_appearedPokemon(buffer);
 				t_appeared_pokemon* appearedPoke = deserializar_appearedPokemon(buffer);
-				printf("pos x de poke: %i", appearedPoke->posicion->posicion_x);
+				t_pokemon_posicion* poke = crearPokemonPosicion(appearedPoke->nombre, appearedPoke->posicion);
+				sem_wait(&mutexPokesEnMapa);
+				list_add(pokemonesEnMapa,poke);
+				sem_post(&mutexPokesEnMapa);
+				sem_post(&counterPokesEnMapa);
+				printf("Aparecio %s en la posicion %i:%i!!", appearedPoke->nombre, appearedPoke->posicion->posicion_x, appearedPoke->posicion->posicion_y);
 				log_info(logger, appearedPoke->nombre);
 
 				free(appearedPoke);
