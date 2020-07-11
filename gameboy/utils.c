@@ -29,7 +29,7 @@ uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_men
 			isValid = 1;
 		}
 	}
-	else if (strcmp(proceso, "SUSCRIBE") == 0)
+	else if (strcmp(proceso, "SUSCRIPTOR") == 0)
 	{
 		ipAux = config_get_string_value(config, "IP_BROKER");
 		puertoAux = config_get_string_value(config, "PUERTO_BROKER");

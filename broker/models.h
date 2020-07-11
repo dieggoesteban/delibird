@@ -24,9 +24,19 @@ typedef enum
 } operation_cod;
 
 typedef struct {
+	char name[50];
     uint32_t mq_cod;
     t_list* mensajes;
     t_list* subscribers;
+
+	//Semaphores
+	pthread_mutex_t s_mensajes;
+	pthread_mutex_t s_subscribers;
+	sem_t s_haySuscriptores;
+	sem_t s_hayMensajes;
+
+	//Threads
+	pthread_t dispatchMessagesThread;
 } t_message_queue;
 
 typedef struct{

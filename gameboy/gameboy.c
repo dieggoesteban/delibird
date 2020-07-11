@@ -29,9 +29,20 @@ int main(int argc, char *argv[])
             log_info(logger, ip);
             log_info(logger, puerto);
             t_paquete *paquete;
-            if (strcmp(proceso, "SUSCRIBE") == 0)
+            if (strcmp(proceso, "SUSCRIPTOR") == 0)
             {
-                paquete = modoSuscriptor(proceso);
+                if(strcmp(tipo_mensaje, "NEW_POKEMON") == 0)               
+                    paquete = modoSuscriptor(1);
+                else if (strcmp(tipo_mensaje, "APPEARED_POKEMON") == 0) 
+                    paquete = modoSuscriptor(2);
+                else if (strcmp(tipo_mensaje, "CATCH_POKEMON") == 0) 
+                    paquete = modoSuscriptor(3);
+                else if (strcmp(tipo_mensaje, "CAUGHT_POKEMON") == 0) 
+                    paquete = modoSuscriptor(4);
+                else if (strcmp(tipo_mensaje, "GET_POKEMON") == 0) 
+                    paquete = modoSuscriptor(5);
+                else if (strcmp(tipo_mensaje, "LOCALIZED_POKEMON") == 0) 
+                    paquete = modoSuscriptor(6);
             }
             else
             {

@@ -1,7 +1,6 @@
 #include "broker.h"
 
 pthread_t serverThread;
-pthread_t dispatchMessagesThread;
 pthread_t cacheThread;
 
 int main() 
@@ -27,14 +26,17 @@ int main()
     pthread_create(&cacheThread, NULL, (void *)startCache, NULL);
 
     //Activar envio de mensajes en las colas
-    pthread_create(&dispatchMessagesThread, NULL, (void *)dispatchMessagesFromMQ, newPokemonMessageQueue);
+    pthread_create(&newPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromMQ, newPokemonMessageQueue);
+    pthread_create(&getPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromMQ, getPokemonMessageQueue);
 
     //Iniciar servidor
     pthread_create(&serverThread, NULL, (void *)iniciar_servidor, NULL);
 
+    //Cierre de threads
     pthread_join(serverThread, NULL);
     pthread_join(cacheThread, NULL);
-    pthread_join(dispatchMessagesThread, NULL);
+    pthread_join(newPokemonMessageQueue->dispatchMessagesThread, NULL);
+    pthread_join(getPokemonMessageQueue->dispatchMessagesThread, NULL);
 
     terminarPrograma();
 }

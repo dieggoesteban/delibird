@@ -114,7 +114,7 @@ typedef struct{
 
 //PAQUETES
 t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje);
-t_paquete* modoSuscriptor(char* tipo_mensaje);
+t_paquete* modoSuscriptor(uint32_t mq_cod);
 void liberarPaquete(t_paquete* paquete);
 void* serializar_paquete(t_paquete* paquete, int bytes);
 

@@ -584,15 +584,14 @@ void liberarPaquete(t_paquete* paquete){
 	free(paquete);
 }
 
-t_paquete* modoSuscriptor(char* tipo_mensaje) 
+t_paquete* modoSuscriptor(uint32_t mq_cod) 
 {
 	t_paquete *paquete;
 	log_info(logger, "Entro a modoSuscriptor\n");
 
 	t_register_module* registerModule = malloc(sizeof(t_register_module));
 
-	//TODO: Deshardcodear
-	registerModule->messageQueue = 1;
+	registerModule->messageQueue = mq_cod;
 
 	paquete = serializar_registerModule(registerModule);
 

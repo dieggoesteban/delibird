@@ -4,13 +4,31 @@
     // Para más información, visite: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
         {
-            "name": "(gdb) Launch",
+            "name": "Broker",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/broker/broker",
             "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Gameboy",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/gameboy/gameboy",
+            "args": ["SUSCRIPTOR", "NEW_POKEMON"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
