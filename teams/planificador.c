@@ -84,17 +84,9 @@ t_entrenador* asignarAEntrenador(t_pokemon_posicion* pokemon) {
 bool moverEntrenadorDeCola(t_list *colaEmisora, t_list *colaReceptora, t_entrenador *entrenador) {
     uint32_t indexExiste = entrenadorPerteneceALista(entrenador, colaEmisora);
     if (indexExiste != ERROR) {
+        //printf("**Posicion actual de entrenador %i:%i\n",(uint32_t)entrenador->posicion->posicion_x, (uint32_t)entrenador->posicion->posicion_y);
         list_add(colaReceptora, (t_entrenador *)list_remove(colaEmisora, indexExiste));
         return true;
-    }
-    return false;
-}
-
-bool pokemonEnObjetivoGlobal(t_pokemon_posicion* pokemon) {
-    uint32_t index = pokemonPosicionPerteneceALista(pokemon,objetivoGlobal);
-    if(index != ERROR) {
-        if(((t_pokemon_cantidad*)list_get(objetivoGlobal,index))->cantidad > 0)
-            return true;
     }
     return false;
 }
@@ -182,7 +174,6 @@ void ejecutarEntrenador(t_entrenador* entrenador){ //aunque no esta contemplando
     }
 }
 
-
 void mandarCATCH(t_entrenador* entrenador) {
     
     // printf("hola antes de crear catch\n");
@@ -207,11 +198,14 @@ void mandarCATCH(t_entrenador* entrenador) {
 
 }
 
-void planificadorREADY() {
+void* planificadorREADY() {
+    printf("Hilo READY ejecutando\n");
     while(1) {
+        printf("Esperando Pokemon...\n");
         sem_wait(&counterPokesEnMapa);
         sem_wait(&mutexPokesEnMapa);
         t_pokemon_posicion* poke = (t_pokemon_posicion*)list_remove(pokemonesEnMapa,0);
+        printf("Saco a %s que esta en %i:%i \n",poke->nombre, (uint32_t)poke->posicion->posicion_x, (uint32_t)poke->posicion->posicion_y);
         sem_post(&mutexPokesEnMapa);
         t_entrenador* entrenador;
         do {
@@ -222,37 +216,61 @@ void planificadorREADY() {
         if (!sePudo) {
             moverEntrenadorDeCola(colaBLOCKED, colaREADY, entrenador);
         }
+        printf("Asignado %s al entrenador %i que esta en %i:%i \n", poke->nombre, (uint32_t)entrenador->id, (uint32_t)entrenador->posicion->posicion_x, (uint32_t)entrenador->posicion->posicion_y);
     }
 }
 
-void planificadorEXEC(t_entrenador*(* alg)(t_entrenador*)) {
+void* planificadorEXEC(void* arg) {
+    AlgoritmoFunc* alg = (AlgoritmoFunc*) arg;
+    printf("Hilo EXEC ejecutando\n");
     while(1) {
-        if(list_size(colaREADY) > 0) {
+        if(list_size(colaREADY) > 0 || list_size(colaEXEC) > 0) {
+            sleep(cicloCPU);
             t_entrenador* entrenador;
             //seria para el primer caso unicamente
             if(list_size(colaEXEC) == 0) {
                 entrenador = alg(NULL);
                 moverEntrenadorDeCola(colaREADY, colaEXEC, entrenador);
                 sem_post(&entrenador->mutex);
-                moverEntrenadorAPokemon(entrenador);
+                if(!entrenadorPuedeCapturar(entrenador)) {
+                    moverEntrenadorAPokemon(entrenador);
+                } else {
+                    printf("Entrenador %i puede capturar y va a BLOCKED\n", entrenador->id);
+                    entrenador->enEspera = true;
+                    mandarCATCH(entrenador);
+                    moverEntrenadorDeCola(colaEXEC, colaBLOCKED, entrenador);
+                    if(list_size(colaREADY) > 0) {
+                        t_entrenador* nuevoEntrenador = alg(NULL);
+                        printf("Entrenador %i pasa a EXEC\n", nuevoEntrenador->id);
+                        moverEntrenadorDeCola(colaREADY, colaEXEC, nuevoEntrenador);
+                        moverEntrenadorAPokemon(nuevoEntrenador);
+                    }
+                }
             }
             //para todos los demas
             else {
                 sem_wait(&mutexEXEC);
                 entrenador = (t_entrenador*)list_get(colaEXEC,0);
                 sem_post(&mutexEXEC);
-                if(desalojo) {
+                if(entrenadorPuedeCapturar(entrenador)) {
+                    printf("Entrenador %i puede capturar y va a BLOCKED\n", entrenador->id);
+                    entrenador->enEspera = true;
+                    mandarCATCH(entrenador);
+                    moverEntrenadorDeCola(colaEXEC, colaBLOCKED, entrenador);
+                    if(list_size(colaREADY) > 0) {
+                        t_entrenador* nuevoEntrenador = alg(NULL);
+                        printf("Entrenador %i pasa a EXEC\n", nuevoEntrenador->id);
+                        moverEntrenadorDeCola(colaREADY, colaEXEC, nuevoEntrenador);
+                        moverEntrenadorAPokemon(nuevoEntrenador);
+                    }
+                }
+                else if(desalojo && list_size(colaREADY) > 0) {
                     t_entrenador* nuevoEntrenador = alg(entrenador);
                     if(nuevoEntrenador->id != entrenador->id) {
+                        printf("----Se desaloja a entrenador %i y entra entrenador %i\n", (uint32_t)entrenador->id, (uint32_t)nuevoEntrenador->id);
                         moverEntrenadorDeCola(colaEXEC, colaREADY, entrenador);
                         moverEntrenadorDeCola(colaREADY, colaEXEC, nuevoEntrenador);
                     }
-                    moverEntrenadorAPokemon(nuevoEntrenador);
-                }
-                else if(entrenadorPuedeCapturar(entrenador)) {
-                    t_entrenador* nuevoEntrenador = alg(NULL);
-                    moverEntrenadorDeCola(colaEXEC, colaBLOCKED, entrenador);
-                    moverEntrenadorDeCola(colaREADY, colaEXEC, nuevoEntrenador);
                     moverEntrenadorAPokemon(nuevoEntrenador);
                 }
                  else {

@@ -13,7 +13,7 @@
 
 #include "utils.h"
 
-typedef t_entrenador (*AlgoritmoFunc)(t_entrenador*);
+typedef t_entrenador* (AlgoritmoFunc)(t_entrenador*);
 
 char* IP;
 char* PUERTO;
@@ -44,7 +44,7 @@ t_entrenador* FIFO(t_entrenador* e);
 t_entrenador* SJF(t_entrenador* e);
 t_entrenador* RR(t_entrenador* e);
 
-AlgoritmoFunc getAlgoritmo(char* config);
+AlgoritmoFunc* getAlgoritmo(char* config);
 
 bool desalojo;
 

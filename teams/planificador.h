@@ -16,6 +16,7 @@
 #include "algoritmos.h"
 #include "sockets.h"
 
+typedef t_entrenador* (AlgoritmoFunc)(t_entrenador*);
 
 //GLOBALES
 t_list* colaNEW;
@@ -49,7 +50,8 @@ void planificarFIFO();
 void ejecutarEntrenador(t_entrenador* entrenador);
 void mandarCATCH(t_entrenador* entrenador);
 
-void planificadorREADY();
-void planificadorEXEC(t_entrenador*(* alg)(t_entrenador*));
+
+void* planificadorREADY();
+void* planificadorEXEC(void*);
 
 #endif /* PLANIFICADOR_H_ */

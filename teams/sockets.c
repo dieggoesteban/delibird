@@ -79,6 +79,7 @@ void iniciar_servidor(void)
 
     freeaddrinfo(servinfo);
 
+	printf("Iniciando servidor...\n");
     while(1)
     	esperar_cliente(socket_servidor);
 }
@@ -102,7 +103,7 @@ void serve_client(uint32_t* socket)
 	uint32_t cod_op;
 	if(recv(*socket, &cod_op, sizeof(int), MSG_WAITALL) == -1)
 		cod_op = -1;
-	printf("codigo de op: %i", cod_op);
+	//printf("codigo de op: %i", cod_op);
 	process_request(cod_op, *socket);
 }
 
@@ -111,16 +112,11 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd) {
 	switch (cod_op) {
 		case APPEARED_POKEMON:
 			{
-				log_info(logger, "SIZE BUFFER EN NEW: %i", buffer->size);
+				//log_info(logger, "SIZE BUFFER EN NEW: %i", buffer->size);
 				// deserializar_appearedPokemon(buffer);
 				t_appeared_pokemon* appearedPoke = deserializar_appearedPokemon(buffer);
 				t_pokemon_posicion* poke = crearPokemonPosicion(appearedPoke->nombre, appearedPoke->posicion);
-				sem_wait(&mutexPokesEnMapa);
-				list_add(pokemonesEnMapa,poke);
-				sem_post(&mutexPokesEnMapa);
-				sem_post(&counterPokesEnMapa);
-				printf("Aparecio %s en la posicion %i:%i!!", appearedPoke->nombre, appearedPoke->posicion->posicion_x, appearedPoke->posicion->posicion_y);
-				log_info(logger, appearedPoke->nombre);
+				insertPokeEnMapa(poke);
 
 				free(appearedPoke);
 				free(buffer->stream);
@@ -155,7 +151,7 @@ t_buffer* recibir_buffer(uint32_t socket_cliente)
 	int size;
     
     recv(socket_cliente, &size, sizeof(int), MSG_WAITALL);
-	printf("size buffer: %d", size);
+	printf("size buffer: %d\n", size);
     buffer->size = size;
 	buffer->stream = malloc(buffer->size);
 	recv(socket_cliente, buffer->stream, buffer->size, MSG_WAITALL);

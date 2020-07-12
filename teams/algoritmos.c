@@ -1,6 +1,7 @@
 #include "algoritmos.h"
 
 t_entrenador *FIFO(t_entrenador* e) {
+    printf("Ejecutando FIFO\n");
     sem_wait(&mutexREADY);
     t_entrenador* entrenador = list_get(colaREADY, 0);
     sem_post(&mutexREADY);
@@ -27,8 +28,18 @@ uint32_t getCurrentQuantum() {
 
 t_entrenador *RR(t_entrenador* e) {
     uint32_t q = getCurrentQuantum();
+    printf("Ejecutando RR, quantum actual: %i\n", q+1);
     if (q > 0) {
-        return e;
+        if(e != NULL) {
+            printf("Retorno el mismo: %i\n", e->id);
+            return e;
+        } else {
+            sem_wait(&mutexREADY);
+            t_entrenador* entrenador = list_get(colaREADY, 0);
+            sem_post(&mutexREADY);
+
+            return entrenador;
+        }
     }
     else {
         currentQuantum = quantum;
@@ -42,7 +53,7 @@ t_entrenador *RR(t_entrenador* e) {
 
 //FIFO/RR/SJF-CD/SJF-SD
 
-AlgoritmoFunc getAlgoritmo(char* config) {
+AlgoritmoFunc* getAlgoritmo(char* config) {
 	if(strcmp(config,"FIFO") == 0) {
         desalojo = false;
 		return FIFO;

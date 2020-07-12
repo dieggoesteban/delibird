@@ -31,9 +31,6 @@ t_list* colaEXEC;
 t_list* colaBLOCKED;
 t_list* colaEXIT;
 
-pthread_t threadREADY;
-pthread_t threadEXEC;
-
 sem_t mutexNEW;
 sem_t mutexREADY;
 sem_t mutexEXEC;
