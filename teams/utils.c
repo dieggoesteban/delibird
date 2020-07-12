@@ -153,11 +153,28 @@ void inicializarEntrenadores() {
 	}
 }
 
+uint32_t maxNum(uint32_t a, uint32_t b) {
+	if(a-b >= 0) {
+		return a-b;
+	} else return 0;
+}
+
+t_list* getCaughtPokemon() {
+	t_list* aux = list_create();
+	for(uint32_t i = 0; i < list_size(colaNEW); i++){
+		list_add_all(aux, ((t_entrenador*)list_get(colaNEW, i))->pokemonCapturados);
+	}
+
+	return aux;
+}
+
 void setObjetivoGlobal(){
 	t_list* pokemonesObjetivos = list_create();
 	t_list* globalAux = list_create();
 
 	objetivoGlobal = list_create();
+
+	t_list* caughtPokes = getCaughtPokemon();
 
 	for(uint32_t i = 0; i < list_size(colaNEW); i++){
 		list_add_all(pokemonesObjetivos, ((t_entrenador*)list_get(colaNEW, i))->pokemonObjetivo);
@@ -169,11 +186,19 @@ void setObjetivoGlobal(){
 		for(uint32_t j = 0; j < list_size(pokemon); j++){
 			if(perteneceALista(list_get(pokemon, j),globalAux) == 0) {
 				uint32_t cant = perteneceAListaContador(list_get(pokemon, j),pokemonesObjetivos);
-				list_add(objetivoGlobal, setPokemonCantidad(list_get(pokemon, j), cant));
+				uint32_t cantidad = perteneceAListaContador(list_get(pokemon,j),caughtPokes);
+				printf("Hay %i %s capturado/s \n", cantidad, (char*)list_get(pokemon, j));
+				list_add(objetivoGlobal, setPokemonCantidad(list_get(pokemon, j), maxNum(cant, cantidad)));
 				list_add(globalAux, list_get(pokemon, j));
 			}
 		}
 		free(pokemon);
+	}
+
+	printf("-OBJETIVO GLOBAL-\n");
+	for(uint32_t i = 0; i < list_size(objetivoGlobal); i++) {
+		t_pokemon_cantidad* poke = (t_pokemon_cantidad*)list_get(objetivoGlobal,i); 
+		printf("%s -- %i\n", (char*)poke->nombre, (uint32_t)poke->cantidad);
 	}
 
 	free(pokemonesObjetivos);

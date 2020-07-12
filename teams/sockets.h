@@ -36,8 +36,9 @@ int crear_conexion(char* ip, char* puerto);
 void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente);
 void* recibir_paquete(int socket_cliente);
 void liberar_conexion(uint32_t socket_cliente);
+uint32_t escuchaBroker();
 
-void sendGET();
+void mandarGET();
 
 //SERVER
 void iniciar_servidor(void);

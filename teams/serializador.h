@@ -65,8 +65,8 @@ t_config* config;
 // 	uint32_t ID_mensaje_original;
 // 	uint32_t sizeNombre;
 // 	char* nombre;
-// 	uint32_t sizePosicion_cantidad; //LO AGREGO POR AHORA
-// 	t_list* posicion_cantidad; //una lista de t_posicion_cantidad
+// 	uint32_t sizePosicion; 
+// 	t_list* posicion; //una lista de t_posicion
 // }t_localized_pokemon;
 
 // typedef struct{
@@ -121,15 +121,24 @@ t_get_pokemon* deserializar_getPokemon(t_buffer* buffer);
 t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon);
 t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer);
 
+t_paquete* serializar_registerModule(t_register_module* registerModule);
+t_register_module* deserializar_registerModule(t_buffer* buffer);
+
+t_paquete* serializar_akc(t_akc* akc);
+t_akc* deserializar_akc(t_buffer* buffer);
+
+t_paquete* serializar_confirmacionMensaje(t_confirmacion_mensaje* confirmacion);
+t_confirmacion_mensaje* deserializar_confirmacionMensaje(t_buffer* buffer);
+
 //CREACION DE LOS STRUCTS
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant);
 t_posicion* crearPosicion(uint32_t x, uint32_t y);
 t_new_pokemon* crearNewPokemon(uint32_t IDMensajeRecibido, char* nombre, t_posicion_cantidad* posicionCantidad);
-t_localized_pokemon* crearLocalizedPokemon(uint32_t IDMensajeRecibido,uint32_t IDMensajeOriginal, char* nombre, uint32_t sizePosicionCantidad, t_list* posicion_cantidad);
+t_localized_pokemon* crearLocalizedPokemon(uint32_t IDMensajeRecibido,uint32_t IDMensajeOriginal, char* nombre, uint32_t cantPosiciones, t_list* posicion);
 t_appeared_pokemon* crearAppearedPokemon(uint32_t IDMensajeRecibido, char* nombre, t_posicion* posicion);
 t_catch_pokemon* crearCatchPokemon(uint32_t ID_mensaje_recibido, char* nombre, t_posicion* posicion);
 t_caught_pokemon* crearCaughtPokemon(uint32_t IDMensajeRecibido, uint32_t IDMensajeOriginal, uint32_t catchStatus);
 t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre);
-
+t_confirmacion_mensaje* crearConfirmacionMensaje(uint32_t ID_mensaje, uint32_t colaMensajes, bool meLlego);
 
 #endif /* CONNECTION_H_ */

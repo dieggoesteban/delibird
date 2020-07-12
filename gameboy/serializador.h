@@ -10,6 +10,14 @@
 #include<string.h>
 #include "utils.h"
 
+
+typedef struct 
+{
+	uint32_t idModuleToRegister;
+	uint32_t messageQueue;
+} t_register_module;
+
+
 typedef enum
 {
 	NEW_POKEMON = 1,
@@ -17,14 +25,24 @@ typedef enum
 	CATCH_POKEMON = 3,
 	CAUGHT_POKEMON = 4,
 	GET_POKEMON = 5,
-	LOCALIZED_POKEMON = 6
+	LOCALIZED_POKEMON = 6,
+	SUSCRIBE = 7
 } mq_cod;
+
+typedef enum
+{
+	ACKNOWLEDGEMENT = 8
+} acciones;
 
 typedef struct
 {
 	int size;
 	void* stream;
 } t_buffer;
+
+typedef struct {
+	uint32_t AKC;
+} t_akc;
 
 typedef struct
 {
@@ -58,8 +76,8 @@ typedef struct{
 	uint32_t ID_mensaje_original;
 	uint32_t sizeNombre;
 	char* nombre;
-	uint32_t sizePosicion_cantidad; //LO AGREGO POR AHORA
-	t_list* posicion_cantidad; //una lista de t_posicion_cantidad
+	uint32_t sizePosicion; 
+	t_list* posicion; //una lista de t_posicion
 }t_localized_pokemon;
 
 typedef struct{
@@ -96,6 +114,7 @@ typedef struct{
 
 //PAQUETES
 t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje);
+t_paquete* modoSuscriptor(uint32_t mq_cod);
 void liberarPaquete(t_paquete* paquete);
 void* serializar_paquete(t_paquete* paquete, int bytes);
 
@@ -113,11 +132,17 @@ t_get_pokemon* deserializar_getPokemon(t_buffer* buffer);
 t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon);
 t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer);
 
+t_paquete* serializar_registerModule(t_register_module* registerModule);
+t_register_module* deserializar_registerModule(t_buffer* buffer);
+
+t_paquete* serializar_akc(t_akc* akc);
+t_akc* deserializar_akc(t_buffer* buffer);
+
 //CREACION DE LOS STRUCTS
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant);
 t_posicion* crearPosicion(uint32_t x, uint32_t y);
 t_new_pokemon* crearNewPokemon(uint32_t IDMensajeRecibido, char* nombre, t_posicion_cantidad* posicionCantidad);
-t_localized_pokemon* crearLocalizedPokemon(uint32_t IDMensajeRecibido,uint32_t IDMensajeOriginal, char* nombre, uint32_t sizePosicionCantidad, t_list* posicion_cantidad);
+t_localized_pokemon* crearLocalizedPokemon(uint32_t IDMensajeRecibido,uint32_t IDMensajeOriginal, char* nombre, uint32_t sizePosicionCantidad, t_list* posicion);
 t_appeared_pokemon* crearAppearedPokemon(uint32_t IDMensajeRecibido, char* nombre, t_posicion* posicion);
 t_catch_pokemon* crearCatchPokemon(uint32_t ID_mensaje_recibido, char* nombre, t_posicion* posicion);
 t_caught_pokemon* crearCaughtPokemon(uint32_t IDMensajeRecibido, uint32_t IDMensajeOriginal, uint32_t catchStatus);

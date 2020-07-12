@@ -37,16 +37,36 @@ void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente) {
 	free(stream);
 }
 
-// void sendGET() {
-// 	char* ipBroker = config_get_string_value(config, "IP_BROKER");
-// 	char* puertoBroker = config_get_string_value(config, "PUERTO_BROKER");
+void sendGET(char* poke) {
+	printf("Send GET\n");
+	t_get_pokemon* getPokemon = crearGetPokemon(11, poke);
+	printf("getPokemon:\n");
+	printf("id: %i\nnombre: %s\ntamanio:%i\n", (uint32_t)getPokemon->ID_mensaje_recibido, (char*)getPokemon->nombre, (uint32_t)getPokemon->sizeNombre);
+	t_paquete* paquete = serializar_getPokemon(getPokemon);
+	printf("GET %s\n",poke);
 
-// 	t_list* conexiones = create_list();
+	free(getPokemon);
 
-// 	for(uint32_t i = 0; i < list_size(objetivoGlobal); i++) {
-		
-// 	}
-// }
+    char* ip = config_get_string_value(config, "IP_BROKER");
+    char* puerto = config_get_string_value(config, "PUERTO_BROKER");
+    uint32_t conexion = crear_conexion(ip, puerto);
+
+    enviarMensaje(paquete, conexion);
+
+    liberar_conexion(conexion);
+	free(paquete);
+
+}
+
+void mandarGET() {
+
+	t_pokemon_cantidad* poke = (t_pokemon_cantidad*)list_get(objetivoGlobal,0);
+	printf("Poke %s\n", poke->nombre);
+	if(poke->cantidad > 0) {
+		sendGET(poke->nombre);
+	}
+
+}
 
 /*SERVER SIDE*/
 
@@ -157,5 +177,12 @@ t_buffer* recibir_buffer(uint32_t socket_cliente)
 	recv(socket_cliente, buffer->stream, buffer->size, MSG_WAITALL);
 
 	return buffer;
+}
+
+uint32_t escuchaBroker(){
+	char* IP_BROKER = config_get_string_value(config,"IP_BROKER");
+    char* PUERTO_BROKER = config_get_string_value(config,"PUERTO_BROKER");
+
+	return crear_conexion(IP_BROKER, PUERTO_BROKER);
 }
 

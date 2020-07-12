@@ -19,15 +19,22 @@ uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_men
 	char *gamecardCommands[] = {"NEW_POKEMON", "CATCH_POKEMON", "GET_POKEMON"};
 	char *ipAux, *puertoAux;
 
-	if (strcmp(proceso, "BROKER") == 0 || strcmp(proceso, "SUSCRIPTOR") == 0)
+	if (strcmp(proceso, "BROKER") == 0)
 	{
 		ipAux = config_get_string_value(config, "IP_BROKER");
 		puertoAux = config_get_string_value(config, "PUERTO_BROKER");
-		log_info(logger,"Se va a conectar en BROKER");
+		log_info(logger,"Se va a conectar en BROKER\n");
 		if (perteneceAlArray(tipo_mensaje, brokerCommands, 5) == 1)
 		{
 			isValid = 1;
 		}
+	}
+	else if (strcmp(proceso, "SUSCRIPTOR") == 0)
+	{
+		ipAux = config_get_string_value(config, "IP_BROKER");
+		puertoAux = config_get_string_value(config, "PUERTO_BROKER");
+		log_info(logger,"Se va a conectar en BROKER\n");
+		isValid = 1;
 	}
 	else if (strcmp(proceso, "TEAM") == 0)
 	{
@@ -54,7 +61,6 @@ uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_men
 	*puerto = malloc(strlen(puertoAux));
 	strcpy(*ip, ipAux);
 	strcpy(*puerto, puertoAux);
-
 	return isValid;
 }
 

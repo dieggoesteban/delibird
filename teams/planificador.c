@@ -181,10 +181,6 @@ void mandarCATCH(t_entrenador* entrenador) {
     // printf("hola antes de serializar\n");
     t_paquete* paquete = serializar_catchPokemon(catchPokemon);
     // printf("hola antes de deserializar\n");
-    t_catch_pokemon* catchPokemon2 = deserializar_catchPokemon(paquete->buffer);
-
-    printf("el nombre del poke deserializado: %s\n", catchPokemon2->nombre);
-
 
     free(catchPokemon);
 

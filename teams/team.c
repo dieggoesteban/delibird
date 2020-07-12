@@ -1,7 +1,7 @@
 #include "team.h"
 
-t_log* logger;
-t_config* config;
+t_log *logger;
+t_config *config;
 
 int main(void)
 {
@@ -65,11 +65,13 @@ int main(void)
     return 0;
 }
 
-void inicializarTeam() {
+void inicializarTeam()
+{
 
     inicializarPid();
     inicializarEntrenadores();
     setObjetivoGlobal();
+    //mandarGET();
 
     /*t_pokemon_posicion* pokemon = crearPokemonPosicion("Pitochu", crearPosicion(1,1));
 
@@ -97,5 +99,4 @@ void inicializarTeam() {
     //comprobar deadlock
     //hacer intercambio
     //finalizar
-
 }
