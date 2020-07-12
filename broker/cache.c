@@ -42,26 +42,48 @@ void startCache()
 
     #pragma region Prueba de consolidacion
 
-        t_holes* initialPart1 = createHole(cache, 1024);
-        t_holes* initialPart2 = createHole(initialPart1->pLimit + 1, 1024);
-        t_holes* initialPart3 = createHole(initialPart2->pLimit + 1, 512);
-        t_holes* initialPart4 = createHole(initialPart3->pLimit + 12, 3096);
+        // t_holes* initialPart1 = createHole(cache, 1024);
+        // t_holes* initialPart2 = createHole(initialPart1->pLimit + 1, 1024);
+        // t_holes* initialPart3 = createHole(initialPart2->pLimit + 1, 512);
+        // t_holes* initialPart4 = createHole(initialPart3->pLimit + 12, 3096);
 
-        list_add(holes, initialPart1);
-        list_add(holes, initialPart2);
-        list_add(holes, initialPart3);
-        list_add(holes, initialPart4);
-        showHoles();
-        consolidar();
-        printf("\n");
-        showHoles();
-        log_info(logger, "Cache module has started successfully\n");
+        // list_add(holes, initialPart1);
+        // list_add(holes, initialPart2);
+        // list_add(holes, initialPart3);
+        // list_add(holes, initialPart4);
+        // showHoles();
+        // consolidar();
+        // printf("\n");
+        // showHoles();
+        // log_info(logger, "Cache module has started successfully\n");
 
         // free(initial);
         // free(cache);
         // free(initialPart1);
         // free(initialPart2);
     
+    #pragma endregion
+
+    #pragma region Prueba de FRECUENCIA_COMPACTACION
+    
+        // t_partition* partition1 = createPartition(cache, 1024);
+        // t_holes* initialPart1 = createHole(partition1->pLimit + 1, 512);
+        // t_partition* partition2 = createPartition(initialPart1->pLimit + 1, 1024);
+        // t_holes* initialPart2 = createHole(partition2->pLimit + 1, 512);
+        // t_partition* partition3 = createPartition(initialPart2->pLimit + 1, 1024);
+        // t_holes* initialPart3 = createHole(partition3->pLimit + 1, 512);
+
+        // list_add(partitions, partition1);
+        // list_add(partitions, partition2);
+        // list_add(partitions, partition3);
+        // list_add(holes, initialPart1);
+        // list_add(holes, initialPart2);
+        // list_add(holes, initialPart3);
+
+        // compactar();
+
+        // showPartitions();
+        // showHoles();
     #pragma endregion
 }
 
@@ -127,6 +149,7 @@ void consolidar()
 
         if(lowerHole->pLimit == upperHole->pStart - 1)
         {
+            printf("Hay consolidación...\n");
             //Inicia la Consolidacion
             t_holes* consolidado = createHole(lowerHole->pStart, lowerHole->length + upperHole->length);
 
@@ -150,9 +173,54 @@ void consolidar()
 void compactar()
 {
     if(list_size(partitions) == 0 || list_size(holes) == 0)
+    {
+        log_warning(broker_custom_logger, "No hay particiones o no hay huecos");
         return;
+    }
 
-    
+    //Primero asegurar que no haya huecos contiguos y luego ordenar ambas listas
+    consolidar();
+    list_sort(partitions, (void*) mem_address_menor_a_mayor);
+    list_sort(holes, (void*) mem_address_menor_a_mayor);
+    uint32_t targetPartitionIndex;
+    t_partition* targetPartition = (t_partition*)malloc(sizeof(t_partition));
+
+    while (existHolesBetweenPartitions())
+    {
+        printf("\n------VUELTA------\n");
+        showPartitions();
+        showHoles();
+        t_holes* hole = (t_holes*)list_get(holes, 0);
+
+        //Busco la particion contigua al hueco
+        targetPartitionIndex = -1;
+        for(uint32_t i = 0; i < list_size(partitions); i++)
+        {
+            targetPartition = list_get(partitions, i);
+            if(targetPartition->pStart == hole->pLimit + 1)
+            {
+                targetPartitionIndex = i;
+                break;
+            }
+        }
+
+        if(targetPartition == NULL) //No hay particiones continuas a ese hueco
+            return;
+        
+        //Se hace un swap entre la particion y el hueco
+        t_partition* relocatedPartition = createPartition(hole->pStart, targetPartition->length);
+        t_holes* relocatedHole = createHole(relocatedPartition->pLimit + 1, hole->length);
+
+        list_remove(holes, 0);
+        list_remove(partitions, targetPartitionIndex);
+        list_add(holes, relocatedHole);
+        list_add(partitions, relocatedPartition);
+        consolidar();
+        list_sort(partitions, (void*) mem_address_menor_a_mayor);
+        list_sort(holes, (void*) mem_address_menor_a_mayor);
+
+        targetPartition = NULL;
+    }
 }
 
 void* particionLibre_ff(uint32_t bytes) 
@@ -213,11 +281,41 @@ void showHoles()
     for(uint32_t i = 0; i < list_size(holes); i++)
     {
         currentHole = list_get(holes, i);
-        printf("Holes %d - Range: %p / %p - Length: %d\n", i, currentHole->pStart, currentHole->pLimit, currentHole->length);
+        printf("Hole %d - Range: %lu / %lu - Length: %d\n", i, 
+            (unsigned long)currentHole->pStart%1000000, (unsigned long)currentHole->pLimit%1000000, currentHole->length);
     }
     //free(currentHole);
 }
+
+t_partition* createPartition(void* startAddress, uint32_t length)
+{
+    t_partition* partition = (t_partition*)malloc(sizeof(t_partition));
+    partition->pStart = startAddress;
+    partition->pLimit = startAddress + length - 1; //Se resta uno porque hay que incluir el byte de pStart
+    partition->length = length; 
+    return partition;
+}
+void showPartitions()
+{
+    t_partition* currentPartition = (t_partition*)malloc(sizeof(t_partition));
+    for(uint32_t i = 0; i < list_size(partitions); i++)
+    {
+        currentPartition = list_get(partitions, i);
+        printf("Partition %d - Range: %lu / %lu - Length: %d\n", i, 
+            (unsigned long)currentPartition->pStart%1000000, (unsigned long)currentPartition->pLimit%1000000, currentPartition->length);
+    }
+    //free(currentPartition);
+}
+
 bool mem_address_menor_a_mayor(t_holes* hole1, t_holes* hole2)
 {
     return hole1->pStart < hole2->pStart;
+}
+
+bool existHolesBetweenPartitions()
+{
+    t_holes* firstHole = list_get(holes, 0); //El primer hueco
+    t_partition* lastPartition = list_get(partitions, list_size(partitions) - 1); //La ultima particion
+
+    return firstHole->pStart < lastPartition->pLimit;
 }

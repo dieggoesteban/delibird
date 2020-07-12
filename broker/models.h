@@ -42,8 +42,9 @@ typedef struct {
 typedef struct{
 	uint32_t id;
 	uint32_t idCorrelativo;
+	uint32_t mq_cod; //Cada mensaje sabe que tipo es
 	t_list* suscriptoresConfirmados; 
-	void* mensaje; //Puede ser de cualquier tipo de mensaje 
+	void* mensaje; //Contenido del mensaje
 } t_message;
 #pragma endregion
 

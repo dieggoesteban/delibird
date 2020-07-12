@@ -22,7 +22,7 @@ t_message_queue* caughtPokemonMessageQueue;
 t_message_queue* localizedPokemonMessageQueue;
 
 t_message_queue* crearMessageQueue(uint32_t mq_cod);
-t_message* crearMessage(void* mensajeRecibido);
+t_message* crearMessage(void* mensajeRecibido, uint32_t mq_cod);
 t_message_queue* getMessageQueueById(uint32_t id);
 t_list* getSuscriptoresByMessageQueueId(uint32_t id);
 
@@ -32,6 +32,7 @@ void addMessageToMQ(t_message* message, t_message_queue* messageQueue);
 void sendMessageFromQueue(t_message* message, uint32_t socket_cliente);
 void dispatchMessagesFromMQ(t_message_queue* messageQueue);
 void cacheMessage(t_message* message);
+void notifySender(t_message* message, uint32_t socket_cliente);
 
 void inicializarCounterMessageId();
 uint32_t asignarMessageId();

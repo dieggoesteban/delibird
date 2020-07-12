@@ -11,7 +11,7 @@
             "program": "${workspaceFolder}/broker/broker",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/broker",
             "environment": [],
             "externalConsole": true,
             "MIMode": "gdb",

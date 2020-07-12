@@ -56,5 +56,8 @@ void dispatchCachedMessages(uint32_t subscriber);
 //AUX Methods for dev purposes
 t_holes* createHole(void* startAddress, uint32_t length);
 void showHoles();
+t_partition* createPartition(void* startAddress, uint32_t length);
+void showPartitions();
 bool mem_address_menor_a_mayor(t_holes* hole1, t_holes* hole2);
+bool existHolesBetweenPartitions();
 #endif /* CACHE_H_ */
