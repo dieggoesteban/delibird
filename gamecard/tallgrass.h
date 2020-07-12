@@ -1,0 +1,101 @@
+#ifndef TALLGRASS_H_
+#define TALLGRASS_H_
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<signal.h>
+#include<unistd.h>
+#include<sys/socket.h>
+#include<netdb.h>
+#include<string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <string.h>
+#include<fcntl.h>
+#include <sys/shm.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
+#include <errno.h>
+
+#include<commons/string.h>
+#include<commons/collections/list.h>
+#include<commons/config.h>
+#include<commons/bitarray.h>
+#include "commons/collections/dictionary.h"
+
+#include "utils.h"
+#include "models.h"
+#include "utilsGenerales.h"
+
+
+//GLOBALES
+t_config* config;
+t_log* logger;
+char* punto_montaje;
+char* pathFiles;
+char* pathBlocks;
+char* pathBitmap;
+char* pathMetadata;
+void* bmap;
+t_bitarray* bitmapArr;
+uint32_t cantBloques;
+uint32_t sizeBloque;
+char* magicNumber;
+t_list* semaforosPokemon;
+
+//CREAR
+bool crearDirectorio(char* rutaDirectorio);
+t_bitarray* crear_bitmap_en_disco(char* archivo, size_t size);
+
+//AGREGAR EN PATH
+char* agregarAPuntoMontaje(char* restoRuta);
+char* agregarADirectorioBlocksInt(uint32_t nroBloque);
+char* agregarADirectorioBlocksChar(char* nroBloque);
+char* agregarADirectorioFiles(char* restoRuta);
+char* agregarADirectorioBitmap(char* restoRuta);
+char* agregarADirectorioMetadataFS(char* restoRuta);
+char* agregarAPath(char* path, char* agregado);
+
+//ATENDER
+t_localized_pokemon* atenderGetPokemon(t_get_pokemon* getPokemon);
+void atenderNewPokemon(t_new_pokemon* newPokemon);
+void atenderCatchPokemon(t_catch_pokemon* catchPokemon);
+
+//ESCRIBIR
+void escribirBloque(char* texto, char* pathMetadataPoke, uint32_t bloqueAEscribir, char* modoEscritura);
+void escribirMetadata(char* path, char* aEscribir);
+void escribirNewPokemon(char *textoNewPoke, char* pathMetadataPoke);
+void escribirCatchPokemon(char *textoCatchPokemon, char* pathMetadataPoke);
+t_localized_pokemon* escribirLocalizedPokemon(t_get_pokemon* getPoke, char* pathMetadataPoke);
+
+//LEER
+char* leerMetadata(char* path);
+void leerCantPosicion(char* nombrePoke, char* posicion);
+char* leerArchivo(char *pathMetadataPoke);
+
+//A TEXTO
+char* newPokemonATexto(t_new_pokemon* newPokemon);
+char* catchPokemonATexto(t_catch_pokemon* catchPokemon);
+
+//INSERTAR
+void insertarMetadataEnPath(char* pathDirectorio, char* archivoMetadata);
+void insertarBloqueEnArchivo(t_config* metadataPoke, char** arrBloques, uint32_t bloque);
+void setSizeArchivo(t_config* metadataPoke, uint32_t sizeNuevo);
+void copiarArchivo(char* sourcePath, char* destinationPath);
+
+//MODIFICAR
+void modificarBloquesNewPoke(char* textoCompleto, char* pathMetadataPoke);
+void modificarBloquesCatchPoke(char* textoCompleto, char* pathMetadataPoke, uint32_t bytesBorrados);
+
+//CALCULOS Y BUSQUEDAS
+uint32_t buscarBloqueLibre();
+uint32_t verQueBloqueEscribir(char* pathMetadataPoke,int* sizeAEscribirPrimerBloque, bool modificarBloques, uint32_t j);
+void separarTextoEnBloques(char* textoArchivo, char* pathMetadataPoke, bool modificarBloques, char* modoEscritura);
+int calculoBytesSobrantes(char** arrBloques, uint32_t sizeArchivo);
+uint32_t buscarBloqueEInsertarEnArchivo(t_config* metadataPoke);
+void sacarUltimoBloqueDeArchivo(t_config* metadataPoke, char** arrBloques);
+bool existeBitmap(char* rutaArchivo);
+bool existeDirectorio(char* rutaDirectorio);
+
+
+#endif /* TALLGRASS_H_ */

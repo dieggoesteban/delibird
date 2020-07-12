@@ -1,0 +1,38 @@
+#ifndef TEAM_H_
+#define TEAM_H_
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<commons/log.h>
+#include<commons/string.h>
+#include<commons/config.h>
+#include<readline/readline.h>
+#include<commons/collections/list.h>
+
+#include "sockets.h"
+#include "utils.h"
+#include "models.h"
+#include "planificador.h"
+
+char* IP;
+char* PUERTO;
+char* LOG;
+
+//GLOBALES
+t_list* objetivoGlobal;
+t_list* pokemonesEnMapa;
+
+t_list* colaNEW;
+t_list* colaREADY;
+t_list* colaEXEC;
+t_list* colaBLOCKED;
+t_list* colaEXIT;
+
+uint32_t cicloCPU;
+
+
+//INICIALIZACION Y TERMINACION DEL MODULO
+void inicializarTeam();
+void terminar_programa(int, t_log*, t_config*);
+
+#endif /* TEAM_H_ */
