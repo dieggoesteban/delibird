@@ -42,6 +42,7 @@ void mandarGET();
 
 //SERVER
 void iniciar_servidor(void);
+void suscribe(void* message_queue);
 void esperar_cliente(uint32_t socket_servidor);
 void serve_client(uint32_t* socket);
 void process_request(uint32_t cod_op, uint32_t cliente_fd);

@@ -78,7 +78,7 @@ void process_request(uint32_t operation_cod, uint32_t socket_cliente)
 t_buffer *recibir_buffer(uint32_t socket_cliente)
 {
 	t_buffer *buffer = malloc(sizeof(t_buffer));
-	int size;
+	int size = 0;
 
 	recv(socket_cliente, &size, sizeof(int), MSG_WAITALL);
 	buffer->size = size;

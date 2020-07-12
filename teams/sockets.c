@@ -37,35 +37,41 @@ void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente) {
 	free(stream);
 }
 
-void sendGET(char* poke) {
-	printf("Send GET\n");
-	t_get_pokemon* getPokemon = crearGetPokemon(11, poke);
-	printf("getPokemon:\n");
-	printf("id: %i\nnombre: %s\ntamanio:%i\n", (uint32_t)getPokemon->ID_mensaje_recibido, (char*)getPokemon->nombre, (uint32_t)getPokemon->sizeNombre);
-	t_paquete* paquete = serializar_getPokemon(getPokemon);
-	printf("GET %s\n",poke);
+void mandarGET() {
 
-	free(getPokemon);
-
-    char* ip = config_get_string_value(config, "IP_BROKER");
+	char* ip = config_get_string_value(config, "IP_BROKER");
     char* puerto = config_get_string_value(config, "PUERTO_BROKER");
     uint32_t conexion = crear_conexion(ip, puerto);
 
-    enviarMensaje(paquete, conexion);
-
-    liberar_conexion(conexion);
-	free(paquete);
-
+	for(uint32_t i=0;i<list_size(objetivoGlobal);i++) {
+		t_pokemon_cantidad* poke = (t_pokemon_cantidad*)list_get(objetivoGlobal,i);
+		if(poke->cantidad > 0) {
+			//sendGET(poke->nombre);
+			t_get_pokemon* getPokemon = crearGetPokemon(11, poke->nombre);
+			t_paquete* paquete = serializar_getPokemon(getPokemon);
+			printf("GET %s\n",poke->nombre);
+			free(getPokemon);
+			enviarMensaje(paquete, conexion);
+		}
+	}
+	liberar_conexion(conexion);
 }
 
-void mandarGET() {
+void suscribe(void* message_queue) {
+	char* ip = config_get_string_value(config, "IP_BROKER");
+    char* puerto = config_get_string_value(config, "PUERTO_BROKER");
+    uint32_t conexion = crear_conexion(ip, puerto);
+	
+	uint32_t mq = (uint32_t) message_queue;
+	t_register_module* suscribe = crearSuscribe(mq);
+	t_paquete* paquete = serializar_registerModule(suscribe);
+	printf("SUSCRIBE %i \n", mq);
+	free(suscribe);
+	enviarMensaje(paquete, conexion);
 
-	t_pokemon_cantidad* poke = (t_pokemon_cantidad*)list_get(objetivoGlobal,0);
-	printf("Poke %s\n", poke->nombre);
-	if(poke->cantidad > 0) {
-		sendGET(poke->nombre);
+	while(1) {
+		serve_client(&conexion);
 	}
-
 }
 
 /*SERVER SIDE*/

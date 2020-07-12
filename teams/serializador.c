@@ -283,7 +283,7 @@ t_paquete* serializar_getPokemon(t_get_pokemon* pokemon) {
     t_buffer* getPokemonBuffer = malloc(sizeof(t_buffer));
 
     getPokemonBuffer->size = sizeof(uint32_t)*2 + strlen(pokemon->nombre) + 1;
-    void* stream = malloc(sizeof(getPokemonBuffer->size));
+    void* stream = malloc(getPokemonBuffer->size);
     int offset = 0;
 
     memcpy(stream + offset, &pokemon->ID_mensaje_recibido, sizeof(uint32_t));
@@ -293,10 +293,8 @@ t_paquete* serializar_getPokemon(t_get_pokemon* pokemon) {
     memcpy(stream + offset, pokemon->nombre, strlen(pokemon->nombre)+1);
 
     getPokemonBuffer->stream = stream;
-	printf("Hola llegue aca\n");
     paquete = crear_paquete(GET_POKEMON, getPokemonBuffer->size, getPokemonBuffer->stream);
-	printf("Hola llegue aca tmbn\n");
-    printf("Codigo mensaje, serializar_getPokemon: %i", paquete->codigo_mensaje);
+    printf("Codigo mensaje, serializar_getPokemon: %i\n", paquete->codigo_mensaje);
     return paquete;
 }
 
@@ -473,6 +471,13 @@ t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre){
 	getPokemon->nombre = nombre;
 
 	return getPokemon;
+}
+
+t_register_module* crearSuscribe(uint32_t ID_message_queue) {
+	t_register_module* suscribe = malloc(sizeof(t_register_module));
+	suscribe->messageQueue = ID_message_queue;
+
+	return suscribe;
 }
 
 t_confirmacion_mensaje* crearConfirmacionMensaje(uint32_t ID_mensaje, uint32_t colaMensajes, bool meLlego){

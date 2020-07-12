@@ -125,6 +125,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 			t_message_queue* messageQueue = getMessageQueueById(operation_cod);
 			t_get_pokemon* getPoke = deserializar_getPokemon(buffer);
 			t_message* message = crearMessage(getPoke, GET_POKEMON);
+			printf("Se recibio GET %s\n", getPoke->nombre);
 			log_info(logger, "Se ha recibido un mensaje del cliente %i en la cola %s", socket_cliente, messageQueue->name);
 			addMessageToMQ(message, messageQueue);
 			

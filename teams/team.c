@@ -18,6 +18,9 @@ int main(void)
     pthread_t threadREADY;
     pthread_t threadEXEC;
     pthread_t threadSERVER;
+    pthread_t threadSUSCRIBE_CAUGHT;
+    pthread_t threadSUSCRIBE_APPEARED;
+    pthread_t threadSUSCRIBE_LOCALIZED;
 
     colaNEW = list_create();
     colaREADY = list_create();
@@ -37,29 +40,30 @@ int main(void)
     inicializarTeam();
 	
     logger = log_create(LOG,"team",true,LOG_LEVEL_INFO);
-    
-
-    // while(list_size(pokemonesEnMapa) > 0) {
-    //     if (!asignarPokemonAEntrenador())
-    //         break;
-    // }
-
-    // for(uint32_t i = 0; i < list_size(colaREADY); i++) {
-    //     printf("El entrenador asignado se encuentra en la posicion %i:%i \n", ((t_entrenador*)list_get(colaREADY,i))->posicion->posicion_x, ((t_entrenador*)list_get(colaREADY,i))->posicion->posicion_y);
-    // }    
-    // planificarFIFO();
 
     if (pthread_create(&threadREADY,NULL,(void*)planificadorREADY,NULL) != 0)
         printf("Error");
 
     if (pthread_create(&threadEXEC,NULL,(void*)planificadorEXEC,(void*)getAlgoritmo(ALGORITMO)) != 0)
         printf("Error");
+    
+    if(pthread_create(&threadSUSCRIBE_CAUGHT,NULL,(void*)suscribe,(void*)CAUGHT_POKEMON) != 0)
+        printf("Error");
 
-    if (pthread_create(&threadSERVER, NULL,(void*)iniciar_servidor,NULL) != 0)
+    if(pthread_create(&threadSUSCRIBE_APPEARED,NULL,(void*)suscribe,(void*)APPEARED_POKEMON) != 0)
+        printf("Error");
+
+    if(pthread_create(&threadSUSCRIBE_LOCALIZED,NULL,(void*)suscribe,(void*)LOCALIZED_POKEMON) != 0)
+        printf("Error");
+
+    if (pthread_create(&threadSERVER,NULL,(void*)iniciar_servidor,NULL) != 0)
         printf("Error");
 
     pthread_join(threadREADY, NULL);
     pthread_join(threadEXEC, NULL);
+    pthread_join(threadSUSCRIBE_CAUGHT, NULL);
+    pthread_join(threadSUSCRIBE_APPEARED, NULL);
+    pthread_join(threadSUSCRIBE_LOCALIZED, NULL);
     pthread_join(threadSERVER, NULL);
 
     return 0;
@@ -71,7 +75,8 @@ void inicializarTeam()
     inicializarPid();
     inicializarEntrenadores();
     setObjetivoGlobal();
-    //mandarGET();
+    
+    mandarGET();
 
     /*t_pokemon_posicion* pokemon = crearPokemonPosicion("Pitochu", crearPosicion(1,1));
 

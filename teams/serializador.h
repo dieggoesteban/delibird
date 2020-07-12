@@ -140,5 +140,6 @@ t_catch_pokemon* crearCatchPokemon(uint32_t ID_mensaje_recibido, char* nombre, t
 t_caught_pokemon* crearCaughtPokemon(uint32_t IDMensajeRecibido, uint32_t IDMensajeOriginal, uint32_t catchStatus);
 t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre);
 t_confirmacion_mensaje* crearConfirmacionMensaje(uint32_t ID_mensaje, uint32_t colaMensajes, bool meLlego);
+t_register_module* crearSuscribe(uint32_t ID_message_queue);
 
 #endif /* CONNECTION_H_ */
