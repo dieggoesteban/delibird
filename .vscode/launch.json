@@ -24,13 +24,32 @@
             ]
         },
         {
-            "name": "Gameboy",
+            "name": "Gameboy/Suscriptor",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/gameboy/gameboy",
             "args": ["SUSCRIPTOR", "NEW_POKEMON"],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/gameboy",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Gameboy/NewPokemon",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/gameboy/gameboy",
+            "args": ["NEW_POKEMON", "PIKACHU", "5", "25", "10"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/gameboy",
             "environment": [],
             "externalConsole": true,
             "MIMode": "gdb",

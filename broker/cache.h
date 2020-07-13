@@ -8,8 +8,12 @@ void* cache;
 
 t_list* partitions;
 t_list* holes;
+t_list* administrative;
 
 pthread_mutex_t* s_counterToCompactacion;
+pthread_mutex_t* s_holes;
+pthread_mutex_t* s_partitions;
+
 uint32_t counterToCompactacion;
 
 typedef struct
@@ -33,9 +37,9 @@ char* ALGORITMO_REEMPLAZO;
 char* ALGORITMO_PARTICION_LIBRE;
 uint32_t FRECUENCIA_COMPACTACION;
 
-void (*algoritmo_memoria) ();
+void (*algoritmo_memoria) (t_message*);
 void (*algoritmo_reemplazo) ();
-void* (*algoritmo_particion_libre) ();
+void* (*algoritmo_particion_libre) (uint32_t bytes);
 
 void startCache();
 void memoria_buddySystem();
@@ -60,4 +64,9 @@ t_partition* createPartition(void* startAddress, uint32_t length);
 void showPartitions();
 bool mem_address_menor_a_mayor(t_holes* hole1, t_holes* hole2);
 bool existHolesBetweenPartitions();
+
+
+//Creacion y serializacion de mensajes con estructura de cache
+cache_message* createCacheMessage(t_message* message);
+
 #endif /* CACHE_H_ */

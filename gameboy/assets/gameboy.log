@@ -2689,3 +2689,1440 @@
 [INFO] 21:09:40:557 gameboy/(12323:12323): 127.0.0.1
 [INFO] 21:09:40:559 gameboy/(12323:12323): 5003
 [INFO] 21:09:40:561 gameboy/(12323:12323): entro a new_pokemon
+[INFO] 16:09:18:254 gameboy/(19218:19218): Se va a conectar en BROKER
+
+[INFO] 16:09:18:259 gameboy/(19218:19218): 127.0.0.1
+[INFO] 16:09:18:259 gameboy/(19218:19218): 5003
+[INFO] 16:09:18:259 gameboy/(19218:19218): Entro a modoSuscriptor
+
+[INFO] 16:15:40:752 gameboy/(19347:19347): Se va a conectar en BROKER
+
+[INFO] 16:15:40:754 gameboy/(19347:19347): 127.0.0.1
+[INFO] 16:15:40:755 gameboy/(19347:19347): 5003
+[INFO] 16:15:40:756 gameboy/(19347:19347): Entro a modoSuscriptor
+
+[INFO] 16:15:45:408 gameboy/(19349:19349): Se va a conectar en BROKER
+
+[INFO] 16:15:45:410 gameboy/(19349:19349): 127.0.0.1
+[INFO] 16:15:45:410 gameboy/(19349:19349): 5003
+[INFO] 16:15:45:410 gameboy/(19349:19349): entro a new_pokemon
+[INFO] 16:15:57:718 gameboy/(19367:19367): Se va a conectar en BROKER
+
+[INFO] 16:15:57:720 gameboy/(19367:19367): 127.0.0.1
+[INFO] 16:15:57:726 gameboy/(19367:19367): 5003
+[INFO] 16:15:57:726 gameboy/(19367:19367): entro a new_pokemon
+[INFO] 16:15:59:15 gameboy/(19370:19370): Se va a conectar en BROKER
+
+[INFO] 16:15:59:17 gameboy/(19370:19370): 127.0.0.1
+[INFO] 16:15:59:18 gameboy/(19370:19370): 5003
+[INFO] 16:15:59:20 gameboy/(19370:19370): entro a new_pokemon
+[INFO] 16:15:59:706 gameboy/(19379:19379): Se va a conectar en BROKER
+
+[INFO] 16:15:59:708 gameboy/(19379:19379): 127.0.0.1
+[INFO] 16:15:59:709 gameboy/(19379:19379): 5003
+[INFO] 16:15:59:711 gameboy/(19379:19379): entro a new_pokemon
+[INFO] 16:16:00:378 gameboy/(19382:19382): Se va a conectar en BROKER
+
+[INFO] 16:16:00:379 gameboy/(19382:19382): 127.0.0.1
+[INFO] 16:16:00:380 gameboy/(19382:19382): 5003
+[INFO] 16:16:00:381 gameboy/(19382:19382): entro a new_pokemon
+[INFO] 16:17:39:15 gameboy/(19496:19496): Se va a conectar en BROKER
+
+[INFO] 16:17:39:19 gameboy/(19496:19496): 127.0.0.1
+[INFO] 16:17:39:20 gameboy/(19496:19496): 5003
+[INFO] 16:17:39:20 gameboy/(19496:19496): entro a new_pokemon
+[INFO] 16:52:19:3 gameboy/(20268:20268): Se va a conectar en BROKER
+
+[INFO] 16:52:19:6 gameboy/(20268:20268): 127.0.0.1
+[INFO] 16:52:19:8 gameboy/(20268:20268): 5003
+[INFO] 16:52:19:9 gameboy/(20268:20268): entro a new_pokemon
+[INFO] 18:32:59:121 gameboy/(22372:22372): Se va a conectar en BROKER
+
+[INFO] 18:32:59:142 gameboy/(22372:22372): 127.0.0.1
+[INFO] 18:32:59:142 gameboy/(22372:22372): 5003
+[INFO] 18:32:59:142 gameboy/(22372:22372): Entro a modoSuscriptor
+
+[INFO] 18:33:09:90 gameboy/(22375:22375): Se va a conectar en BROKER
+
+[INFO] 18:33:09:92 gameboy/(22375:22375): 127.0.0.1
+[INFO] 18:33:09:93 gameboy/(22375:22375): 5003
+[INFO] 18:33:09:93 gameboy/(22375:22375): entro a new_pokemon
+[INFO] 19:18:34:631 gameboy/(23572:23572): Se va a conectar en BROKER
+
+[INFO] 19:18:34:631 gameboy/(23572:23572): 127.0.0.1
+[INFO] 19:18:34:631 gameboy/(23572:23572): 5003
+[INFO] 19:22:24:25 gameboy/(23772:23772): Se va a conectar en BROKER
+
+[INFO] 19:22:24:25 gameboy/(23772:23772): 127.0.0.1
+[INFO] 19:22:26:852 gameboy/(23772:23772): 5003
+[INFO] 02:33:56:8 gameboy/(4231:4231): Se va a conectar en BROKER
+
+[INFO] 02:33:56:33 gameboy/(4231:4231): 127.0.0.1
+[INFO] 02:33:56:36 gameboy/(4231:4231): 5003
+[INFO] 02:33:56:37 gameboy/(4231:4231): Entro a modoSuscriptor
+
+[INFO] 02:34:03:889 gameboy/(4234:4234): Se va a conectar en BROKER
+
+[INFO] 02:34:03:891 gameboy/(4234:4234): 127.0.0.1
+[INFO] 02:34:03:892 gameboy/(4234:4234): 5003
+[INFO] 02:34:03:894 gameboy/(4234:4234): entro a new_pokemon
+[INFO] 02:37:50:769 gameboy/(4410:4410): Se va a conectar en BROKER
+
+[INFO] 02:37:50:772 gameboy/(4410:4410): 127.0.0.1
+[INFO] 02:37:50:774 gameboy/(4410:4410): 5003
+[INFO] 02:37:50:775 gameboy/(4410:4410): Entro a modoSuscriptor
+
+[INFO] 02:37:55:264 gameboy/(4412:4412): Se va a conectar en BROKER
+
+[INFO] 02:37:55:267 gameboy/(4412:4412): 127.0.0.1
+[INFO] 02:37:55:269 gameboy/(4412:4412): 5003
+[INFO] 02:37:55:269 gameboy/(4412:4412): entro a new_pokemon
+[INFO] 02:37:57:611 gameboy/(4414:4414): Se va a conectar en BROKER
+
+[INFO] 02:37:57:617 gameboy/(4414:4414): 127.0.0.1
+[INFO] 02:37:57:617 gameboy/(4414:4414): 5003
+[INFO] 02:37:57:617 gameboy/(4414:4414): entro a new_pokemon
+[INFO] 02:37:58:431 gameboy/(4416:4416): Se va a conectar en BROKER
+
+[INFO] 02:37:58:435 gameboy/(4416:4416): 127.0.0.1
+[INFO] 02:37:58:436 gameboy/(4416:4416): 5003
+[INFO] 02:37:58:436 gameboy/(4416:4416): entro a new_pokemon
+[INFO] 02:38:00:649 gameboy/(4418:4418): Se va a conectar en BROKER
+
+[INFO] 02:38:00:652 gameboy/(4418:4418): 127.0.0.1
+[INFO] 02:38:00:654 gameboy/(4418:4418): 5003
+[INFO] 02:38:00:654 gameboy/(4418:4418): entro a new_pokemon
+[INFO] 02:38:06:433 gameboy/(4420:4420): Se va a conectar en BROKER
+
+[INFO] 02:38:06:435 gameboy/(4420:4420): 127.0.0.1
+[INFO] 02:38:06:437 gameboy/(4420:4420): 5003
+[INFO] 02:38:06:438 gameboy/(4420:4420): Entro a modoSuscriptor
+
+[INFO] 02:38:08:252 gameboy/(4422:4422): Se va a conectar en BROKER
+
+[INFO] 02:38:08:256 gameboy/(4422:4422): 127.0.0.1
+[INFO] 02:38:08:258 gameboy/(4422:4422): 5003
+[INFO] 02:38:08:259 gameboy/(4422:4422): entro a new_pokemon
+[INFO] 02:38:10:56 gameboy/(4424:4424): Se va a conectar en BROKER
+
+[INFO] 02:38:10:59 gameboy/(4424:4424): 127.0.0.1
+[INFO] 02:38:10:61 gameboy/(4424:4424): 5003
+[INFO] 02:38:10:61 gameboy/(4424:4424): entro a new_pokemon
+[INFO] 02:38:11:143 gameboy/(4428:4428): Se va a conectar en BROKER
+
+[INFO] 02:38:11:146 gameboy/(4428:4428): 127.0.0.1
+[INFO] 02:38:11:147 gameboy/(4428:4428): 5003
+[INFO] 02:38:11:148 gameboy/(4428:4428): entro a new_pokemon
+[INFO] 02:38:14:87 gameboy/(4430:4430): Se va a conectar en BROKER
+
+[INFO] 02:38:14:90 gameboy/(4430:4430): 127.0.0.1
+[INFO] 02:38:14:92 gameboy/(4430:4430): 5003
+[INFO] 02:38:14:92 gameboy/(4430:4430): entro a new_pokemon
+[INFO] 02:38:15:228 gameboy/(4432:4432): Se va a conectar en BROKER
+
+[INFO] 02:38:15:230 gameboy/(4432:4432): 127.0.0.1
+[INFO] 02:38:15:232 gameboy/(4432:4432): 5003
+[INFO] 02:38:15:233 gameboy/(4432:4432): entro a new_pokemon
+[INFO] 02:38:16:496 gameboy/(4434:4434): Se va a conectar en BROKER
+
+[INFO] 02:38:16:498 gameboy/(4434:4434): 127.0.0.1
+[INFO] 02:38:16:500 gameboy/(4434:4434): 5003
+[INFO] 02:38:16:501 gameboy/(4434:4434): entro a new_pokemon
+[INFO] 02:38:17:338 gameboy/(4436:4436): Se va a conectar en BROKER
+
+[INFO] 02:38:17:341 gameboy/(4436:4436): 127.0.0.1
+[INFO] 02:38:17:342 gameboy/(4436:4436): 5003
+[INFO] 02:38:17:343 gameboy/(4436:4436): entro a new_pokemon
+[INFO] 02:38:18:35 gameboy/(4438:4438): Se va a conectar en BROKER
+
+[INFO] 02:38:18:38 gameboy/(4438:4438): 127.0.0.1
+[INFO] 02:38:18:40 gameboy/(4438:4438): 5003
+[INFO] 02:38:18:40 gameboy/(4438:4438): entro a new_pokemon
+[INFO] 02:38:19:281 gameboy/(4440:4440): Se va a conectar en BROKER
+
+[INFO] 02:38:19:283 gameboy/(4440:4440): 127.0.0.1
+[INFO] 02:38:19:285 gameboy/(4440:4440): 5003
+[INFO] 02:38:19:286 gameboy/(4440:4440): Entro a modoSuscriptor
+
+[INFO] 02:38:21:185 gameboy/(4442:4442): Se va a conectar en BROKER
+
+[INFO] 02:38:21:190 gameboy/(4442:4442): 127.0.0.1
+[INFO] 02:38:21:193 gameboy/(4442:4442): 5003
+[INFO] 02:38:21:194 gameboy/(4442:4442): entro a new_pokemon
+[INFO] 02:38:31:168 gameboy/(4449:4449): Se va a conectar en BROKER
+
+[INFO] 02:38:31:172 gameboy/(4449:4449): 127.0.0.1
+[INFO] 02:38:31:174 gameboy/(4449:4449): 5003
+[INFO] 02:38:31:174 gameboy/(4449:4449): Entro a modoSuscriptor
+
+[INFO] 02:38:32:615 gameboy/(4451:4451): Se va a conectar en BROKER
+
+[INFO] 02:38:32:617 gameboy/(4451:4451): 127.0.0.1
+[INFO] 02:38:32:618 gameboy/(4451:4451): 5003
+[INFO] 02:38:32:620 gameboy/(4451:4451): entro a new_pokemon
+[INFO] 02:38:36:377 gameboy/(4455:4455): Se va a conectar en BROKER
+
+[INFO] 02:38:36:381 gameboy/(4455:4455): 127.0.0.1
+[INFO] 02:38:36:383 gameboy/(4455:4455): 5003
+[INFO] 02:38:36:383 gameboy/(4455:4455): entro a new_pokemon
+[INFO] 02:38:37:48 gameboy/(4457:4457): Se va a conectar en BROKER
+
+[INFO] 02:38:37:50 gameboy/(4457:4457): 127.0.0.1
+[INFO] 02:38:37:51 gameboy/(4457:4457): 5003
+[INFO] 02:38:37:52 gameboy/(4457:4457): entro a new_pokemon
+[INFO] 02:38:37:648 gameboy/(4459:4459): Se va a conectar en BROKER
+
+[INFO] 02:38:37:650 gameboy/(4459:4459): 127.0.0.1
+[INFO] 02:38:37:653 gameboy/(4459:4459): 5003
+[INFO] 02:38:37:653 gameboy/(4459:4459): entro a new_pokemon
+[INFO] 02:38:38:241 gameboy/(4461:4461): Se va a conectar en BROKER
+
+[INFO] 02:38:38:246 gameboy/(4461:4461): 127.0.0.1
+[INFO] 02:38:38:246 gameboy/(4461:4461): 5003
+[INFO] 02:38:38:247 gameboy/(4461:4461): entro a new_pokemon
+[INFO] 02:38:38:816 gameboy/(4463:4463): Se va a conectar en BROKER
+
+[INFO] 02:38:38:818 gameboy/(4463:4463): 127.0.0.1
+[INFO] 02:38:38:819 gameboy/(4463:4463): 5003
+[INFO] 02:38:38:821 gameboy/(4463:4463): entro a new_pokemon
+[INFO] 02:38:39:377 gameboy/(4465:4465): Se va a conectar en BROKER
+
+[INFO] 02:38:39:379 gameboy/(4465:4465): 127.0.0.1
+[INFO] 02:38:39:381 gameboy/(4465:4465): 5003
+[INFO] 02:38:39:382 gameboy/(4465:4465): entro a new_pokemon
+[INFO] 02:38:39:865 gameboy/(4467:4467): Se va a conectar en BROKER
+
+[INFO] 02:38:39:868 gameboy/(4467:4467): 127.0.0.1
+[INFO] 02:38:39:869 gameboy/(4467:4467): 5003
+[INFO] 02:38:39:870 gameboy/(4467:4467): entro a new_pokemon
+[INFO] 02:38:40:341 gameboy/(4469:4469): Se va a conectar en BROKER
+
+[INFO] 02:38:40:346 gameboy/(4469:4469): 127.0.0.1
+[INFO] 02:38:40:347 gameboy/(4469:4469): 5003
+[INFO] 02:38:40:347 gameboy/(4469:4469): entro a new_pokemon
+[INFO] 02:38:40:795 gameboy/(4471:4471): Se va a conectar en BROKER
+
+[INFO] 02:38:40:797 gameboy/(4471:4471): 127.0.0.1
+[INFO] 02:38:40:799 gameboy/(4471:4471): 5003
+[INFO] 02:38:40:799 gameboy/(4471:4471): entro a new_pokemon
+[INFO] 02:38:41:185 gameboy/(4473:4473): Se va a conectar en BROKER
+
+[INFO] 02:38:41:187 gameboy/(4473:4473): 127.0.0.1
+[INFO] 02:38:41:189 gameboy/(4473:4473): 5003
+[INFO] 02:38:41:190 gameboy/(4473:4473): entro a new_pokemon
+[INFO] 02:38:41:536 gameboy/(4475:4475): Se va a conectar en BROKER
+
+[INFO] 02:38:41:539 gameboy/(4475:4475): 127.0.0.1
+[INFO] 02:38:41:541 gameboy/(4475:4475): 5003
+[INFO] 02:38:41:542 gameboy/(4475:4475): entro a new_pokemon
+[INFO] 02:39:41:448 gameboy/(4552:4552): Se va a conectar en BROKER
+
+[INFO] 02:39:41:451 gameboy/(4552:4552): 127.0.0.1
+[INFO] 02:39:41:452 gameboy/(4552:4552): 5003
+[INFO] 02:39:41:453 gameboy/(4552:4552): Entro a modoSuscriptor
+
+[INFO] 02:39:43:804 gameboy/(4554:4554): Se va a conectar en BROKER
+
+[INFO] 02:39:43:808 gameboy/(4554:4554): 127.0.0.1
+[INFO] 02:39:43:811 gameboy/(4554:4554): 5003
+[INFO] 02:39:43:812 gameboy/(4554:4554): entro a new_pokemon
+[INFO] 02:41:26:248 gameboy/(4386:4386): Se va a conectar en BROKER
+
+[INFO] 02:41:26:253 gameboy/(4386:4386): 127.0.0.1
+[INFO] 02:41:26:254 gameboy/(4386:4386): 5003
+[INFO] 02:41:26:254 gameboy/(4386:4386): Entro a modoSuscriptor
+
+[INFO] 02:41:29:866 gameboy/(4388:4388): Se va a conectar en BROKER
+
+[INFO] 02:41:29:868 gameboy/(4388:4388): 127.0.0.1
+[INFO] 02:41:29:870 gameboy/(4388:4388): 5003
+[INFO] 02:41:29:871 gameboy/(4388:4388): entro a new_pokemon
+[INFO] 02:43:09:353 gameboy/(22828:22828): Se va a conectar en BROKER
+
+[INFO] 02:43:09:355 gameboy/(22828:22828): 127.0.0.1
+[INFO] 02:43:09:357 gameboy/(22828:22828): 5003
+[INFO] 02:43:09:358 gameboy/(22828:22828): Entro a modoSuscriptor
+
+[INFO] 02:43:11:833 gameboy/(22835:22835): Se va a conectar en BROKER
+
+[INFO] 02:43:11:835 gameboy/(22835:22835): 127.0.0.1
+[INFO] 02:43:11:837 gameboy/(22835:22835): 5003
+[INFO] 02:43:11:838 gameboy/(22835:22835): entro a new_pokemon
+[INFO] 02:43:15:188 gameboy/(22838:22838): Se va a conectar en BROKER
+
+[INFO] 02:43:15:192 gameboy/(22838:22838): 127.0.0.1
+[INFO] 02:43:15:193 gameboy/(22838:22838): 5003
+[INFO] 02:43:15:193 gameboy/(22838:22838): entro a new_pokemon
+[INFO] 02:43:16:72 gameboy/(22841:22841): Se va a conectar en BROKER
+
+[INFO] 02:43:16:74 gameboy/(22841:22841): 127.0.0.1
+[INFO] 02:43:16:76 gameboy/(22841:22841): 5003
+[INFO] 02:43:16:77 gameboy/(22841:22841): entro a new_pokemon
+[INFO] 02:43:18:816 gameboy/(22844:22844): Se va a conectar en BROKER
+
+[INFO] 02:43:18:820 gameboy/(22844:22844): 127.0.0.1
+[INFO] 02:43:18:822 gameboy/(22844:22844): 5003
+[INFO] 02:43:18:822 gameboy/(22844:22844): entro a new_pokemon
+[INFO] 02:44:41:446 gameboy/(22941:22941): Se va a conectar en BROKER
+
+[INFO] 02:44:41:448 gameboy/(22941:22941): 127.0.0.1
+[INFO] 02:44:41:450 gameboy/(22941:22941): 5003
+[INFO] 02:44:41:451 gameboy/(22941:22941): Entro a modoSuscriptor
+
+[INFO] 02:44:43:431 gameboy/(22943:22943): Se va a conectar en BROKER
+
+[INFO] 02:44:43:435 gameboy/(22943:22943): 127.0.0.1
+[INFO] 02:44:43:437 gameboy/(22943:22943): 5003
+[INFO] 02:44:43:438 gameboy/(22943:22943): entro a new_pokemon
+[INFO] 02:44:45:888 gameboy/(22945:22945): Se va a conectar en BROKER
+
+[INFO] 02:44:45:891 gameboy/(22945:22945): 127.0.0.1
+[INFO] 02:44:45:892 gameboy/(22945:22945): 5003
+[INFO] 02:44:45:893 gameboy/(22945:22945): entro a new_pokemon
+[INFO] 02:44:47:79 gameboy/(22947:22947): Se va a conectar en BROKER
+
+[INFO] 02:44:47:81 gameboy/(22947:22947): 127.0.0.1
+[INFO] 02:44:47:83 gameboy/(22947:22947): 5003
+[INFO] 02:44:47:84 gameboy/(22947:22947): entro a new_pokemon
+[INFO] 02:44:51:390 gameboy/(22949:22949): Se va a conectar en BROKER
+
+[INFO] 02:44:51:394 gameboy/(22949:22949): 127.0.0.1
+[INFO] 02:44:51:396 gameboy/(22949:22949): 5003
+[INFO] 02:44:51:396 gameboy/(22949:22949): entro a new_pokemon
+[INFO] 02:45:06:885 gameboy/(22956:22956): Se va a conectar en BROKER
+
+[INFO] 02:45:06:887 gameboy/(22956:22956): 127.0.0.1
+[INFO] 02:45:06:889 gameboy/(22956:22956): 5003
+[INFO] 02:45:06:890 gameboy/(22956:22956): entro a new_pokemon
+[INFO] 02:48:18:132 gameboy/(23099:23099): Se va a conectar en BROKER
+
+[INFO] 02:48:18:136 gameboy/(23099:23099): 127.0.0.1
+[INFO] 02:48:18:138 gameboy/(23099:23099): 5003
+[INFO] 02:48:18:138 gameboy/(23099:23099): Entro a modoSuscriptor
+
+[INFO] 02:48:20:190 gameboy/(23101:23101): Se va a conectar en BROKER
+
+[INFO] 02:48:20:192 gameboy/(23101:23101): 127.0.0.1
+[INFO] 02:48:20:194 gameboy/(23101:23101): 5003
+[INFO] 02:48:20:195 gameboy/(23101:23101): entro a new_pokemon
+[INFO] 02:48:24:105 gameboy/(23103:23103): Se va a conectar en BROKER
+
+[INFO] 02:48:24:108 gameboy/(23103:23103): 127.0.0.1
+[INFO] 02:48:24:109 gameboy/(23103:23103): 5003
+[INFO] 02:48:24:110 gameboy/(23103:23103): entro a new_pokemon
+[INFO] 02:48:26:759 gameboy/(23105:23105): Se va a conectar en BROKER
+
+[INFO] 02:48:26:761 gameboy/(23105:23105): 127.0.0.1
+[INFO] 02:48:26:762 gameboy/(23105:23105): 5003
+[INFO] 02:48:26:768 gameboy/(23105:23105): entro a new_pokemon
+[INFO] 02:48:35:49 gameboy/(23112:23112): Se va a conectar en BROKER
+
+[INFO] 02:48:35:52 gameboy/(23112:23112): 127.0.0.1
+[INFO] 02:48:35:53 gameboy/(23112:23112): 5003
+[INFO] 02:48:35:54 gameboy/(23112:23112): entro a new_pokemon
+[INFO] 02:48:38:817 gameboy/(23119:23119): Se va a conectar en BROKER
+
+[INFO] 02:48:38:821 gameboy/(23119:23119): 127.0.0.1
+[INFO] 02:48:38:825 gameboy/(23119:23119): 5003
+[INFO] 02:48:38:825 gameboy/(23119:23119): entro a new_pokemon
+[INFO] 02:48:41:419 gameboy/(23126:23126): Se va a conectar en BROKER
+
+[INFO] 02:48:41:421 gameboy/(23126:23126): 127.0.0.1
+[INFO] 02:48:41:423 gameboy/(23126:23126): 5003
+[INFO] 02:48:41:424 gameboy/(23126:23126): entro a new_pokemon
+[INFO] 02:48:43:446 gameboy/(23128:23128): Se va a conectar en BROKER
+
+[INFO] 02:48:43:451 gameboy/(23128:23128): 127.0.0.1
+[INFO] 02:48:43:451 gameboy/(23128:23128): 5003
+[INFO] 02:48:43:452 gameboy/(23128:23128): entro a new_pokemon
+[INFO] 02:48:45:357 gameboy/(23130:23130): Se va a conectar en BROKER
+
+[INFO] 02:48:45:359 gameboy/(23130:23130): 127.0.0.1
+[INFO] 02:48:45:362 gameboy/(23130:23130): 5003
+[INFO] 02:48:45:362 gameboy/(23130:23130): entro a new_pokemon
+[INFO] 02:48:47:331 gameboy/(23132:23132): Se va a conectar en BROKER
+
+[INFO] 02:48:47:335 gameboy/(23132:23132): 127.0.0.1
+[INFO] 02:48:47:338 gameboy/(23132:23132): 5003
+[INFO] 02:48:47:338 gameboy/(23132:23132): entro a new_pokemon
+[INFO] 02:48:49:248 gameboy/(23134:23134): Se va a conectar en BROKER
+
+[INFO] 02:48:49:250 gameboy/(23134:23134): 127.0.0.1
+[INFO] 02:48:49:252 gameboy/(23134:23134): 5003
+[INFO] 02:48:49:253 gameboy/(23134:23134): entro a new_pokemon
+[INFO] 02:48:50:835 gameboy/(23136:23136): Se va a conectar en BROKER
+
+[INFO] 02:48:50:838 gameboy/(23136:23136): 127.0.0.1
+[INFO] 02:48:50:839 gameboy/(23136:23136): 5003
+[INFO] 02:48:50:840 gameboy/(23136:23136): entro a new_pokemon
+[INFO] 02:48:52:173 gameboy/(23138:23138): Se va a conectar en BROKER
+
+[INFO] 02:48:52:175 gameboy/(23138:23138): 127.0.0.1
+[INFO] 02:48:52:178 gameboy/(23138:23138): 5003
+[INFO] 02:48:52:178 gameboy/(23138:23138): entro a new_pokemon
+[INFO] 02:48:53:208 gameboy/(23140:23140): Se va a conectar en BROKER
+
+[INFO] 02:48:53:211 gameboy/(23140:23140): 127.0.0.1
+[INFO] 02:48:53:213 gameboy/(23140:23140): 5003
+[INFO] 02:48:53:214 gameboy/(23140:23140): entro a new_pokemon
+[INFO] 02:48:53:977 gameboy/(23142:23142): Se va a conectar en BROKER
+
+[INFO] 02:48:53:980 gameboy/(23142:23142): 127.0.0.1
+[INFO] 02:48:53:982 gameboy/(23142:23142): 5003
+[INFO] 02:48:53:983 gameboy/(23142:23142): entro a new_pokemon
+[INFO] 02:48:54:767 gameboy/(23144:23144): Se va a conectar en BROKER
+
+[INFO] 02:48:54:769 gameboy/(23144:23144): 127.0.0.1
+[INFO] 02:48:54:770 gameboy/(23144:23144): 5003
+[INFO] 02:48:54:772 gameboy/(23144:23144): entro a new_pokemon
+[INFO] 02:48:55:503 gameboy/(23146:23146): Se va a conectar en BROKER
+
+[INFO] 02:48:55:506 gameboy/(23146:23146): 127.0.0.1
+[INFO] 02:48:55:507 gameboy/(23146:23146): 5003
+[INFO] 02:48:55:509 gameboy/(23146:23146): entro a new_pokemon
+[INFO] 02:48:56:193 gameboy/(23148:23148): Se va a conectar en BROKER
+
+[INFO] 02:48:56:195 gameboy/(23148:23148): 127.0.0.1
+[INFO] 02:48:56:197 gameboy/(23148:23148): 5003
+[INFO] 02:48:56:203 gameboy/(23148:23148): entro a new_pokemon
+[INFO] 02:48:57:18 gameboy/(23150:23150): Se va a conectar en BROKER
+
+[INFO] 02:48:57:19 gameboy/(23150:23150): 127.0.0.1
+[INFO] 02:48:57:21 gameboy/(23150:23150): 5003
+[INFO] 02:48:57:22 gameboy/(23150:23150): entro a new_pokemon
+[INFO] 02:48:59:144 gameboy/(23152:23152): Se va a conectar en BROKER
+
+[INFO] 02:48:59:148 gameboy/(23152:23152): 127.0.0.1
+[INFO] 02:48:59:149 gameboy/(23152:23152): 5003
+[INFO] 02:48:59:149 gameboy/(23152:23152): Entro a modoSuscriptor
+
+[INFO] 02:49:00:879 gameboy/(23154:23154): Se va a conectar en BROKER
+
+[INFO] 02:49:00:881 gameboy/(23154:23154): 127.0.0.1
+[INFO] 02:49:00:882 gameboy/(23154:23154): 5003
+[INFO] 02:49:00:884 gameboy/(23154:23154): entro a new_pokemon
+[INFO] 02:49:02:944 gameboy/(23156:23156): Se va a conectar en BROKER
+
+[INFO] 02:49:02:947 gameboy/(23156:23156): 127.0.0.1
+[INFO] 02:49:02:949 gameboy/(23156:23156): 5003
+[INFO] 02:49:02:950 gameboy/(23156:23156): Entro a modoSuscriptor
+
+[INFO] 02:49:05:711 gameboy/(23168:23168): Se va a conectar en BROKER
+
+[INFO] 02:49:05:714 gameboy/(23168:23168): 127.0.0.1
+[INFO] 02:49:05:716 gameboy/(23168:23168): 5003
+[INFO] 02:49:05:716 gameboy/(23168:23168): Entro a modoSuscriptor
+
+[INFO] 02:49:06:927 gameboy/(23171:23171): Se va a conectar en BROKER
+
+[INFO] 02:49:06:928 gameboy/(23171:23171): 127.0.0.1
+[INFO] 02:49:06:930 gameboy/(23171:23171): 5003
+[INFO] 02:49:06:935 gameboy/(23171:23171): Entro a modoSuscriptor
+
+[INFO] 02:49:08:662 gameboy/(23173:23173): Se va a conectar en BROKER
+
+[INFO] 02:49:08:665 gameboy/(23173:23173): 127.0.0.1
+[INFO] 02:49:08:667 gameboy/(23173:23173): 5003
+[INFO] 02:49:08:667 gameboy/(23173:23173): entro a new_pokemon
+[INFO] 02:49:12:544 gameboy/(23175:23175): Se va a conectar en BROKER
+
+[INFO] 02:49:12:547 gameboy/(23175:23175): 127.0.0.1
+[INFO] 02:49:12:549 gameboy/(23175:23175): 5003
+[INFO] 02:49:12:549 gameboy/(23175:23175): Entro a modoSuscriptor
+
+[INFO] 02:49:14:138 gameboy/(23177:23177): Se va a conectar en BROKER
+
+[INFO] 02:49:14:141 gameboy/(23177:23177): 127.0.0.1
+[INFO] 02:49:14:143 gameboy/(23177:23177): 5003
+[INFO] 02:49:14:143 gameboy/(23177:23177): Entro a modoSuscriptor
+
+[INFO] 02:49:15:500 gameboy/(23179:23179): Se va a conectar en BROKER
+
+[INFO] 02:49:15:502 gameboy/(23179:23179): 127.0.0.1
+[INFO] 02:49:15:504 gameboy/(23179:23179): 5003
+[INFO] 02:49:15:505 gameboy/(23179:23179): Entro a modoSuscriptor
+
+[INFO] 02:49:16:817 gameboy/(23181:23181): Se va a conectar en BROKER
+
+[INFO] 02:49:16:820 gameboy/(23181:23181): 127.0.0.1
+[INFO] 02:49:16:821 gameboy/(23181:23181): 5003
+[INFO] 02:49:16:823 gameboy/(23181:23181): Entro a modoSuscriptor
+
+[INFO] 02:49:17:729 gameboy/(23183:23183): Se va a conectar en BROKER
+
+[INFO] 02:49:17:732 gameboy/(23183:23183): 127.0.0.1
+[INFO] 02:49:17:734 gameboy/(23183:23183): 5003
+[INFO] 02:49:17:735 gameboy/(23183:23183): Entro a modoSuscriptor
+
+[INFO] 02:49:18:720 gameboy/(23185:23185): Se va a conectar en BROKER
+
+[INFO] 02:49:18:722 gameboy/(23185:23185): 127.0.0.1
+[INFO] 02:49:18:724 gameboy/(23185:23185): 5003
+[INFO] 02:49:18:726 gameboy/(23185:23185): Entro a modoSuscriptor
+
+[INFO] 02:49:20:366 gameboy/(23187:23187): Se va a conectar en BROKER
+
+[INFO] 02:49:20:369 gameboy/(23187:23187): 127.0.0.1
+[INFO] 02:49:20:371 gameboy/(23187:23187): 5003
+[INFO] 02:49:20:372 gameboy/(23187:23187): entro a new_pokemon
+[INFO] 02:49:23:651 gameboy/(23189:23189): Se va a conectar en BROKER
+
+[INFO] 02:49:23:653 gameboy/(23189:23189): 127.0.0.1
+[INFO] 02:49:23:654 gameboy/(23189:23189): 5003
+[INFO] 02:49:23:656 gameboy/(23189:23189): entro a new_pokemon
+[INFO] 02:49:26:166 gameboy/(23191:23191): Se va a conectar en BROKER
+
+[INFO] 02:49:26:168 gameboy/(23191:23191): 127.0.0.1
+[INFO] 02:49:26:170 gameboy/(23191:23191): 5003
+[INFO] 02:49:26:171 gameboy/(23191:23191): entro a new_pokemon
+[INFO] 02:49:29:279 gameboy/(23193:23193): Se va a conectar en BROKER
+
+[INFO] 02:49:29:282 gameboy/(23193:23193): 127.0.0.1
+[INFO] 02:49:29:283 gameboy/(23193:23193): 5003
+[INFO] 02:49:29:284 gameboy/(23193:23193): Entro a modoSuscriptor
+
+[INFO] 02:49:32:642 gameboy/(23200:23200): Se va a conectar en BROKER
+
+[INFO] 02:49:32:643 gameboy/(23200:23200): 127.0.0.1
+[INFO] 02:49:32:645 gameboy/(23200:23200): 5003
+[INFO] 02:49:32:646 gameboy/(23200:23200): entro a new_pokemon
+[INFO] 02:49:39:206 gameboy/(23204:23204): Se va a conectar en BROKER
+
+[INFO] 02:49:39:212 gameboy/(23204:23204): 127.0.0.1
+[INFO] 02:49:39:212 gameboy/(23204:23204): 5003
+[INFO] 02:49:39:213 gameboy/(23204:23204): entro a new_pokemon
+[INFO] 02:49:40:637 gameboy/(23206:23206): Se va a conectar en BROKER
+
+[INFO] 02:49:40:640 gameboy/(23206:23206): 127.0.0.1
+[INFO] 02:49:40:641 gameboy/(23206:23206): 5003
+[INFO] 02:49:40:643 gameboy/(23206:23206): entro a new_pokemon
+[INFO] 02:49:42:185 gameboy/(23208:23208): Se va a conectar en BROKER
+
+[INFO] 02:49:42:188 gameboy/(23208:23208): 127.0.0.1
+[INFO] 02:49:42:190 gameboy/(23208:23208): 5003
+[INFO] 02:49:42:190 gameboy/(23208:23208): entro a new_pokemon
+[INFO] 02:49:43:695 gameboy/(23215:23215): Se va a conectar en BROKER
+
+[INFO] 02:49:43:697 gameboy/(23215:23215): 127.0.0.1
+[INFO] 02:49:43:699 gameboy/(23215:23215): 5003
+[INFO] 02:49:43:700 gameboy/(23215:23215): entro a new_pokemon
+[INFO] 02:49:44:593 gameboy/(23217:23217): Se va a conectar en BROKER
+
+[INFO] 02:49:44:597 gameboy/(23217:23217): 127.0.0.1
+[INFO] 02:49:44:599 gameboy/(23217:23217): 5003
+[INFO] 02:49:44:599 gameboy/(23217:23217): entro a new_pokemon
+[INFO] 02:50:06:722 gameboy/(23224:23224): Se va a conectar en BROKER
+
+[INFO] 02:50:06:724 gameboy/(23224:23224): 127.0.0.1
+[INFO] 02:50:06:726 gameboy/(23224:23224): 5003
+[INFO] 02:50:06:727 gameboy/(23224:23224): entro a new_pokemon
+[INFO] 02:50:07:408 gameboy/(23226:23226): Se va a conectar en BROKER
+
+[INFO] 02:50:07:410 gameboy/(23226:23226): 127.0.0.1
+[INFO] 02:50:07:412 gameboy/(23226:23226): 5003
+[INFO] 02:50:07:413 gameboy/(23226:23226): entro a new_pokemon
+[INFO] 02:50:07:898 gameboy/(23228:23228): Se va a conectar en BROKER
+
+[INFO] 02:50:07:901 gameboy/(23228:23228): 127.0.0.1
+[INFO] 02:50:07:903 gameboy/(23228:23228): 5003
+[INFO] 02:50:07:904 gameboy/(23228:23228): entro a new_pokemon
+[INFO] 02:50:08:384 gameboy/(23230:23230): Se va a conectar en BROKER
+
+[INFO] 02:50:08:387 gameboy/(23230:23230): 127.0.0.1
+[INFO] 02:50:08:389 gameboy/(23230:23230): 5003
+[INFO] 02:50:08:390 gameboy/(23230:23230): entro a new_pokemon
+[INFO] 02:50:08:911 gameboy/(23232:23232): Se va a conectar en BROKER
+
+[INFO] 02:50:08:913 gameboy/(23232:23232): 127.0.0.1
+[INFO] 02:50:08:915 gameboy/(23232:23232): 5003
+[INFO] 02:50:08:916 gameboy/(23232:23232): entro a new_pokemon
+[INFO] 02:50:11:88 gameboy/(23234:23234): Se va a conectar en BROKER
+
+[INFO] 02:50:11:90 gameboy/(23234:23234): 127.0.0.1
+[INFO] 02:50:11:92 gameboy/(23234:23234): 5003
+[INFO] 02:50:11:93 gameboy/(23234:23234): Entro a modoSuscriptor
+
+[INFO] 02:50:12:439 gameboy/(23236:23236): Se va a conectar en BROKER
+
+[INFO] 02:50:12:441 gameboy/(23236:23236): 127.0.0.1
+[INFO] 02:50:12:442 gameboy/(23236:23236): 5003
+[INFO] 02:50:12:444 gameboy/(23236:23236): entro a new_pokemon
+[INFO] 02:50:13:461 gameboy/(23238:23238): Se va a conectar en BROKER
+
+[INFO] 02:50:13:464 gameboy/(23238:23238): 127.0.0.1
+[INFO] 02:50:13:466 gameboy/(23238:23238): 5003
+[INFO] 02:50:13:467 gameboy/(23238:23238): entro a new_pokemon
+[INFO] 02:50:15:57 gameboy/(23240:23240): Se va a conectar en BROKER
+
+[INFO] 02:50:15:61 gameboy/(23240:23240): 127.0.0.1
+[INFO] 02:50:15:63 gameboy/(23240:23240): 5003
+[INFO] 02:50:15:63 gameboy/(23240:23240): Entro a modoSuscriptor
+
+[INFO] 02:50:16:945 gameboy/(23242:23242): Se va a conectar en BROKER
+
+[INFO] 02:50:16:949 gameboy/(23242:23242): 127.0.0.1
+[INFO] 02:50:16:950 gameboy/(23242:23242): 5003
+[INFO] 02:50:16:951 gameboy/(23242:23242): Entro a modoSuscriptor
+
+[INFO] 02:50:18:126 gameboy/(23244:23244): Se va a conectar en BROKER
+
+[INFO] 02:50:18:129 gameboy/(23244:23244): 127.0.0.1
+[INFO] 02:50:18:131 gameboy/(23244:23244): 5003
+[INFO] 02:50:18:131 gameboy/(23244:23244): entro a new_pokemon
+[INFO] 02:50:19:123 gameboy/(23246:23246): Se va a conectar en BROKER
+
+[INFO] 02:50:19:126 gameboy/(23246:23246): 127.0.0.1
+[INFO] 02:50:19:128 gameboy/(23246:23246): 5003
+[INFO] 02:50:19:128 gameboy/(23246:23246): entro a new_pokemon
+[INFO] 02:50:19:909 gameboy/(23248:23248): Se va a conectar en BROKER
+
+[INFO] 02:50:19:911 gameboy/(23248:23248): 127.0.0.1
+[INFO] 02:50:19:912 gameboy/(23248:23248): 5003
+[INFO] 02:50:19:913 gameboy/(23248:23248): entro a new_pokemon
+[INFO] 02:51:46:731 gameboy/(23328:23328): Se va a conectar en BROKER
+
+[INFO] 02:51:46:734 gameboy/(23328:23328): 127.0.0.1
+[INFO] 02:51:46:736 gameboy/(23328:23328): 5003
+[INFO] 02:51:46:737 gameboy/(23328:23328): Entro a modoSuscriptor
+
+[INFO] 02:51:50:23 gameboy/(23330:23330): Se va a conectar en BROKER
+
+[INFO] 02:51:50:26 gameboy/(23330:23330): 127.0.0.1
+[INFO] 02:51:50:27 gameboy/(23330:23330): 5003
+[INFO] 02:51:50:28 gameboy/(23330:23330): entro a new_pokemon
+[INFO] 02:51:52:435 gameboy/(23337:23337): Se va a conectar en BROKER
+
+[INFO] 02:51:52:439 gameboy/(23337:23337): 127.0.0.1
+[INFO] 02:51:52:440 gameboy/(23337:23337): 5003
+[INFO] 02:51:52:440 gameboy/(23337:23337): entro a new_pokemon
+[INFO] 02:51:53:855 gameboy/(23339:23339): Se va a conectar en BROKER
+
+[INFO] 02:51:53:858 gameboy/(23339:23339): 127.0.0.1
+[INFO] 02:51:53:860 gameboy/(23339:23339): 5003
+[INFO] 02:51:53:861 gameboy/(23339:23339): entro a new_pokemon
+[INFO] 02:51:54:987 gameboy/(23341:23341): Se va a conectar en BROKER
+
+[INFO] 02:51:54:990 gameboy/(23341:23341): 127.0.0.1
+[INFO] 02:51:54:991 gameboy/(23341:23341): 5003
+[INFO] 02:51:54:993 gameboy/(23341:23341): entro a new_pokemon
+[INFO] 02:51:55:990 gameboy/(23348:23348): Se va a conectar en BROKER
+
+[INFO] 02:51:55:992 gameboy/(23348:23348): 127.0.0.1
+[INFO] 02:51:55:994 gameboy/(23348:23348): 5003
+[INFO] 02:51:55:995 gameboy/(23348:23348): entro a new_pokemon
+[INFO] 02:51:57:75 gameboy/(23355:23355): Se va a conectar en BROKER
+
+[INFO] 02:51:57:78 gameboy/(23355:23355): 127.0.0.1
+[INFO] 02:51:57:79 gameboy/(23355:23355): 5003
+[INFO] 02:51:57:79 gameboy/(23355:23355): entro a new_pokemon
+[INFO] 02:51:58:408 gameboy/(23357:23357): Se va a conectar en BROKER
+
+[INFO] 02:51:58:410 gameboy/(23357:23357): 127.0.0.1
+[INFO] 02:51:58:412 gameboy/(23357:23357): 5003
+[INFO] 02:51:58:413 gameboy/(23357:23357): entro a new_pokemon
+[INFO] 02:52:01:520 gameboy/(23359:23359): Se va a conectar en BROKER
+
+[INFO] 02:52:01:522 gameboy/(23359:23359): 127.0.0.1
+[INFO] 02:52:01:524 gameboy/(23359:23359): 5003
+[INFO] 02:52:01:524 gameboy/(23359:23359): Entro a modoSuscriptor
+
+[INFO] 02:52:05:970 gameboy/(23361:23361): Se va a conectar en BROKER
+
+[INFO] 02:52:05:972 gameboy/(23361:23361): 127.0.0.1
+[INFO] 02:52:05:973 gameboy/(23361:23361): 5003
+[INFO] 02:52:05:975 gameboy/(23361:23361): Entro a modoSuscriptor
+
+[INFO] 02:52:07:20 gameboy/(23363:23363): Se va a conectar en BROKER
+
+[INFO] 02:52:07:22 gameboy/(23363:23363): 127.0.0.1
+[INFO] 02:52:07:24 gameboy/(23363:23363): 5003
+[INFO] 02:52:07:25 gameboy/(23363:23363): Entro a modoSuscriptor
+
+[INFO] 02:53:12:177 gameboy/(23437:23437): Se va a conectar en BROKER
+
+[INFO] 02:53:12:179 gameboy/(23437:23437): 127.0.0.1
+[INFO] 02:53:12:181 gameboy/(23437:23437): 5003
+[INFO] 02:53:12:182 gameboy/(23437:23437): Entro a modoSuscriptor
+
+[INFO] 02:53:15:20 gameboy/(23439:23439): Se va a conectar en BROKER
+
+[INFO] 02:53:15:23 gameboy/(23439:23439): 127.0.0.1
+[INFO] 02:53:15:24 gameboy/(23439:23439): 5003
+[INFO] 02:53:15:24 gameboy/(23439:23439): entro a new_pokemon
+[INFO] 02:53:16:301 gameboy/(23441:23441): Se va a conectar en BROKER
+
+[INFO] 02:53:16:303 gameboy/(23441:23441): 127.0.0.1
+[INFO] 02:53:16:304 gameboy/(23441:23441): 5003
+[INFO] 02:53:16:306 gameboy/(23441:23441): entro a new_pokemon
+[INFO] 02:53:17:379 gameboy/(23443:23443): Se va a conectar en BROKER
+
+[INFO] 02:53:17:381 gameboy/(23443:23443): 127.0.0.1
+[INFO] 02:53:17:383 gameboy/(23443:23443): 5003
+[INFO] 02:53:17:384 gameboy/(23443:23443): entro a new_pokemon
+[INFO] 02:53:18:941 gameboy/(23445:23445): Se va a conectar en BROKER
+
+[INFO] 02:53:18:943 gameboy/(23445:23445): 127.0.0.1
+[INFO] 02:53:18:945 gameboy/(23445:23445): 5003
+[INFO] 02:53:18:946 gameboy/(23445:23445): entro a new_pokemon
+[INFO] 02:53:19:823 gameboy/(23447:23447): Se va a conectar en BROKER
+
+[INFO] 02:53:19:826 gameboy/(23447:23447): 127.0.0.1
+[INFO] 02:53:19:828 gameboy/(23447:23447): 5003
+[INFO] 02:53:19:828 gameboy/(23447:23447): entro a new_pokemon
+[INFO] 02:53:20:572 gameboy/(23449:23449): Se va a conectar en BROKER
+
+[INFO] 02:53:20:575 gameboy/(23449:23449): 127.0.0.1
+[INFO] 02:53:20:575 gameboy/(23449:23449): 5003
+[INFO] 02:53:20:578 gameboy/(23449:23449): entro a new_pokemon
+[INFO] 02:58:53:560 gameboy/(23611:23611): Se va a conectar en BROKER
+
+[INFO] 02:58:53:563 gameboy/(23611:23611): 127.0.0.1
+[INFO] 02:58:53:565 gameboy/(23611:23611): 5003
+[INFO] 02:58:53:567 gameboy/(23611:23611): Entro a modoSuscriptor
+
+[INFO] 02:58:56:618 gameboy/(23613:23613): Se va a conectar en BROKER
+
+[INFO] 02:58:56:621 gameboy/(23613:23613): 127.0.0.1
+[INFO] 02:58:56:623 gameboy/(23613:23613): 5003
+[INFO] 02:58:56:623 gameboy/(23613:23613): entro a new_pokemon
+[INFO] 02:58:58:831 gameboy/(23615:23615): Se va a conectar en BROKER
+
+[INFO] 02:58:58:836 gameboy/(23615:23615): 127.0.0.1
+[INFO] 02:58:58:837 gameboy/(23615:23615): 5003
+[INFO] 02:58:58:837 gameboy/(23615:23615): entro a new_pokemon
+[INFO] 02:59:03:325 gameboy/(23618:23618): Se va a conectar en BROKER
+
+[INFO] 02:59:03:327 gameboy/(23618:23618): 127.0.0.1
+[INFO] 02:59:03:328 gameboy/(23618:23618): 5003
+[INFO] 02:59:03:329 gameboy/(23618:23618): entro a new_pokemon
+[INFO] 02:59:05:262 gameboy/(23625:23625): Se va a conectar en BROKER
+
+[INFO] 02:59:05:264 gameboy/(23625:23625): 127.0.0.1
+[INFO] 02:59:05:266 gameboy/(23625:23625): 5003
+[INFO] 02:59:05:267 gameboy/(23625:23625): entro a new_pokemon
+[INFO] 02:59:06:409 gameboy/(23627:23627): Se va a conectar en BROKER
+
+[INFO] 02:59:06:412 gameboy/(23627:23627): 127.0.0.1
+[INFO] 02:59:06:414 gameboy/(23627:23627): 5003
+[INFO] 02:59:06:415 gameboy/(23627:23627): entro a new_pokemon
+[INFO] 02:59:07:444 gameboy/(23629:23629): Se va a conectar en BROKER
+
+[INFO] 02:59:07:447 gameboy/(23629:23629): 127.0.0.1
+[INFO] 02:59:07:450 gameboy/(23629:23629): 5003
+[INFO] 02:59:07:450 gameboy/(23629:23629): entro a new_pokemon
+[INFO] 02:59:08:92 gameboy/(23631:23631): Se va a conectar en BROKER
+
+[INFO] 02:59:08:94 gameboy/(23631:23631): 127.0.0.1
+[INFO] 02:59:08:96 gameboy/(23631:23631): 5003
+[INFO] 02:59:08:97 gameboy/(23631:23631): entro a new_pokemon
+[INFO] 02:59:08:553 gameboy/(23633:23633): Se va a conectar en BROKER
+
+[INFO] 02:59:08:556 gameboy/(23633:23633): 127.0.0.1
+[INFO] 02:59:08:558 gameboy/(23633:23633): 5003
+[INFO] 02:59:08:558 gameboy/(23633:23633): entro a new_pokemon
+[INFO] 02:59:08:978 gameboy/(23635:23635): Se va a conectar en BROKER
+
+[INFO] 02:59:08:980 gameboy/(23635:23635): 127.0.0.1
+[INFO] 02:59:08:982 gameboy/(23635:23635): 5003
+[INFO] 02:59:08:983 gameboy/(23635:23635): entro a new_pokemon
+[INFO] 02:59:09:410 gameboy/(23637:23637): Se va a conectar en BROKER
+
+[INFO] 02:59:09:412 gameboy/(23637:23637): 127.0.0.1
+[INFO] 02:59:09:414 gameboy/(23637:23637): 5003
+[INFO] 02:59:09:415 gameboy/(23637:23637): entro a new_pokemon
+[INFO] 02:59:09:824 gameboy/(23639:23639): Se va a conectar en BROKER
+
+[INFO] 02:59:09:826 gameboy/(23639:23639): 127.0.0.1
+[INFO] 02:59:09:829 gameboy/(23639:23639): 5003
+[INFO] 02:59:09:829 gameboy/(23639:23639): entro a new_pokemon
+[INFO] 02:59:10:311 gameboy/(23641:23641): Se va a conectar en BROKER
+
+[INFO] 02:59:10:314 gameboy/(23641:23641): 127.0.0.1
+[INFO] 02:59:10:315 gameboy/(23641:23641): 5003
+[INFO] 02:59:10:316 gameboy/(23641:23641): entro a new_pokemon
+[INFO] 02:59:10:781 gameboy/(23643:23643): Se va a conectar en BROKER
+
+[INFO] 02:59:10:784 gameboy/(23643:23643): 127.0.0.1
+[INFO] 02:59:10:785 gameboy/(23643:23643): 5003
+[INFO] 02:59:10:787 gameboy/(23643:23643): entro a new_pokemon
+[INFO] 02:59:11:249 gameboy/(23645:23645): Se va a conectar en BROKER
+
+[INFO] 02:59:11:251 gameboy/(23645:23645): 127.0.0.1
+[INFO] 02:59:11:253 gameboy/(23645:23645): 5003
+[INFO] 02:59:11:254 gameboy/(23645:23645): entro a new_pokemon
+[INFO] 02:59:13:386 gameboy/(23647:23647): Se va a conectar en BROKER
+
+[INFO] 02:59:13:390 gameboy/(23647:23647): 127.0.0.1
+[INFO] 02:59:13:391 gameboy/(23647:23647): 5003
+[INFO] 02:59:13:391 gameboy/(23647:23647): Entro a modoSuscriptor
+
+[INFO] 02:59:16:196 gameboy/(23649:23649): Se va a conectar en BROKER
+
+[INFO] 02:59:16:199 gameboy/(23649:23649): 127.0.0.1
+[INFO] 02:59:16:201 gameboy/(23649:23649): 5003
+[INFO] 02:59:16:201 gameboy/(23649:23649): entro a new_pokemon
+[INFO] 02:59:18:771 gameboy/(23651:23651): Se va a conectar en BROKER
+
+[INFO] 02:59:18:773 gameboy/(23651:23651): 127.0.0.1
+[INFO] 02:59:18:775 gameboy/(23651:23651): 5003
+[INFO] 02:59:18:776 gameboy/(23651:23651): Entro a modoSuscriptor
+
+[INFO] 02:59:20:351 gameboy/(23653:23653): Se va a conectar en BROKER
+
+[INFO] 02:59:20:353 gameboy/(23653:23653): 127.0.0.1
+[INFO] 02:59:20:354 gameboy/(23653:23653): 5003
+[INFO] 02:59:20:356 gameboy/(23653:23653): Entro a modoSuscriptor
+
+[INFO] 02:59:21:99 gameboy/(23655:23655): Se va a conectar en BROKER
+
+[INFO] 02:59:21:101 gameboy/(23655:23655): 127.0.0.1
+[INFO] 02:59:21:102 gameboy/(23655:23655): 5003
+[INFO] 02:59:21:104 gameboy/(23655:23655): Entro a modoSuscriptor
+
+[INFO] 02:59:21:782 gameboy/(23657:23657): Se va a conectar en BROKER
+
+[INFO] 02:59:21:786 gameboy/(23657:23657): 127.0.0.1
+[INFO] 02:59:21:788 gameboy/(23657:23657): 5003
+[INFO] 02:59:21:788 gameboy/(23657:23657): Entro a modoSuscriptor
+
+[INFO] 02:59:22:435 gameboy/(23659:23659): Se va a conectar en BROKER
+
+[INFO] 02:59:22:438 gameboy/(23659:23659): 127.0.0.1
+[INFO] 02:59:22:440 gameboy/(23659:23659): 5003
+[INFO] 02:59:22:440 gameboy/(23659:23659): Entro a modoSuscriptor
+
+[INFO] 02:59:23:56 gameboy/(23661:23661): Se va a conectar en BROKER
+
+[INFO] 02:59:23:59 gameboy/(23661:23661): 127.0.0.1
+[INFO] 02:59:23:61 gameboy/(23661:23661): 5003
+[INFO] 02:59:23:62 gameboy/(23661:23661): Entro a modoSuscriptor
+
+[INFO] 02:59:23:686 gameboy/(23663:23663): Se va a conectar en BROKER
+
+[INFO] 02:59:23:689 gameboy/(23663:23663): 127.0.0.1
+[INFO] 02:59:23:690 gameboy/(23663:23663): 5003
+[INFO] 02:59:23:691 gameboy/(23663:23663): Entro a modoSuscriptor
+
+[INFO] 02:59:24:359 gameboy/(23665:23665): Se va a conectar en BROKER
+
+[INFO] 02:59:24:361 gameboy/(23665:23665): 127.0.0.1
+[INFO] 02:59:24:365 gameboy/(23665:23665): 5003
+[INFO] 02:59:24:366 gameboy/(23665:23665): Entro a modoSuscriptor
+
+[INFO] 02:59:25:34 gameboy/(23667:23667): Se va a conectar en BROKER
+
+[INFO] 02:59:25:36 gameboy/(23667:23667): 127.0.0.1
+[INFO] 02:59:25:39 gameboy/(23667:23667): 5003
+[INFO] 02:59:25:39 gameboy/(23667:23667): Entro a modoSuscriptor
+
+[INFO] 02:59:25:746 gameboy/(23669:23669): Se va a conectar en BROKER
+
+[INFO] 02:59:25:748 gameboy/(23669:23669): 127.0.0.1
+[INFO] 02:59:25:750 gameboy/(23669:23669): 5003
+[INFO] 02:59:25:751 gameboy/(23669:23669): Entro a modoSuscriptor
+
+[INFO] 02:59:26:464 gameboy/(23671:23671): Se va a conectar en BROKER
+
+[INFO] 02:59:26:466 gameboy/(23671:23671): 127.0.0.1
+[INFO] 02:59:26:468 gameboy/(23671:23671): 5003
+[INFO] 02:59:26:468 gameboy/(23671:23671): Entro a modoSuscriptor
+
+[INFO] 02:59:27:214 gameboy/(23673:23673): Se va a conectar en BROKER
+
+[INFO] 02:59:27:217 gameboy/(23673:23673): 127.0.0.1
+[INFO] 02:59:27:219 gameboy/(23673:23673): 5003
+[INFO] 02:59:27:220 gameboy/(23673:23673): Entro a modoSuscriptor
+
+[INFO] 02:59:28:902 gameboy/(23675:23675): Se va a conectar en BROKER
+
+[INFO] 02:59:28:906 gameboy/(23675:23675): 127.0.0.1
+[INFO] 02:59:28:907 gameboy/(23675:23675): 5003
+[INFO] 02:59:28:908 gameboy/(23675:23675): entro a new_pokemon
+[INFO] 03:00:15:34 gameboy/(23746:23746): Se va a conectar en BROKER
+
+[INFO] 03:00:15:36 gameboy/(23746:23746): 127.0.0.1
+[INFO] 03:00:15:37 gameboy/(23746:23746): 5003
+[INFO] 03:00:15:39 gameboy/(23746:23746): Entro a modoSuscriptor
+
+[INFO] 03:00:19:385 gameboy/(23748:23748): Se va a conectar en BROKER
+
+[INFO] 03:00:19:387 gameboy/(23748:23748): 127.0.0.1
+[INFO] 03:00:19:388 gameboy/(23748:23748): 5003
+[INFO] 03:00:19:390 gameboy/(23748:23748): entro a new_pokemon
+[INFO] 03:00:20:814 gameboy/(23750:23750): Se va a conectar en BROKER
+
+[INFO] 03:00:20:816 gameboy/(23750:23750): 127.0.0.1
+[INFO] 03:00:20:819 gameboy/(23750:23750): 5003
+[INFO] 03:00:20:819 gameboy/(23750:23750): entro a new_pokemon
+[INFO] 03:00:22:12 gameboy/(23752:23752): Se va a conectar en BROKER
+
+[INFO] 03:00:22:15 gameboy/(23752:23752): 127.0.0.1
+[INFO] 03:00:22:17 gameboy/(23752:23752): 5003
+[INFO] 03:00:22:18 gameboy/(23752:23752): entro a new_pokemon
+[INFO] 03:00:23:105 gameboy/(23754:23754): Se va a conectar en BROKER
+
+[INFO] 03:00:23:107 gameboy/(23754:23754): 127.0.0.1
+[INFO] 03:00:23:109 gameboy/(23754:23754): 5003
+[INFO] 03:00:23:110 gameboy/(23754:23754): entro a new_pokemon
+[INFO] 03:00:23:916 gameboy/(23756:23756): Se va a conectar en BROKER
+
+[INFO] 03:00:23:919 gameboy/(23756:23756): 127.0.0.1
+[INFO] 03:00:23:921 gameboy/(23756:23756): 5003
+[INFO] 03:00:23:922 gameboy/(23756:23756): entro a new_pokemon
+[INFO] 03:00:24:564 gameboy/(23758:23758): Se va a conectar en BROKER
+
+[INFO] 03:00:24:570 gameboy/(23758:23758): 127.0.0.1
+[INFO] 03:00:24:575 gameboy/(23758:23758): 5003
+[INFO] 03:00:24:575 gameboy/(23758:23758): entro a new_pokemon
+[INFO] 03:00:25:222 gameboy/(23760:23760): Se va a conectar en BROKER
+
+[INFO] 03:00:25:225 gameboy/(23760:23760): 127.0.0.1
+[INFO] 03:00:25:227 gameboy/(23760:23760): 5003
+[INFO] 03:00:25:228 gameboy/(23760:23760): entro a new_pokemon
+[INFO] 03:00:25:764 gameboy/(23762:23762): Se va a conectar en BROKER
+
+[INFO] 03:00:25:766 gameboy/(23762:23762): 127.0.0.1
+[INFO] 03:00:25:767 gameboy/(23762:23762): 5003
+[INFO] 03:00:25:768 gameboy/(23762:23762): entro a new_pokemon
+[INFO] 03:00:26:200 gameboy/(23764:23764): Se va a conectar en BROKER
+
+[INFO] 03:00:26:202 gameboy/(23764:23764): 127.0.0.1
+[INFO] 03:00:26:204 gameboy/(23764:23764): 5003
+[INFO] 03:00:26:205 gameboy/(23764:23764): entro a new_pokemon
+[INFO] 03:00:26:586 gameboy/(23766:23766): Se va a conectar en BROKER
+
+[INFO] 03:00:26:588 gameboy/(23766:23766): 127.0.0.1
+[INFO] 03:00:26:590 gameboy/(23766:23766): 5003
+[INFO] 03:00:26:591 gameboy/(23766:23766): entro a new_pokemon
+[INFO] 03:00:27:7 gameboy/(23768:23768): Se va a conectar en BROKER
+
+[INFO] 03:00:27:9 gameboy/(23768:23768): 127.0.0.1
+[INFO] 03:00:27:10 gameboy/(23768:23768): 5003
+[INFO] 03:00:27:12 gameboy/(23768:23768): entro a new_pokemon
+[INFO] 03:00:34:27 gameboy/(23775:23775): Se va a conectar en BROKER
+
+[INFO] 03:00:34:29 gameboy/(23775:23775): 127.0.0.1
+[INFO] 03:00:34:31 gameboy/(23775:23775): 5003
+[INFO] 03:00:34:32 gameboy/(23775:23775): Entro a modoSuscriptor
+
+[INFO] 03:00:35:419 gameboy/(23779:23779): Se va a conectar en BROKER
+
+[INFO] 03:00:35:422 gameboy/(23779:23779): 127.0.0.1
+[INFO] 03:00:35:424 gameboy/(23779:23779): 5003
+[INFO] 03:00:35:424 gameboy/(23779:23779): Entro a modoSuscriptor
+
+[INFO] 03:00:35:2 gameboy/(23781:23781): Se va a conectar en BROKER
+
+[INFO] 03:00:35:5 gameboy/(23781:23781): 127.0.0.1
+[INFO] 03:00:36:6 gameboy/(23781:23781): 5003
+[INFO] 03:00:36:7 gameboy/(23781:23781): Entro a modoSuscriptor
+
+[INFO] 03:00:36:504 gameboy/(23783:23783): Se va a conectar en BROKER
+
+[INFO] 03:00:36:506 gameboy/(23783:23783): 127.0.0.1
+[INFO] 03:00:36:508 gameboy/(23783:23783): 5003
+[INFO] 03:00:36:509 gameboy/(23783:23783): Entro a modoSuscriptor
+
+[INFO] 03:00:36:958 gameboy/(23785:23785): Se va a conectar en BROKER
+
+[INFO] 03:00:36:961 gameboy/(23785:23785): 127.0.0.1
+[INFO] 03:00:36:963 gameboy/(23785:23785): 5003
+[INFO] 03:00:36:963 gameboy/(23785:23785): Entro a modoSuscriptor
+
+[INFO] 03:00:37:436 gameboy/(23787:23787): Se va a conectar en BROKER
+
+[INFO] 03:00:37:439 gameboy/(23787:23787): 127.0.0.1
+[INFO] 03:00:37:441 gameboy/(23787:23787): 5003
+[INFO] 03:00:37:441 gameboy/(23787:23787): Entro a modoSuscriptor
+
+[INFO] 03:00:37:951 gameboy/(23789:23789): Se va a conectar en BROKER
+
+[INFO] 03:00:37:953 gameboy/(23789:23789): 127.0.0.1
+[INFO] 03:00:37:955 gameboy/(23789:23789): 5003
+[INFO] 03:00:37:956 gameboy/(23789:23789): Entro a modoSuscriptor
+
+[INFO] 03:00:38:448 gameboy/(23791:23791): Se va a conectar en BROKER
+
+[INFO] 03:00:38:451 gameboy/(23791:23791): 127.0.0.1
+[INFO] 03:00:38:453 gameboy/(23791:23791): 5003
+[INFO] 03:00:38:453 gameboy/(23791:23791): Entro a modoSuscriptor
+
+[INFO] 03:00:38:968 gameboy/(23793:23793): Se va a conectar en BROKER
+
+[INFO] 03:00:38:970 gameboy/(23793:23793): 127.0.0.1
+[INFO] 03:00:38:972 gameboy/(23793:23793): 5003
+[INFO] 03:00:38:974 gameboy/(23793:23793): Entro a modoSuscriptor
+
+[INFO] 03:00:39:515 gameboy/(23795:23795): Se va a conectar en BROKER
+
+[INFO] 03:00:39:518 gameboy/(23795:23795): 127.0.0.1
+[INFO] 03:00:39:519 gameboy/(23795:23795): 5003
+[INFO] 03:00:39:521 gameboy/(23795:23795): Entro a modoSuscriptor
+
+[INFO] 03:00:41:99 gameboy/(23797:23797): Se va a conectar en BROKER
+
+[INFO] 03:00:41:103 gameboy/(23797:23797): 127.0.0.1
+[INFO] 03:00:41:104 gameboy/(23797:23797): 5003
+[INFO] 03:00:41:104 gameboy/(23797:23797): entro a new_pokemon
+[INFO] 03:00:41:493 gameboy/(23799:23799): Se va a conectar en BROKER
+
+[INFO] 03:00:41:495 gameboy/(23799:23799): 127.0.0.1
+[INFO] 03:00:41:497 gameboy/(23799:23799): 5003
+[INFO] 03:00:41:498 gameboy/(23799:23799): entro a new_pokemon
+[INFO] 03:00:42:258 gameboy/(23806:23806): Se va a conectar en BROKER
+
+[INFO] 03:00:42:260 gameboy/(23806:23806): 127.0.0.1
+[INFO] 03:00:42:262 gameboy/(23806:23806): 5003
+[INFO] 03:00:42:263 gameboy/(23806:23806): entro a new_pokemon
+[INFO] 03:00:42:927 gameboy/(23808:23808): Se va a conectar en BROKER
+
+[INFO] 03:00:42:930 gameboy/(23808:23808): 127.0.0.1
+[INFO] 03:00:42:931 gameboy/(23808:23808): 5003
+[INFO] 03:00:42:933 gameboy/(23808:23808): entro a new_pokemon
+[INFO] 03:00:43:515 gameboy/(23810:23810): Se va a conectar en BROKER
+
+[INFO] 03:00:43:518 gameboy/(23810:23810): 127.0.0.1
+[INFO] 03:00:43:520 gameboy/(23810:23810): 5003
+[INFO] 03:00:43:520 gameboy/(23810:23810): entro a new_pokemon
+[INFO] 03:00:43:0 gameboy/(23812:23812): Se va a conectar en BROKER
+
+[INFO] 03:00:43:2 gameboy/(23812:23812): 127.0.0.1
+[INFO] 03:00:43:4 gameboy/(23812:23812): 5003
+[INFO] 03:00:43:5 gameboy/(23812:23812): entro a new_pokemon
+[INFO] 03:00:44:386 gameboy/(23814:23814): Se va a conectar en BROKER
+
+[INFO] 03:00:44:388 gameboy/(23814:23814): 127.0.0.1
+[INFO] 03:00:44:389 gameboy/(23814:23814): 5003
+[INFO] 03:00:44:391 gameboy/(23814:23814): entro a new_pokemon
+[INFO] 03:00:44:753 gameboy/(23816:23816): Se va a conectar en BROKER
+
+[INFO] 03:00:44:756 gameboy/(23816:23816): 127.0.0.1
+[INFO] 03:00:44:758 gameboy/(23816:23816): 5003
+[INFO] 03:00:44:759 gameboy/(23816:23816): entro a new_pokemon
+[INFO] 03:00:45:114 gameboy/(23818:23818): Se va a conectar en BROKER
+
+[INFO] 03:00:45:117 gameboy/(23818:23818): 127.0.0.1
+[INFO] 03:00:45:119 gameboy/(23818:23818): 5003
+[INFO] 03:00:45:121 gameboy/(23818:23818): entro a new_pokemon
+[INFO] 03:00:45:445 gameboy/(23820:23820): Se va a conectar en BROKER
+
+[INFO] 03:00:45:447 gameboy/(23820:23820): 127.0.0.1
+[INFO] 03:00:45:448 gameboy/(23820:23820): 5003
+[INFO] 03:00:45:450 gameboy/(23820:23820): entro a new_pokemon
+[INFO] 03:00:45:770 gameboy/(23822:23822): Se va a conectar en BROKER
+
+[INFO] 03:00:45:771 gameboy/(23822:23822): 127.0.0.1
+[INFO] 03:00:45:773 gameboy/(23822:23822): 5003
+[INFO] 03:00:45:774 gameboy/(23822:23822): entro a new_pokemon
+[INFO] 03:00:46:103 gameboy/(23824:23824): Se va a conectar en BROKER
+
+[INFO] 03:00:46:106 gameboy/(23824:23824): 127.0.0.1
+[INFO] 03:00:46:108 gameboy/(23824:23824): 5003
+[INFO] 03:00:46:109 gameboy/(23824:23824): entro a new_pokemon
+[INFO] 03:00:46:422 gameboy/(23827:23827): Se va a conectar en BROKER
+
+[INFO] 03:00:46:425 gameboy/(23827:23827): 127.0.0.1
+[INFO] 03:00:46:426 gameboy/(23827:23827): 5003
+[INFO] 03:00:46:427 gameboy/(23827:23827): entro a new_pokemon
+[INFO] 03:00:46:747 gameboy/(23829:23829): Se va a conectar en BROKER
+
+[INFO] 03:00:46:749 gameboy/(23829:23829): 127.0.0.1
+[INFO] 03:00:46:751 gameboy/(23829:23829): 5003
+[INFO] 03:00:46:752 gameboy/(23829:23829): entro a new_pokemon
+[INFO] 03:00:47:68 gameboy/(23831:23831): Se va a conectar en BROKER
+
+[INFO] 03:00:47:71 gameboy/(23831:23831): 127.0.0.1
+[INFO] 03:00:47:73 gameboy/(23831:23831): 5003
+[INFO] 03:00:47:75 gameboy/(23831:23831): entro a new_pokemon
+[INFO] 03:00:47:388 gameboy/(23833:23833): Se va a conectar en BROKER
+
+[INFO] 03:00:47:390 gameboy/(23833:23833): 127.0.0.1
+[INFO] 03:00:47:392 gameboy/(23833:23833): 5003
+[INFO] 03:00:47:393 gameboy/(23833:23833): entro a new_pokemon
+[INFO] 03:00:47:695 gameboy/(23835:23835): Se va a conectar en BROKER
+
+[INFO] 03:00:47:698 gameboy/(23835:23835): 127.0.0.1
+[INFO] 03:00:47:700 gameboy/(23835:23835): 5003
+[INFO] 03:00:47:701 gameboy/(23835:23835): entro a new_pokemon
+[INFO] 03:00:48:8 gameboy/(23837:23837): Se va a conectar en BROKER
+
+[INFO] 03:00:48:11 gameboy/(23837:23837): 127.0.0.1
+[INFO] 03:00:48:13 gameboy/(23837:23837): 5003
+[INFO] 03:00:48:14 gameboy/(23837:23837): entro a new_pokemon
+[INFO] 03:00:48:362 gameboy/(23839:23839): Se va a conectar en BROKER
+
+[INFO] 03:00:48:364 gameboy/(23839:23839): 127.0.0.1
+[INFO] 03:00:48:365 gameboy/(23839:23839): 5003
+[INFO] 03:00:48:366 gameboy/(23839:23839): entro a new_pokemon
+[INFO] 03:00:48:712 gameboy/(23841:23841): Se va a conectar en BROKER
+
+[INFO] 03:00:48:715 gameboy/(23841:23841): 127.0.0.1
+[INFO] 03:00:48:716 gameboy/(23841:23841): 5003
+[INFO] 03:00:48:716 gameboy/(23841:23841): entro a new_pokemon
+[INFO] 03:00:49:17 gameboy/(23843:23843): Se va a conectar en BROKER
+
+[INFO] 03:00:49:20 gameboy/(23843:23843): 127.0.0.1
+[INFO] 03:00:49:22 gameboy/(23843:23843): 5003
+[INFO] 03:00:49:22 gameboy/(23843:23843): entro a new_pokemon
+[INFO] 03:00:49:358 gameboy/(23845:23845): Se va a conectar en BROKER
+
+[INFO] 03:00:49:361 gameboy/(23845:23845): 127.0.0.1
+[INFO] 03:00:49:362 gameboy/(23845:23845): 5003
+[INFO] 03:00:49:363 gameboy/(23845:23845): entro a new_pokemon
+[INFO] 03:00:49:714 gameboy/(23847:23847): Se va a conectar en BROKER
+
+[INFO] 03:00:49:716 gameboy/(23847:23847): 127.0.0.1
+[INFO] 03:00:49:718 gameboy/(23847:23847): 5003
+[INFO] 03:00:49:719 gameboy/(23847:23847): entro a new_pokemon
+[INFO] 03:00:50:19 gameboy/(23849:23849): Se va a conectar en BROKER
+
+[INFO] 03:00:50:23 gameboy/(23849:23849): 127.0.0.1
+[INFO] 03:00:50:24 gameboy/(23849:23849): 5003
+[INFO] 03:00:50:24 gameboy/(23849:23849): entro a new_pokemon
+[INFO] 03:00:50:367 gameboy/(23851:23851): Se va a conectar en BROKER
+
+[INFO] 03:00:50:370 gameboy/(23851:23851): 127.0.0.1
+[INFO] 03:00:50:371 gameboy/(23851:23851): 5003
+[INFO] 03:00:50:372 gameboy/(23851:23851): entro a new_pokemon
+[INFO] 03:00:50:727 gameboy/(23853:23853): Se va a conectar en BROKER
+
+[INFO] 03:00:50:730 gameboy/(23853:23853): 127.0.0.1
+[INFO] 03:00:50:732 gameboy/(23853:23853): 5003
+[INFO] 03:00:50:732 gameboy/(23853:23853): entro a new_pokemon
+[INFO] 03:00:56:942 gameboy/(23855:23855): Se va a conectar en BROKER
+
+[INFO] 03:00:56:944 gameboy/(23855:23855): 127.0.0.1
+[INFO] 03:00:56:945 gameboy/(23855:23855): 5003
+[INFO] 03:00:56:947 gameboy/(23855:23855): entro a new_pokemon
+[INFO] 03:00:57:498 gameboy/(23857:23857): Se va a conectar en BROKER
+
+[INFO] 03:00:57:501 gameboy/(23857:23857): 127.0.0.1
+[INFO] 03:00:57:509 gameboy/(23857:23857): 5003
+[INFO] 03:00:57:509 gameboy/(23857:23857): entro a new_pokemon
+[INFO] 03:00:57:690 gameboy/(23859:23859): Se va a conectar en BROKER
+
+[INFO] 03:00:57:692 gameboy/(23859:23859): 127.0.0.1
+[INFO] 03:00:57:693 gameboy/(23859:23859): 5003
+[INFO] 03:00:57:694 gameboy/(23859:23859): entro a new_pokemon
+[INFO] 03:00:57:859 gameboy/(23861:23861): Se va a conectar en BROKER
+
+[INFO] 03:00:57:861 gameboy/(23861:23861): 127.0.0.1
+[INFO] 03:00:57:863 gameboy/(23861:23861): 5003
+[INFO] 03:00:57:864 gameboy/(23861:23861): entro a new_pokemon
+[INFO] 03:00:58:33 gameboy/(23863:23863): Se va a conectar en BROKER
+
+[INFO] 03:00:58:35 gameboy/(23863:23863): 127.0.0.1
+[INFO] 03:00:58:37 gameboy/(23863:23863): 5003
+[INFO] 03:00:58:38 gameboy/(23863:23863): entro a new_pokemon
+[INFO] 03:00:58:205 gameboy/(23865:23865): Se va a conectar en BROKER
+
+[INFO] 03:00:58:207 gameboy/(23865:23865): 127.0.0.1
+[INFO] 03:00:58:208 gameboy/(23865:23865): 5003
+[INFO] 03:00:58:210 gameboy/(23865:23865): entro a new_pokemon
+[INFO] 03:00:58:371 gameboy/(23872:23872): Se va a conectar en BROKER
+
+[INFO] 03:00:58:373 gameboy/(23872:23872): 127.0.0.1
+[INFO] 03:00:58:374 gameboy/(23872:23872): 5003
+[INFO] 03:00:58:376 gameboy/(23872:23872): entro a new_pokemon
+[INFO] 03:00:58:525 gameboy/(23879:23879): Se va a conectar en BROKER
+
+[INFO] 03:00:58:527 gameboy/(23879:23879): 127.0.0.1
+[INFO] 03:00:58:529 gameboy/(23879:23879): 5003
+[INFO] 03:00:58:530 gameboy/(23879:23879): entro a new_pokemon
+[INFO] 03:00:58:726 gameboy/(23881:23881): Se va a conectar en BROKER
+
+[INFO] 03:00:58:728 gameboy/(23881:23881): 127.0.0.1
+[INFO] 03:00:58:730 gameboy/(23881:23881): 5003
+[INFO] 03:00:58:731 gameboy/(23881:23881): entro a new_pokemon
+[INFO] 03:00:58:872 gameboy/(23883:23883): Se va a conectar en BROKER
+
+[INFO] 03:00:58:874 gameboy/(23883:23883): 127.0.0.1
+[INFO] 03:00:58:876 gameboy/(23883:23883): 5003
+[INFO] 03:00:58:877 gameboy/(23883:23883): entro a new_pokemon
+[INFO] 03:00:59:72 gameboy/(23885:23885): Se va a conectar en BROKER
+
+[INFO] 03:00:59:75 gameboy/(23885:23885): 127.0.0.1
+[INFO] 03:00:59:76 gameboy/(23885:23885): 5003
+[INFO] 03:00:59:77 gameboy/(23885:23885): entro a new_pokemon
+[INFO] 03:00:59:277 gameboy/(23887:23887): Se va a conectar en BROKER
+
+[INFO] 03:00:59:279 gameboy/(23887:23887): 127.0.0.1
+[INFO] 03:00:59:281 gameboy/(23887:23887): 5003
+[INFO] 03:00:59:283 gameboy/(23887:23887): entro a new_pokemon
+[INFO] 03:00:59:468 gameboy/(23889:23889): Se va a conectar en BROKER
+
+[INFO] 03:00:59:471 gameboy/(23889:23889): 127.0.0.1
+[INFO] 03:00:59:472 gameboy/(23889:23889): 5003
+[INFO] 03:00:59:473 gameboy/(23889:23889): entro a new_pokemon
+[INFO] 03:06:06:876 gameboy/(24089:24089): Se va a conectar en BROKER
+
+[INFO] 03:06:06:878 gameboy/(24089:24089): 127.0.0.1
+[INFO] 03:06:06:878 gameboy/(24089:24089): 5003
+[INFO] 03:06:06:878 gameboy/(24089:24089): Entro a modoSuscriptor
+
+[INFO] 03:06:09:544 gameboy/(24091:24091): Se va a conectar en BROKER
+
+[INFO] 03:06:09:547 gameboy/(24091:24091): 127.0.0.1
+[INFO] 03:06:09:548 gameboy/(24091:24091): 5003
+[INFO] 03:06:09:550 gameboy/(24091:24091): entro a new_pokemon
+[INFO] 03:06:11:705 gameboy/(24094:24094): Se va a conectar en BROKER
+
+[INFO] 03:06:11:707 gameboy/(24094:24094): 127.0.0.1
+[INFO] 03:06:11:708 gameboy/(24094:24094): 5003
+[INFO] 03:06:11:709 gameboy/(24094:24094): entro a new_pokemon
+[INFO] 03:06:13:299 gameboy/(24097:24097): Se va a conectar en BROKER
+
+[INFO] 03:06:13:301 gameboy/(24097:24097): 127.0.0.1
+[INFO] 03:06:13:302 gameboy/(24097:24097): 5003
+[INFO] 03:06:13:304 gameboy/(24097:24097): entro a new_pokemon
+[INFO] 03:06:15:158 gameboy/(24100:24100): Se va a conectar en BROKER
+
+[INFO] 03:06:15:162 gameboy/(24100:24100): 127.0.0.1
+[INFO] 03:06:15:163 gameboy/(24100:24100): 5003
+[INFO] 03:06:15:164 gameboy/(24100:24100): entro a new_pokemon
+[INFO] 03:06:17:45 gameboy/(24108:24108): Se va a conectar en BROKER
+
+[INFO] 03:06:17:58 gameboy/(24108:24108): 127.0.0.1
+[INFO] 03:06:17:59 gameboy/(24108:24108): 5003
+[INFO] 03:06:17:61 gameboy/(24108:24108): entro a new_pokemon
+[INFO] 03:06:18:912 gameboy/(24111:24111): Se va a conectar en BROKER
+
+[INFO] 03:06:18:914 gameboy/(24111:24111): 127.0.0.1
+[INFO] 03:06:18:915 gameboy/(24111:24111): 5003
+[INFO] 03:06:18:917 gameboy/(24111:24111): entro a new_pokemon
+[INFO] 03:06:20:786 gameboy/(24114:24114): Se va a conectar en BROKER
+
+[INFO] 03:06:20:789 gameboy/(24114:24114): 127.0.0.1
+[INFO] 03:06:20:790 gameboy/(24114:24114): 5003
+[INFO] 03:06:20:792 gameboy/(24114:24114): entro a new_pokemon
+[INFO] 03:06:23:495 gameboy/(24117:24117): Se va a conectar en BROKER
+
+[INFO] 03:06:23:497 gameboy/(24117:24117): 127.0.0.1
+[INFO] 03:06:23:498 gameboy/(24117:24117): 5003
+[INFO] 03:06:23:499 gameboy/(24117:24117): Entro a modoSuscriptor
+
+[INFO] 03:06:24:397 gameboy/(24119:24119): Se va a conectar en BROKER
+
+[INFO] 03:06:24:398 gameboy/(24119:24119): 127.0.0.1
+[INFO] 03:06:24:400 gameboy/(24119:24119): 5003
+[INFO] 03:06:24:400 gameboy/(24119:24119): Entro a modoSuscriptor
+
+[INFO] 03:06:24:959 gameboy/(24121:24121): Se va a conectar en BROKER
+
+[INFO] 03:06:24:961 gameboy/(24121:24121): 127.0.0.1
+[INFO] 03:06:24:963 gameboy/(24121:24121): 5003
+[INFO] 03:06:24:964 gameboy/(24121:24121): Entro a modoSuscriptor
+
+[INFO] 03:06:25:508 gameboy/(24123:24123): Se va a conectar en BROKER
+
+[INFO] 03:06:25:511 gameboy/(24123:24123): 127.0.0.1
+[INFO] 03:06:25:512 gameboy/(24123:24123): 5003
+[INFO] 03:06:25:514 gameboy/(24123:24123): Entro a modoSuscriptor
+
+[INFO] 03:06:26:98 gameboy/(24125:24125): Se va a conectar en BROKER
+
+[INFO] 03:06:26:100 gameboy/(24125:24125): 127.0.0.1
+[INFO] 03:06:26:103 gameboy/(24125:24125): 5003
+[INFO] 03:06:26:103 gameboy/(24125:24125): Entro a modoSuscriptor
+
+[INFO] 03:06:26:673 gameboy/(24127:24127): Se va a conectar en BROKER
+
+[INFO] 03:06:26:676 gameboy/(24127:24127): 127.0.0.1
+[INFO] 03:06:26:678 gameboy/(24127:24127): 5003
+[INFO] 03:06:26:679 gameboy/(24127:24127): Entro a modoSuscriptor
+
+[INFO] 03:06:27:239 gameboy/(24129:24129): Se va a conectar en BROKER
+
+[INFO] 03:06:27:243 gameboy/(24129:24129): 127.0.0.1
+[INFO] 03:06:27:244 gameboy/(24129:24129): 5003
+[INFO] 03:06:27:245 gameboy/(24129:24129): Entro a modoSuscriptor
+
+[INFO] 03:06:27:838 gameboy/(24131:24131): Se va a conectar en BROKER
+
+[INFO] 03:06:27:841 gameboy/(24131:24131): 127.0.0.1
+[INFO] 03:06:27:842 gameboy/(24131:24131): 5003
+[INFO] 03:06:27:842 gameboy/(24131:24131): Entro a modoSuscriptor
+
+[INFO] 03:06:28:423 gameboy/(24133:24133): Se va a conectar en BROKER
+
+[INFO] 03:06:28:425 gameboy/(24133:24133): 127.0.0.1
+[INFO] 03:06:28:427 gameboy/(24133:24133): 5003
+[INFO] 03:06:28:428 gameboy/(24133:24133): Entro a modoSuscriptor
+
+[INFO] 03:06:32:222 gameboy/(24135:24135): Se va a conectar en BROKER
+
+[INFO] 03:06:32:228 gameboy/(24135:24135): 127.0.0.1
+[INFO] 03:06:32:229 gameboy/(24135:24135): 5003
+[INFO] 03:06:32:230 gameboy/(24135:24135): entro a new_pokemon
+[INFO] 03:06:34:34 gameboy/(24138:24138): Se va a conectar en BROKER
+
+[INFO] 03:06:34:36 gameboy/(24138:24138): 127.0.0.1
+[INFO] 03:06:34:38 gameboy/(24138:24138): 5003
+[INFO] 03:06:34:39 gameboy/(24138:24138): entro a new_pokemon
+[INFO] 03:06:35:257 gameboy/(24144:24144): Se va a conectar en BROKER
+
+[INFO] 03:06:35:260 gameboy/(24144:24144): 127.0.0.1
+[INFO] 03:06:35:262 gameboy/(24144:24144): 5003
+[INFO] 03:06:35:263 gameboy/(24144:24144): entro a new_pokemon
+[INFO] 03:06:36:238 gameboy/(24147:24147): Se va a conectar en BROKER
+
+[INFO] 03:06:36:240 gameboy/(24147:24147): 127.0.0.1
+[INFO] 03:06:36:241 gameboy/(24147:24147): 5003
+[INFO] 03:06:36:243 gameboy/(24147:24147): entro a new_pokemon
+[INFO] 03:06:37:162 gameboy/(24155:24155): Se va a conectar en BROKER
+
+[INFO] 03:06:37:164 gameboy/(24155:24155): 127.0.0.1
+[INFO] 03:06:37:165 gameboy/(24155:24155): 5003
+[INFO] 03:06:37:167 gameboy/(24155:24155): entro a new_pokemon
+[INFO] 03:06:37:898 gameboy/(24158:24158): Se va a conectar en BROKER
+
+[INFO] 03:06:37:900 gameboy/(24158:24158): 127.0.0.1
+[INFO] 03:06:37:902 gameboy/(24158:24158): 5003
+[INFO] 03:06:37:903 gameboy/(24158:24158): entro a new_pokemon
+[INFO] 03:06:38:314 gameboy/(24161:24161): Se va a conectar en BROKER
+
+[INFO] 03:06:38:316 gameboy/(24161:24161): 127.0.0.1
+[INFO] 03:06:38:318 gameboy/(24161:24161): 5003
+[INFO] 03:06:38:319 gameboy/(24161:24161): entro a new_pokemon
+[INFO] 03:06:38:696 gameboy/(24164:24164): Se va a conectar en BROKER
+
+[INFO] 03:06:38:699 gameboy/(24164:24164): 127.0.0.1
+[INFO] 03:06:38:701 gameboy/(24164:24164): 5003
+[INFO] 03:06:38:702 gameboy/(24164:24164): entro a new_pokemon
+[INFO] 03:06:39:66 gameboy/(24167:24167): Se va a conectar en BROKER
+
+[INFO] 03:06:39:68 gameboy/(24167:24167): 127.0.0.1
+[INFO] 03:06:39:70 gameboy/(24167:24167): 5003
+[INFO] 03:06:39:71 gameboy/(24167:24167): entro a new_pokemon
+[INFO] 03:06:39:433 gameboy/(24170:24170): Se va a conectar en BROKER
+
+[INFO] 03:06:39:435 gameboy/(24170:24170): 127.0.0.1
+[INFO] 03:06:39:436 gameboy/(24170:24170): 5003
+[INFO] 03:06:39:438 gameboy/(24170:24170): entro a new_pokemon
+[INFO] 03:06:39:813 gameboy/(24173:24173): Se va a conectar en BROKER
+
+[INFO] 03:06:39:815 gameboy/(24173:24173): 127.0.0.1
+[INFO] 03:06:39:816 gameboy/(24173:24173): 5003
+[INFO] 03:06:39:818 gameboy/(24173:24173): entro a new_pokemon
+[INFO] 03:06:40:155 gameboy/(24176:24176): Se va a conectar en BROKER
+
+[INFO] 03:06:40:159 gameboy/(24176:24176): 127.0.0.1
+[INFO] 03:06:40:161 gameboy/(24176:24176): 5003
+[INFO] 03:06:40:161 gameboy/(24176:24176): entro a new_pokemon
+[INFO] 03:06:40:486 gameboy/(24179:24179): Se va a conectar en BROKER
+
+[INFO] 03:06:40:488 gameboy/(24179:24179): 127.0.0.1
+[INFO] 03:06:40:490 gameboy/(24179:24179): 5003
+[INFO] 03:06:40:491 gameboy/(24179:24179): entro a new_pokemon
+[INFO] 03:06:40:792 gameboy/(24182:24182): Se va a conectar en BROKER
+
+[INFO] 03:06:40:795 gameboy/(24182:24182): 127.0.0.1
+[INFO] 03:06:40:796 gameboy/(24182:24182): 5003
+[INFO] 03:06:40:797 gameboy/(24182:24182): entro a new_pokemon
+[INFO] 03:06:41:122 gameboy/(24185:24185): Se va a conectar en BROKER
+
+[INFO] 03:06:41:124 gameboy/(24185:24185): 127.0.0.1
+[INFO] 03:06:41:125 gameboy/(24185:24185): 5003
+[INFO] 03:06:41:125 gameboy/(24185:24185): entro a new_pokemon
+[INFO] 03:06:41:457 gameboy/(24188:24188): Se va a conectar en BROKER
+
+[INFO] 03:06:41:462 gameboy/(24188:24188): 127.0.0.1
+[INFO] 03:06:41:463 gameboy/(24188:24188): 5003
+[INFO] 03:06:41:465 gameboy/(24188:24188): entro a new_pokemon
+[INFO] 03:06:41:796 gameboy/(24196:24196): Se va a conectar en BROKER
+
+[INFO] 03:06:41:798 gameboy/(24196:24196): 127.0.0.1
+[INFO] 03:06:41:799 gameboy/(24196:24196): 5003
+[INFO] 03:06:41:801 gameboy/(24196:24196): entro a new_pokemon
+[INFO] 03:06:42:201 gameboy/(24199:24199): Se va a conectar en BROKER
+
+[INFO] 03:06:42:203 gameboy/(24199:24199): 127.0.0.1
+[INFO] 03:06:42:205 gameboy/(24199:24199): 5003
+[INFO] 03:06:42:206 gameboy/(24199:24199): entro a new_pokemon
+[INFO] 03:07:55:615 gameboy/(24275:24275): Se va a conectar en BROKER
+
+[INFO] 03:07:55:617 gameboy/(24275:24275): 127.0.0.1
+[INFO] 03:07:55:618 gameboy/(24275:24275): 5003
+[INFO] 03:07:55:621 gameboy/(24275:24275): entro a new_pokemon
+[INFO] 03:07:56:921 gameboy/(24277:24277): Se va a conectar en BROKER
+
+[INFO] 03:07:56:924 gameboy/(24277:24277): 127.0.0.1
+[INFO] 03:07:56:925 gameboy/(24277:24277): 5003
+[INFO] 03:07:56:926 gameboy/(24277:24277): entro a new_pokemon
+[INFO] 03:07:57:813 gameboy/(24279:24279): Se va a conectar en BROKER
+
+[INFO] 03:07:57:816 gameboy/(24279:24279): 127.0.0.1
+[INFO] 03:07:57:817 gameboy/(24279:24279): 5003
+[INFO] 03:07:57:818 gameboy/(24279:24279): entro a new_pokemon
+[INFO] 03:07:59:750 gameboy/(24281:24281): Se va a conectar en BROKER
+
+[INFO] 03:07:59:754 gameboy/(24281:24281): 127.0.0.1
+[INFO] 03:07:59:756 gameboy/(24281:24281): 5003
+[INFO] 03:07:59:756 gameboy/(24281:24281): Entro a modoSuscriptor
+
+[INFO] 03:08:17:977 gameboy/(24286:24286): Se va a conectar en BROKER
+
+[INFO] 03:08:17:981 gameboy/(24286:24286): 127.0.0.1
+[INFO] 03:08:17:983 gameboy/(24286:24286): 5003
+[INFO] 03:08:17:983 gameboy/(24286:24286): Entro a modoSuscriptor
+
+[INFO] 03:08:20:274 gameboy/(24288:24288): Se va a conectar en BROKER
+
+[INFO] 03:08:20:278 gameboy/(24288:24288): 127.0.0.1
+[INFO] 03:08:20:282 gameboy/(24288:24288): 5003
+[INFO] 03:08:20:287 gameboy/(24288:24288): Entro a modoSuscriptor
+
+[INFO] 03:08:29:119 gameboy/(24290:24290): Se va a conectar en BROKER
+
+[INFO] 03:08:29:122 gameboy/(24290:24290): 127.0.0.1
+[INFO] 03:08:29:123 gameboy/(24290:24290): 5003
+[INFO] 03:08:29:125 gameboy/(24290:24290): entro a new_pokemon
+[INFO] 03:08:30:657 gameboy/(24293:24293): Se va a conectar en BROKER
+
+[INFO] 03:08:30:659 gameboy/(24293:24293): 127.0.0.1
+[INFO] 03:08:30:659 gameboy/(24293:24293): 5003
+[INFO] 03:08:30:660 gameboy/(24293:24293): Entro a modoSuscriptor
+
+[INFO] 03:08:45:10 gameboy/(24302:24302): Se va a conectar en BROKER
+
+[INFO] 03:08:45:13 gameboy/(24302:24302): 127.0.0.1
+[INFO] 03:08:45:14 gameboy/(24302:24302): 5003
+[INFO] 03:08:45:14 gameboy/(24302:24302): entro a new_pokemon
+[INFO] 03:08:46:451 gameboy/(24305:24305): Se va a conectar en BROKER
+
+[INFO] 03:08:46:453 gameboy/(24305:24305): 127.0.0.1
+[INFO] 03:08:46:455 gameboy/(24305:24305): 5003
+[INFO] 03:08:46:456 gameboy/(24305:24305): entro a new_pokemon
+[INFO] 03:08:47:418 gameboy/(24307:24307): Se va a conectar en BROKER
+
+[INFO] 03:08:47:420 gameboy/(24307:24307): 127.0.0.1
+[INFO] 03:08:47:422 gameboy/(24307:24307): 5003
+[INFO] 03:08:47:423 gameboy/(24307:24307): Entro a modoSuscriptor
+
+[INFO] 03:09:26:263 gameboy/(24310:24310): Se va a conectar en BROKER
+
+[INFO] 03:09:26:267 gameboy/(24310:24310): 127.0.0.1
+[INFO] 03:09:26:269 gameboy/(24310:24310): 5003
+[INFO] 03:09:26:270 gameboy/(24310:24310): entro a catch_pokemon
+[INFO] 03:09:33:374 gameboy/(24312:24312): Se va a conectar en BROKER
+
+[INFO] 03:09:33:377 gameboy/(24312:24312): 127.0.0.1
+[INFO] 03:09:33:378 gameboy/(24312:24312): 5003
+[INFO] 03:09:33:378 gameboy/(24312:24312): entro a new_pokemon
+[INFO] 03:09:42:521 gameboy/(24317:24317): Se va a conectar en BROKER
+
+[INFO] 03:09:42:524 gameboy/(24317:24317): 127.0.0.1
+[INFO] 03:09:42:525 gameboy/(24317:24317): 5003
+[INFO] 03:09:42:527 gameboy/(24317:24317): entro a new_pokemon
+[INFO] 03:09:43:323 gameboy/(24320:24320): Se va a conectar en BROKER
+
+[INFO] 03:09:43:327 gameboy/(24320:24320): 127.0.0.1
+[INFO] 03:09:43:329 gameboy/(24320:24320): 5003
+[INFO] 03:09:43:329 gameboy/(24320:24320): Entro a modoSuscriptor
+
+[INFO] 03:09:43:900 gameboy/(24322:24322): Se va a conectar en BROKER
+
+[INFO] 03:09:43:902 gameboy/(24322:24322): 127.0.0.1
+[INFO] 03:09:43:904 gameboy/(24322:24322): 5003
+[INFO] 03:09:43:905 gameboy/(24322:24322): Entro a modoSuscriptor
+

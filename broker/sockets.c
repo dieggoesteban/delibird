@@ -5,7 +5,8 @@
 void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente) {
 	int sizePaquete = paquete->buffer->size + 2 * sizeof(int);
 	void* stream = serializar_paquete(paquete, sizePaquete);
-	send(socket_cliente,stream,sizePaquete,MSG_CONFIRM);
+	if(send(socket_cliente,stream,sizePaquete,MSG_CONFIRM) == -1)
+		log_error(broker_custom_logger, "Send error");
 	liberarPaquete(paquete);
 	free(stream);
 }
@@ -65,12 +66,12 @@ void serve_client(uint32_t *socket_cliente)
 	uint32_t operation_cod;
 	if (recv(*socket_cliente, &operation_cod, sizeof(int), MSG_WAITALL) == -1)
 		operation_cod = -1;
-	printf("\nCodigo de operacion: %i\n", operation_cod);
 	process_request(operation_cod, *socket_cliente);
 }
 
 void process_request(uint32_t operation_cod, uint32_t socket_cliente)
 {
+	printf("\n");
     t_buffer *buffer = recibir_buffer(socket_cliente);
 	processMessage(buffer, operation_cod, socket_cliente);
 }

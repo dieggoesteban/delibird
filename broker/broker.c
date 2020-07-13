@@ -27,14 +27,14 @@ int main()
 
     //Iniciar cache
     pthread_create(&cacheThread, NULL, (void *)startCache, NULL);
-
+    
     //Activar envio de mensajes en las colas
-    pthread_create(&newPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromMQ, newPokemonMessageQueue);
-    pthread_create(&appearedPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromMQ, appearedPokemonMessageQueue);
-    pthread_create(&catchPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromMQ, catchPokemonMessageQueue);
-    pthread_create(&caughtPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromMQ, caughtPokemonMessageQueue);
-    pthread_create(&getPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromMQ, getPokemonMessageQueue);
-    pthread_create(&localizedPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromMQ, localizedPokemonMessageQueue);
+    pthread_create(&newPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromQueue, newPokemonMessageQueue);
+    pthread_create(&appearedPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromQueue, appearedPokemonMessageQueue);
+    pthread_create(&catchPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromQueue, catchPokemonMessageQueue);
+    pthread_create(&caughtPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromQueue, caughtPokemonMessageQueue);
+    pthread_create(&getPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromQueue, getPokemonMessageQueue);
+    pthread_create(&localizedPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromQueue, localizedPokemonMessageQueue);
     
     //Cierre de threads
     pthread_join(serverThread, NULL);

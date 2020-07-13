@@ -39,6 +39,37 @@ t_register_module* deserializar_registerModule(t_buffer* buffer) {
 	return registerModule;
 }
 
+t_paquete* serializar_acknowledgement(t_acknowledgement* akc)
+{
+	t_buffer* akcBuffer = malloc(sizeof(t_buffer));
+	akcBuffer->size = sizeof(uint32_t) * 2;
+	void* stream = malloc(akcBuffer->size);
+	uint32_t offset = 0;
+
+	memcpy(stream + offset, &(akc->idMessageReceived), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+    memcpy(stream + offset, &(akc->mq), sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+
+	akcBuffer->stream = stream;
+	t_paquete* paquete = crear_paquete(ACKNOWLEDGEMENT, akcBuffer->size, akcBuffer->stream);
+
+	return paquete;
+}
+t_acknowledgement* deserializar_acknowledgement(t_buffer* buffer)
+{
+	t_acknowledgement* akc = malloc(sizeof(t_acknowledgement));
+
+	void* stream = buffer->stream;
+    
+	memcpy(&(akc->idMessageReceived), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
+    memcpy(&(akc->mq), stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+    
+	return akc;
+}
+
 t_paquete* serializar_newPokemon(t_new_pokemon* newPokemon) {
     t_buffer* newPokemon_buffer = malloc(sizeof(t_buffer));
     newPokemon_buffer->size = sizeof(uint32_t)*2 //ID_mensaje_recibido + sizePokemon

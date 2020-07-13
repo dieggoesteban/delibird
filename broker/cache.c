@@ -35,10 +35,12 @@ void startCache()
 
     //Memory allocation
     cache = malloc(TAMANO_MEMORIA);
-    // t_holes* initial = (t_holes*)malloc(sizeof(t_holes));
-    // initial->pStart = cache;
-    // initial->length = TAMANO_MEMORIA;
-    // list_add(holes, initial);
+    t_holes* initial = (t_holes*)malloc(sizeof(t_holes));
+    initial->pStart = cache;
+    initial->length = TAMANO_MEMORIA;
+    list_add(holes, initial);
+
+    log_info(broker_custom_logger, "Cache inicializada correctamente");
 
     #pragma region Prueba de consolidacion
 
@@ -64,13 +66,13 @@ void startCache()
     
     #pragma endregion
 
-    #pragma region Prueba de FRECUENCIA_COMPACTACION
+    #pragma region Prueba de compactacion
     
         // t_partition* partition1 = createPartition(cache, 1024);
         // t_holes* initialPart1 = createHole(partition1->pLimit + 1, 512);
-        // t_partition* partition2 = createPartition(initialPart1->pLimit + 1, 1024);
+        // t_partition* partition2 = createPartition(initialPart1->pLimit + 1, 256);
         // t_holes* initialPart2 = createHole(partition2->pLimit + 1, 512);
-        // t_partition* partition3 = createPartition(initialPart2->pLimit + 1, 1024);
+        // t_partition* partition3 = createPartition(initialPart2->pLimit + 1, 128);
         // t_holes* initialPart3 = createHole(partition3->pLimit + 1, 512);
 
         // list_add(partitions, partition1);
@@ -87,42 +89,46 @@ void startCache()
     #pragma endregion
 }
 
-void memoria_buddySystem() {
+void memoria_buddySystem(t_message* message) {
     log_info(broker_custom_logger, "I'm using Buddy System Algorithm\n");
 
     //not implemented
 }
 
-void memoria_particiones() {
-    log_info(broker_custom_logger, "I'm using Dynamic Partitions Algorithm\n");
+void memoria_particiones(t_message* message) {
+    log_info(broker_custom_logger, "Dynamic Partitions Algorithm\n");
 
     //Etapa 1: Buscar partición libre
     t_partition* targetPartition = (t_partition*)malloc(sizeof(t_partition));
-    targetPartition = algoritmo_particion_libre();
+    targetPartition = algoritmo_particion_libre(4);
 
     while(targetPartition == NULL)
     {
+        pthread_mutex_lock(s_counterToCompactacion);
         if(counterToCompactacion < FRECUENCIA_COMPACTACION)
         {
-            pthread_mutex_lock(s_counterToCompactacion);
             counterToCompactacion++;
-            pthread_mutex_unlock(s_counterToCompactacion);
         }
         else
         {
-            compactar();
-            pthread_mutex_lock(s_counterToCompactacion);
+            pthread_mutex_lock(s_holes);
+            pthread_mutex_lock(s_partitions);
+                compactar();
+            pthread_mutex_unlock(s_partitions);
+            pthread_mutex_unlock(s_holes);
+
             counterToCompactacion = 0;
-            pthread_mutex_unlock(s_counterToCompactacion);
-            targetPartition = algoritmo_particion_libre();
+            targetPartition = algoritmo_particion_libre(4);
             continue;
         }
-
+        pthread_mutex_unlock(s_counterToCompactacion);
         //Etapa 3: Reemplazo y Consolidacion
         algoritmo_reemplazo();
-        consolidar();
 
-        targetPartition = algoritmo_particion_libre();
+        pthread_mutex_lock(s_holes);
+            consolidar();
+        pthread_mutex_unlock(s_holes);
+        targetPartition = algoritmo_particion_libre(4);
     }
     
     //Cuando el targetPartition ya esté ubicado se meten los datos donde corresponda
@@ -149,7 +155,6 @@ void consolidar()
 
         if(lowerHole->pLimit == upperHole->pStart - 1)
         {
-            printf("Hay consolidación...\n");
             //Inicia la Consolidacion
             t_holes* consolidado = createHole(lowerHole->pStart, lowerHole->length + upperHole->length);
 
@@ -165,7 +170,6 @@ void consolidar()
         }
         i++;
     }
-
     //TODO: Donde hago el free? Si no me rompe la lista
     // free(lowerHole);
     // free(upperHole);
@@ -215,9 +219,9 @@ void compactar()
         list_remove(partitions, targetPartitionIndex);
         list_add(holes, relocatedHole);
         list_add(partitions, relocatedPartition);
-        consolidar();
         list_sort(partitions, (void*) mem_address_menor_a_mayor);
         list_sort(holes, (void*) mem_address_menor_a_mayor);
+        consolidar();
 
         targetPartition = NULL;
     }
@@ -225,38 +229,55 @@ void compactar()
 
 void* particionLibre_ff(uint32_t bytes) 
 { 
-    //TODO: Agregar los semaforos
+    uint32_t bytesToAlloc = 0;
+    if(bytes > TAMANO_MINIMO_PARTICION)
+        bytesToAlloc = bytes;
+    else
+        bytesToAlloc = TAMANO_MINIMO_PARTICION;
+
     t_holes* currentPartition = (t_holes*)malloc(sizeof(t_holes));
-    for(int i = 0; i < list_size(holes); i++)
-    {
-        currentPartition = list_get(holes, i);
-        if (currentPartition->length >= bytes)
+
+    pthread_mutex_lock(s_holes);
+        for(int i = 0; i < list_size(holes); i++)
         {
-            return currentPartition->pStart;
+            currentPartition = list_get(holes, i);
+            if (currentPartition->length >= bytesToAlloc)
+            {
+                return currentPartition->pStart;
+            }
         }
-    }
+    pthread_mutex_unlock(s_holes);
+
     free(currentPartition);
     return NULL;
 }
 
 void* particionLibre_bf(uint32_t bytes)
 {
+    uint32_t bytesToAlloc = 0;
+    if(bytes > TAMANO_MINIMO_PARTICION)
+        bytesToAlloc = bytes;
+    else
+        bytesToAlloc = TAMANO_MINIMO_PARTICION;
+
     void* result = NULL;
-    //TODO: Agregar los semaforos
     t_holes* currentPartition = (t_holes*)malloc(sizeof(t_holes));
     t_holes* bestFit = (t_holes*)malloc(sizeof(t_holes));
-    for(uint32_t i = 0; i < list_size(holes); i++)
-    {
-        currentPartition = list_get(holes, i);
-        if(bestFit == NULL && currentPartition->length >= bytes)
-            bestFit = currentPartition;
-        else if (currentPartition->length >= bytes && currentPartition->length < bestFit->length)
+
+    pthread_mutex_lock(s_holes);
+        for(uint32_t i = 0; i < list_size(holes); i++)
         {
-            bestFit = currentPartition;
-            if(bestFit->length == bytes)
-                break;
-        }      
-    }
+            currentPartition = list_get(holes, i);
+            if(bestFit == NULL && currentPartition->length >= bytesToAlloc)
+                bestFit = currentPartition;
+            else if (currentPartition->length >= bytesToAlloc && currentPartition->length < bestFit->length)
+            {
+                bestFit = currentPartition;
+                if(bestFit->length == bytesToAlloc)
+                    break;
+            }      
+        }
+    pthread_mutex_unlock(s_holes);
 
     result = bestFit->pStart;
 
@@ -278,12 +299,15 @@ t_holes* createHole(void* startAddress, uint32_t length)
 void showHoles()
 {
     t_holes* currentHole = (t_holes*)malloc(sizeof(t_holes));
+
+    pthread_mutex_lock(s_holes);
     for(uint32_t i = 0; i < list_size(holes); i++)
     {
         currentHole = list_get(holes, i);
         printf("Hole %d - Range: %lu / %lu - Length: %d\n", i, 
             (unsigned long)currentHole->pStart%1000000, (unsigned long)currentHole->pLimit%1000000, currentHole->length);
     }
+    pthread_mutex_unlock(s_holes);
     //free(currentHole);
 }
 
@@ -298,12 +322,15 @@ t_partition* createPartition(void* startAddress, uint32_t length)
 void showPartitions()
 {
     t_partition* currentPartition = (t_partition*)malloc(sizeof(t_partition));
+
+    pthread_mutex_lock(s_partitions);
     for(uint32_t i = 0; i < list_size(partitions); i++)
     {
         currentPartition = list_get(partitions, i);
         printf("Partition %d - Range: %lu / %lu - Length: %d\n", i, 
             (unsigned long)currentPartition->pStart%1000000, (unsigned long)currentPartition->pLimit%1000000, currentPartition->length);
     }
+    pthread_mutex_unlock(s_partitions);
     //free(currentPartition);
 }
 
@@ -314,8 +341,36 @@ bool mem_address_menor_a_mayor(t_holes* hole1, t_holes* hole2)
 
 bool existHolesBetweenPartitions()
 {
-    t_holes* firstHole = list_get(holes, 0); //El primer hueco
-    t_partition* lastPartition = list_get(partitions, list_size(partitions) - 1); //La ultima particion
+    pthread_mutex_lock(s_holes);
+    pthread_mutex_lock(s_partitions);
+        t_holes* firstHole = list_get(holes, 0); //El primer hueco
+        t_partition* lastPartition = list_get(partitions, list_size(partitions) - 1); //La ultima particion
+    pthread_mutex_unlock(s_partitions);
+    pthread_mutex_unlock(s_holes);
 
     return firstHole->pStart < lastPartition->pLimit;
+}
+
+cache_message* createCacheMessage(t_message* message)
+{
+    cache_message* cacheMessage = (cache_message*)malloc(sizeof(cache_message));
+    cacheMessage->message = message;
+    
+    switch(message->mq_cod)
+    {
+        case NEW_POKEMON:
+        {
+            t_new_pokemon* o_newPokemon = (t_new_pokemon*)malloc(sizeof(t_new_pokemon)); //o: original
+            cache_new_pokemon* c_newPokemon = (cache_new_pokemon*)malloc(sizeof(cache_new_pokemon)); //c: cached
+            o_newPokemon = (t_new_pokemon*)message->mensaje;
+
+            c_newPokemon->nameLength = o_newPokemon->sizeNombre;
+            c_newPokemon->pokeName = o_newPokemon->nombre;
+            c_newPokemon->cantidad = o_newPokemon->posicionCantidad->cantidad;
+            c_newPokemon->posX = o_newPokemon->posicionCantidad->posicion_x;
+            c_newPokemon->posY = o_newPokemon->posicionCantidad->posicion_y;
+        }
+    }
+
+    return cacheMessage;
 }

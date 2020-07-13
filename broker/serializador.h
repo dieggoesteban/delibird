@@ -10,6 +10,9 @@ void* serializar_paquete(t_paquete* paquete, int bytes);
 t_paquete* serializar_registerModule(t_register_module* registerModule);
 t_register_module* deserializar_registerModule(t_buffer* buffer);
 
+t_paquete* serializar_acknowledgement(t_acknowledgement* akc);
+t_acknowledgement* deserializar_acknowledgement(t_buffer* buffer);
+
 t_paquete* serializar_newPokemon(t_new_pokemon* newPokemon);
 t_new_pokemon* deserializar_newPokemon(t_buffer* buffer);
 

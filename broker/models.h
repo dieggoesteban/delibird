@@ -43,8 +43,18 @@ typedef struct{
 	uint32_t id;
 	uint32_t idCorrelativo;
 	uint32_t mq_cod; //Cada mensaje sabe que tipo es
+	uint32_t cantidadSuscriptoresEnviados;
 	t_list* suscriptoresConfirmados; 
 	void* mensaje; //Contenido del mensaje
+
+	//Semaphores
+	pthread_mutex_t s_cantidadSuscriptoresEnviados;
+	pthread_mutex_t s_suscriptoresConfirmados;
+
+	//Threads
+	pthread_t caching;
+	pthread_t ackReceive;
+	pthread_t deleteFromQueue;
 } t_message;
 #pragma endregion
 
@@ -93,6 +103,8 @@ typedef struct
 {
 	uint32_t messageQueue;
 } t_register_module;
+
+
 
 typedef struct
 {
@@ -144,9 +156,55 @@ typedef struct{
 } t_id_mensaje_recibido;
 
 typedef struct{
-
+	uint32_t idMessageReceived;
+	uint32_t mq;
 } t_acknowledgement;
 #pragma endregion
 
+#pragma region Mensajes_Estructura_Cache
+
+typedef struct {
+	t_message* message;
+	void* cacheStructure;
+} cache_message;
+
+typedef struct {
+	uint32_t nameLength;
+	char* pokeName;
+	uint32_t posX;
+	uint32_t posY;
+	uint32_t cantidad;
+} cache_new_pokemon;
+
+typedef struct {
+	uint32_t nameLength;
+	char* pokeName;
+	uint32_t cantidadPos;
+	uint32_t* posiciones;
+} cache_localized_pokemon;
+
+typedef struct {
+	uint32_t nameLength;
+	char* pokeName;
+} cache_get_pokemon;
+
+typedef struct {
+	uint32_t nameLength;
+	char* pokeName;
+	uint32_t posX;
+	uint32_t posY;
+} cache_appeared_pokemon;
+
+typedef struct {
+	uint32_t nameLength;
+	char* pokeName;
+	uint32_t posX;
+	uint32_t posY;
+} cache_catch_pokemon;
+
+typedef struct {
+	uint32_t seAtrapo;
+} cache_caught_pokemon;
+#pragma endregion
 
 #endif /* MODELS_H_ */
