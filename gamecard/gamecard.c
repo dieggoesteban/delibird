@@ -76,6 +76,7 @@ void inicializarGamecard(){
     IP = config_get_string_value(config,"IP_GAMECARD");
     PUERTO = config_get_string_value(config,"PUERTO_GAMECARD");
     tiempoReintentoConexion = (uint32_t)config_get_int_value(config,"TIEMPO_DE_REINTENTO_CONEXION");
+    tiempoOperacion = (uint32_t)config_get_int_value(config,"TIEMPO_DE_REINTENTO_OPERACION");
     punto_montaje = config_get_string_value(config,"PUNTO_MONTAJE_TALLGRASS");
 
     
@@ -104,9 +105,9 @@ void inicializarGamecard(){
     // if(existeBitmap(pathBitmap)){
 
     // }else{
-        bitmapArr = crear_bitmap_en_disco(pathBitmap, cantBloques);
+    bitmapArr = crear_bitmap_en_disco(pathBitmap, cantBloques);
     // }
-
+    semaforosPokemon = list_create();
     // sem_init(&semReconexion,0,1);
 
     // pthread_create(&hiloEscuchaBroker, NULL, escuchaPermanenteBroker,&idConexionPermanente);

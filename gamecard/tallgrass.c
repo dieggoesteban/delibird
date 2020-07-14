@@ -281,6 +281,13 @@ void setSizeArchivo(t_config* metadataPoke, uint32_t sizeNuevo){
     config_save(metadataPoke);
 }
 
+void modificarOpenArchivo(char* metadataPoke, char* valorOpen){
+    t_config* configMetaPoke = config_create(metadataPoke);
+    config_set_value(configMetaPoke, "OPEN", valorOpen);
+    config_save(configMetaPoke);
+    config_destroy(configMetaPoke);
+}
+
 void escribirBloque(char *texto, char* pathMetadataPoke, uint32_t bloqueAEscribir, char* modoEscritura)
 {
     FILE *fp;
@@ -487,6 +494,8 @@ char* catchPokemonATexto(t_catch_pokemon* catchPokemon){
     return textoCompleto;
 }
 
+
+
 t_localized_pokemon* atenderGetPokemon(t_get_pokemon* getPokemon){
     t_localized_pokemon* localizedPokemon;
     char* pathFilesPokemon = string_duplicate(pathFiles);
@@ -516,25 +525,68 @@ void atenderCatchPokemon(t_catch_pokemon* catchPokemon){
 }
 
 //se deserializa en el processrequest de gamecard.c
-void atenderNewPokemon(t_new_pokemon* newPokemon){
+void* atenderNewPokemon(void* newPokemonParam){
+    t_new_pokemon* newPokemon = (t_new_pokemon*)newPokemonParam;
     char* pathFilesPokemon = string_duplicate(pathFiles);
     string_append(&pathFilesPokemon,newPokemon->nombre);
     char* pathMetadataPoke = agregarAPath(pathFilesPokemon,"/Metadata.txt");
+    t_config* metadataPoke = config_create(pathMetadataPoke);
+    uint32_t indexSemaforo = 0;
 
     bool yaExistia = crearDirectorio(pathFilesPokemon);
     if(!yaExistia){
         insertarMetadataEnPath(pathFilesPokemon,"./assets/MetadataArchivoGeneral.txt");
         t_semaforo_pokemon* semPoke = crearSemaforoPokemon(newPokemon->nombre);
         sem_wait(&(semPoke->semPoke));
-        list_add(semaforosPokemon,semPoke);
-        escribirNewPokemon(newPokemonATexto(newPokemon), pathMetadataPoke);
+        modificarOpenArchivo(pathMetadataPoke,"Y");
+        indexSemaforo = list_add(semaforosPokemon,semPoke);
+        log_info(logger,"el index de la lista de semaforos en el if: %i",indexSemaforo);
+        // escribirNewPokemon(newPokemonATexto(newPokemon), pathMetadataPoke);
     }else{
+        if(estaOpen(metadataPoke)){
+            log_info(logger,"entra en IF de si esta open");
+            pthread_t hiloRecuperacion;
+            pthread_create(&hiloRecuperacion, NULL, reintentarOperacion,metadataPoke);
+            pthread_join(hiloRecuperacion,NULL);
+        }
+        indexSemaforo = encontrarSemaforoDelPoke(newPokemon->nombre,semaforosPokemon);
+        log_info(logger,"el index de la lista de semaforos en el else: %i",indexSemaforo);
+        sem_wait(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, indexSemaforo))->semPoke));
 
-        escribirNewPokemon(newPokemonATexto(newPokemon), pathMetadataPoke);
+        modificarOpenArchivo(pathMetadataPoke,"Y");
+    }
+    escribirNewPokemon(newPokemonATexto(newPokemon), pathMetadataPoke);
+    sem_post(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, indexSemaforo))->semPoke)); 
+    sleep(tiempoOperacion);
+    modificarOpenArchivo(pathMetadataPoke,"N");
+    printf("termino la operacioon\n");
+    sleep(tiempoOperacion);
+    return NULL;
+}
 
+bool estaOpen(t_config* metadataPoke){
+    char* valorOpen = config_get_string_value(metadataPoke,"OPEN");
+    if(string_equals_ignore_case(valorOpen, "Y")){
+        printf("ESTA OPEN\n");
+        log_info(logger,"ESTA OPEN con valor: %s",config_get_string_value(metadataPoke,"OPEN"));
+        return true;
+    }else{
+        printf("NO ESTA OPEN\n");
+        log_info(logger,"NO ESTA OPEN con valor %s", config_get_string_value(metadataPoke,"OPEN"));
+        return false;
     }
 }
 
-void reintentarOperacion(){
-
+void* reintentarOperacion(void* metadataPoke){
+    t_config* configMetadataPoke = (t_config*)metadataPoke;
+    bool archivoCerrado = false;
+    uint32_t i = 0;
+    while(archivoCerrado){
+        sleep(tiempoReintentoConexion);
+        archivoCerrado = !estaOpen(configMetadataPoke);
+        i++;
+        printf("reintento numero %i\n", i);
+        log_info(logger, "reintento numeo %i", i);
+    }
+    return false;
 }

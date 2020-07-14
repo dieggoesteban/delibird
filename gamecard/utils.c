@@ -128,6 +128,16 @@ void removerKeyDic(t_dictionary *dic, char *key) {
 	}
 }
 
+
+uint32_t encontrarSemaforoDelPoke(char* nombrePoke, t_list* listaSem){
+	for(uint32_t i = 0; i < list_size(listaSem); i++){
+		if( string_equals_ignore_case(((t_semaforo_pokemon*)list_get(listaSem,i))->nombrePoke, nombrePoke)){
+			return i;
+		}
+	}
+	return 0;
+}
+
 char* dictionaryToString(t_dictionary* dictionary){
 	char* textoCompleto = string_new();
 	printf("llega a entrar a la funcion");
@@ -152,4 +162,3 @@ t_list* dictionaryToListPosiciones(t_dictionary* dictionary){
 	dictionary_iterator(dictionary,separarKeyEnPosicion);
 	return listaPosiciones;
 }
-

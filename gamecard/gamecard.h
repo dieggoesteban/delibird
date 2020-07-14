@@ -8,11 +8,11 @@
 #include<commons/config.h>
 #include<readline/readline.h>
 #include<commons/bitarray.h>
+#include "semaphore.h"
 
 #include "utils.h"
 #include "sockets.h"
 #include "models.h"
-#include "semaphore.h"
 #include "tallgrass.h"
 
 
@@ -22,12 +22,13 @@ t_log* logger;
 char* IP;
 char* PUERTO;
 uint32_t tiempoReintentoConexion;
+uint32_t tiempoOperacion;
 char* punto_montaje;
 char* pathFiles;
 char* pathBlocks;
 char* pathBitmap;
 char* pathMetadata;
-
+t_list* semaforosPokemon;
 t_bitarray* bitmapArr;
 uint32_t cantBloques;
 uint32_t sizeBloque;

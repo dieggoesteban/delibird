@@ -35,5 +35,6 @@ void removerKeyDic(t_dictionary *dic, char *key);
 void setValueDic(t_dictionary *dic, char *key, char *value);
 char* dictionaryToString(t_dictionary* dictionary);
 t_list* dictionaryToListPosiciones(t_dictionary* dictionary);
+uint32_t encontrarSemaforoDelPoke(char* nombrePoke, t_list* listaSem);
 
 #endif /* UTILS_H_ */

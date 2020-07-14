@@ -16,6 +16,7 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <errno.h>
+#include <pthread.h>
 
 #include<commons/string.h>
 #include<commons/collections/list.h>
@@ -42,6 +43,8 @@ uint32_t cantBloques;
 uint32_t sizeBloque;
 char* magicNumber;
 t_list* semaforosPokemon;
+uint32_t tiempoReintentoConexion;
+uint32_t tiempoOperacion;
 
 //CREAR
 bool crearDirectorio(char* rutaDirectorio);
@@ -58,7 +61,7 @@ char* agregarAPath(char* path, char* agregado);
 
 //ATENDER
 t_localized_pokemon* atenderGetPokemon(t_get_pokemon* getPokemon);
-void atenderNewPokemon(t_new_pokemon* newPokemon);
+void* atenderNewPokemon(void* newPokemon);
 void atenderCatchPokemon(t_catch_pokemon* catchPokemon);
 
 //ESCRIBIR
@@ -86,6 +89,8 @@ void copiarArchivo(char* sourcePath, char* destinationPath);
 //MODIFICAR
 void modificarBloquesNewPoke(char* textoCompleto, char* pathMetadataPoke);
 void modificarBloquesCatchPoke(char* textoCompleto, char* pathMetadataPoke, uint32_t bytesBorrados);
+// void modificarOpenArchivo(t_config* metadataPoke, char* valorOpen);
+void modificarOpenArchivo(char* metadataPoke, char* valorOpen);
 
 //CALCULOS Y BUSQUEDAS
 uint32_t buscarBloqueLibre();
@@ -96,6 +101,8 @@ uint32_t buscarBloqueEInsertarEnArchivo(t_config* metadataPoke);
 void sacarUltimoBloqueDeArchivo(t_config* metadataPoke, char** arrBloques);
 bool existeBitmap(char* rutaArchivo);
 bool existeDirectorio(char* rutaDirectorio);
+bool estaOpen(t_config* metadataPoke);
+void* reintentarOperacion(void* metadataPoke);
 
 
 #endif /* TALLGRASS_H_ */

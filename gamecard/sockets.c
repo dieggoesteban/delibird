@@ -122,7 +122,10 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd)
 		log_info(logger, "SIZE BUFFER EN NEW: %i\n", buffer->size);
 		t_new_pokemon *newPoke = deserializar_newPokemon(buffer);
 		printf("Nombre del poke new: %s\n", newPoke->nombre);
-		atenderNewPokemon(newPoke);
+		pthread_t hiloAtenderPoke;
+		pthread_create(&hiloAtenderPoke, NULL, atenderNewPokemon,(void*)newPoke);
+    	pthread_join(hiloAtenderPoke,NULL);
+		// atenderNewPokemon(newPoke);
 		log_info(logger, newPoke->nombre);
 		t_posicion* posicion = crearPosicion(newPoke->posicionCantidad->posicion_x, newPoke->posicionCantidad->posicion_y);
 		t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(0, newPoke->ID_mensaje_recibido, newPoke->nombre, posicion);
