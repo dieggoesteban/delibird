@@ -41,14 +41,20 @@ int main(int argc, char *argv[])
                 else if (strcmp(tipo_mensaje, "LOCALIZED_POKEMON") == 0) 
                     paquete = modoSuscriptor(6);
                 enviarMensaje(paquete, conexion);
+                while(true) //TODO: Aca hay que ver como hacer lo del tiempo con el parametro
+                {
+                    serve_client(&conexion);
+                }
             }
             else
             {
                 paquete = getPaquete(arrayArgumentos, tipo_mensaje);
                 enviarMensaje(paquete, conexion);
+                while(true)
+                {
+                    serve_client(&conexion); //TODO: Hay que hacer que salga del while cuando recibe el ID del mensaje
+                }
             }          
-            t_buffer* bufferRecibido = recibir_buffer(conexion);
-            t_acknowledgement* akc = deserializar_acknowledgement(bufferRecibido);
         }
         else
         {

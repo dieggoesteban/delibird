@@ -174,7 +174,6 @@ t_paquete* serializar_appearedPokemon(t_appeared_pokemon* pokemon) {
 
 	t_paquete* paquete = crear_paquete(APPEARED_POKEMON, pokemon_buffer->size, pokemon_buffer->stream);
 
-	printf("Codigo de mensaje en serialziar poke: %i\n", paquete->codigo_mensaje);
     return paquete;
 }
 t_appeared_pokemon* deserializar_appearedPokemon(t_buffer* buffer) {
@@ -220,7 +219,6 @@ t_paquete* serializar_catchPokemon(t_catch_pokemon* pokemon) {
 
     t_paquete* paquete = crear_paquete(CATCH_POKEMON, pokemon_buffer->size, pokemon_buffer->stream);
 
-    printf("Codigo de mensaje en serializar poke: %i\n", paquete->codigo_mensaje);
     return paquete;
 }
 t_catch_pokemon* deserializar_catchPokemon(t_buffer* buffer) {
@@ -260,7 +258,6 @@ t_paquete* serializar_caughtPokemon(t_caught_pokemon* pokemon) {
 
     t_paquete* paquete = crear_paquete(CAUGHT_POKEMON, pokemon_buffer->size, pokemon_buffer->stream);
 
-    printf("Codigo de mensaje en serialziar poke: %i\n", paquete->codigo_mensaje);
     return paquete;
 }
 t_caught_pokemon* deserializar_caughtPokemon(t_buffer* buffer) {
@@ -340,6 +337,16 @@ t_paquete* serializar_idMensajeRecibido(t_id_mensaje_recibido* idMensajeRecibido
     t_paquete* paquete = crear_paquete(MENSAJE_RECIBIDO, buffer->size, buffer->stream);
 
     return paquete;
+}
+t_id_mensaje_recibido* deserializar_idMensajeRecibido(t_buffer* buffer) {
+    t_id_mensaje_recibido* idMensajeEnviado = malloc(sizeof(t_id_mensaje_recibido)); //Enviado para el que lo deserializa
+
+    void* stream = buffer->stream;
+
+    memcpy(&(idMensajeEnviado->id_mensajeEnviado), stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+
+    return idMensajeEnviado;
 }
 
 #pragma endregion

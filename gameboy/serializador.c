@@ -1,6 +1,7 @@
 #include "serializador.h"
 
-void* serializar_paquete(t_paquete* paquete, int bytes) {
+void* serializar_paquete(t_paquete* paquete, int bytes) 
+{
 	void * magic = malloc(bytes);
 	int desplazamiento = 0;
 
@@ -14,7 +15,8 @@ void* serializar_paquete(t_paquete* paquete, int bytes) {
 	return magic;
 }
 
-t_buffer* crear_buffer(uint32_t sizeStream, void* stream){
+t_buffer* crear_buffer(uint32_t sizeStream, void* stream)
+{
 	t_buffer* buffer = malloc(sizeof(t_buffer));
 	buffer->size = sizeStream;
 	buffer->stream = malloc(buffer->size);
@@ -22,7 +24,8 @@ t_buffer* crear_buffer(uint32_t sizeStream, void* stream){
 	return buffer;
 }
 
-t_paquete* crear_paquete(uint32_t mq_cod, uint32_t sizeStream, void* stream){
+t_paquete* crear_paquete(uint32_t mq_cod, uint32_t sizeStream, void* stream)
+{
 	t_paquete* paquete = malloc(sizeof(t_paquete));
 	paquete->codigo_mensaje = mq_cod;
 	paquete->buffer = crear_buffer(sizeStream, stream);
@@ -30,7 +33,8 @@ t_paquete* crear_paquete(uint32_t mq_cod, uint32_t sizeStream, void* stream){
 	return paquete;
 }
 
-t_paquete* serializar_newPokemon(t_new_pokemon* newPokemon){
+t_paquete* serializar_newPokemon(t_new_pokemon* newPokemon)
+{
     t_buffer* newPokemon_buffer = malloc(sizeof(t_buffer));
     newPokemon_buffer->size = sizeof(uint32_t)*2 //ID_mensaje_recibido + sizePokemon
                             + strlen(newPokemon->nombre) + 1
@@ -58,7 +62,8 @@ t_paquete* serializar_newPokemon(t_new_pokemon* newPokemon){
     return paquete;
 }
 
-t_new_pokemon* deserializar_newPokemon(t_buffer* buffer){
+t_new_pokemon* deserializar_newPokemon(t_buffer* buffer)
+{
 	t_new_pokemon* newPokemon = malloc(sizeof(t_new_pokemon));
 	newPokemon->posicionCantidad = malloc(sizeof(t_posicion_cantidad));
 	
@@ -80,8 +85,8 @@ t_new_pokemon* deserializar_newPokemon(t_buffer* buffer){
 	return newPokemon;
 }
 
-
-t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon) {
+t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon) 
+{
 	t_buffer* buffer = malloc(sizeof(t_buffer));
 	uint32_t sizeListaPos = sizeof(t_posicion)* localizedPokemon->cantidadPosiciones;
 
@@ -108,10 +113,11 @@ t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon) {
 
 	t_paquete* paquete = crear_paquete(LOCALIZED_POKEMON, buffer->size, buffer->stream);
 
-	printf("codigo de mensaje de serializar poke: %i \n", paquete->codigo_mensaje);
 	return paquete;		
 }
-t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer) {
+
+t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer) 
+{
 	t_localized_pokemon* localizedPokemon = malloc(sizeof(t_localized_pokemon));
 	
 	void* stream = buffer->stream;
@@ -134,7 +140,8 @@ t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer) {
 	return localizedPokemon;
 }
 
-t_paquete* serializar_appearedPokemon(t_appeared_pokemon* pokemon){
+t_paquete* serializar_appearedPokemon(t_appeared_pokemon* pokemon)
+{
 	
 	t_paquete* paquete;
     t_buffer* pokemon_buffer = malloc(sizeof(t_buffer));
@@ -164,7 +171,8 @@ t_paquete* serializar_appearedPokemon(t_appeared_pokemon* pokemon){
     return paquete;
 }
 
-t_appeared_pokemon* deserializar_appearedPokemon(t_buffer* buffer){
+t_appeared_pokemon* deserializar_appearedPokemon(t_buffer* buffer)
+{
 	t_appeared_pokemon* pokemon = malloc(sizeof(t_appeared_pokemon));
 	pokemon->posicion = malloc(sizeof(t_posicion));
 	
@@ -186,7 +194,8 @@ t_appeared_pokemon* deserializar_appearedPokemon(t_buffer* buffer){
 	return pokemon;
 }
 
-t_paquete* serializar_caughtPokemon(t_caught_pokemon* pokemon){
+t_paquete* serializar_caughtPokemon(t_caught_pokemon* pokemon)
+{
     t_paquete* paquete;
     t_buffer* pokemon_buffer = malloc(sizeof(t_buffer));
     pokemon_buffer->size = sizeof(uint32_t)*3;
@@ -207,7 +216,8 @@ t_paquete* serializar_caughtPokemon(t_caught_pokemon* pokemon){
     return paquete;
 }
 
-t_caught_pokemon* deserializar_caughtPokemon(t_buffer* buffer){
+t_caught_pokemon* deserializar_caughtPokemon(t_buffer* buffer)
+{
     t_caught_pokemon* pokemon = malloc(sizeof(t_caught_pokemon));
 
     void* stream = buffer->stream;
@@ -221,7 +231,8 @@ t_caught_pokemon* deserializar_caughtPokemon(t_buffer* buffer){
     return pokemon;
 }
 
-t_paquete* serializar_catchPokemon(t_catch_pokemon* pokemon){
+t_paquete* serializar_catchPokemon(t_catch_pokemon* pokemon)
+{
 
     t_paquete* paquete;
     t_buffer* pokemon_buffer = malloc(sizeof(t_buffer));
@@ -249,7 +260,8 @@ t_paquete* serializar_catchPokemon(t_catch_pokemon* pokemon){
     return paquete;
 }
 
-t_catch_pokemon* deserializar_catchPokemon(t_buffer* buffer){
+t_catch_pokemon* deserializar_catchPokemon(t_buffer* buffer)
+{
     t_catch_pokemon* pokemon = malloc(sizeof(t_catch_pokemon));
     pokemon->posicion = malloc(sizeof(t_posicion));
 
@@ -270,7 +282,8 @@ t_catch_pokemon* deserializar_catchPokemon(t_buffer* buffer){
 }
 
 
-t_paquete* serializar_getPokemon(t_get_pokemon* pokemon) {
+t_paquete* serializar_getPokemon(t_get_pokemon* pokemon) 
+{
     t_paquete* paquete;
     t_buffer* getPokemonBuffer = malloc(sizeof(t_buffer));
 
@@ -290,7 +303,8 @@ t_paquete* serializar_getPokemon(t_get_pokemon* pokemon) {
     return paquete;
 }
 
-t_get_pokemon* deserializar_getPokemon(t_buffer* buffer){
+t_get_pokemon* deserializar_getPokemon(t_buffer* buffer)
+{
     t_get_pokemon* pokemon = malloc(sizeof(t_get_pokemon));
 
     void* stream = buffer->stream;
@@ -305,7 +319,6 @@ t_get_pokemon* deserializar_getPokemon(t_buffer* buffer){
     return pokemon;
 }
 
-//Register Module serialization
 t_paquete* serializar_registerModule(t_register_module* registerModule)
 {
 	t_buffer* registerModuleBuffer = malloc(sizeof(t_buffer));
@@ -322,7 +335,6 @@ t_paquete* serializar_registerModule(t_register_module* registerModule)
 	return paquete;
 }
 
-//Register Module deserialization
 t_register_module* deserializar_registerModule(t_buffer* buffer)
 {
 	t_register_module* registerModule = malloc(sizeof(t_register_module));
@@ -350,6 +362,7 @@ t_paquete* serializar_acknowledgement(t_acknowledgement* akc)
 
 	return paquete;
 }
+
 t_acknowledgement* deserializar_acknowledgement(t_buffer* buffer)
 {
 	t_acknowledgement* akc = malloc(sizeof(t_acknowledgement));
@@ -361,6 +374,32 @@ t_acknowledgement* deserializar_acknowledgement(t_buffer* buffer)
 
 	return akc;
 }
+
+t_paquete* serializar_idMensajeRecibido(t_id_mensaje_recibido* idMensajeRecibido) 
+{
+    t_buffer* buffer = malloc(sizeof(t_buffer));
+	buffer->size = sizeof(uint32_t);
+    void* stream = malloc(buffer->size);
+
+    memcpy(stream, &(idMensajeRecibido->id_mensajeEnviado), sizeof(uint32_t));
+
+    buffer->stream = stream;
+    t_paquete* paquete = crear_paquete(MENSAJE_RECIBIDO, buffer->size, buffer->stream);
+
+    return paquete;
+}
+t_id_mensaje_recibido* deserializar_idMensajeRecibido(t_buffer* buffer) 
+{
+    t_id_mensaje_recibido* idMensajeEnviado = malloc(sizeof(t_id_mensaje_recibido)); //Enviado para el que lo deserializa
+
+    void* stream = buffer->stream;
+
+    memcpy(&(idMensajeEnviado->id_mensajeEnviado), stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+
+    return idMensajeEnviado;
+}
+
 
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant) 
 {

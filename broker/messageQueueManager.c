@@ -321,7 +321,7 @@ void cacheMessage(t_message* message)
 {
 	log_info(logger, "Agregando mensaje id %i a la cache...", message->id);
 	//algoritmo_memoria(message);
-	log_info(logger, "Mensaje id %i agregado a la cache\n", message->id);
+	log_info(logger, "Mensaje id %i agregado a la cache", message->id);
 }
 
 void inicializarCounterMessageId()

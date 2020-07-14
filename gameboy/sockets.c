@@ -65,19 +65,12 @@ void serve_client(uint32_t* socket)
 void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cliente) {
 	switch (operation_cod)
 	{
-		// case ACKNOWLEDGEMENT:
-		// {
-		// 	t_acknowledgement* ack = deserializar_acknowledgement(buffer);
-		// 	// receiveAcknowledgement(ack, socket_cliente);
-		// 	log_info(logger, "Se ha recibido ACK de %i por el mensaje %i", socket_cliente, ack->idMessageReceived);
-		// }
 		case NEW_POKEMON:
 		{
-	
 			t_new_pokemon* newPoke = deserializar_newPokemon(buffer);
 	
-			log_info(logger, "Se ha recibido un mensaje del cliente %i del cod_op", socket_cliente, operation_cod);
-			log_info(logger, "Se trajo el new_pokemon de nombre %s", newPoke->nombre);
+			log_info(logger, "Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON");
+			log_info(logger, "Recibido new_pokemon de nombre %s", newPoke->nombre);
 		
 			break;
 		}
@@ -86,8 +79,8 @@ void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_c
 
 			t_appeared_pokemon* appearedPoke = deserializar_appearedPokemon(buffer);
 	
-			log_info(logger, "Se ha recibido un mensaje del cliente %i del cod_op", socket_cliente, operation_cod);
-			log_info(logger, "Se trajo el appeared_pokemon de nombre %s", appearedPoke->nombre);
+			log_info(logger, "Se ha recibido un mensaje del BROKER por la cola APPEARED_POKEMON");
+			log_info(logger, "Recibido appeared_pokemon de nombre %s", appearedPoke->nombre);
 
 			break;
 		}
@@ -95,8 +88,8 @@ void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_c
 		{
 			t_get_pokemon* getPoke = deserializar_getPokemon(buffer);
 		
-			log_info(logger, "Se ha recibido un mensaje del cliente %i del cod_op", socket_cliente, operation_cod);
-			log_info(logger, "Se trajo el get_pokemon de nombre %s", getPoke->nombre);
+			log_info(logger, "Se ha recibido un mensaje del BROKER por la cola GET_POKEMON");
+			log_info(logger, "Recibido get_pokemon de nombre %s", getPoke->nombre);
 
 			break;
 		}
@@ -104,8 +97,8 @@ void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_c
 		{
 			t_caught_pokemon* caughtPoke = deserializar_caughtPokemon(buffer);
 
-			log_info(logger, "Se ha recibido un mensaje del cliente %i del cod_op", socket_cliente, operation_cod);
-			log_info(logger, "Se trajo el caught_pokemon de ID_Mensaje %i e ID_MensajeCorrelativo", caughtPoke->ID_mensaje_recibido, caughtPoke->ID_mensaje_original);
+			log_info(logger, "Se ha recibido un mensaje del BROKER por la cola CAUGHT_POKEMON");
+			log_info(logger, "Recibido caught_pokemon ID: %i e ID_MensajeCorrelativo %i", caughtPoke->ID_mensaje_recibido, caughtPoke->ID_mensaje_original);
 
 			break;
 		}
@@ -113,8 +106,8 @@ void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_c
 		{
 			t_localized_pokemon* localizedPoke = deserializar_localizedPokemon(buffer);
 	
-			log_info(logger, "Se ha recibido un mensaje del cliente %i del cod_op", socket_cliente, operation_cod);
-			log_info(logger, "Se trajo el get_pokemon de nombre %s", localizedPoke->nombre);
+			log_info(logger, "Se ha recibido un mensaje del BROKER por la cola LOCALIZED_POKEMON");
+			log_info(logger, "Recibido localized_pokemon de nombre %s", localizedPoke->nombre);
 
 			break;
 		}
@@ -122,10 +115,21 @@ void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_c
 		{
 			t_catch_pokemon* catchPoke = deserializar_catchPokemon(buffer);
 
-			log_info(logger, "Se ha recibido un mensaje del cliente %i del cod_op", socket_cliente, operation_cod);
-			log_info(logger, "Se trajo el get_pokemon de nombre %s", catchPoke->nombre);
+			log_info(logger, "Se ha recibido un mensaje del BROKER por la cola CATCH_POKEMON");
+			log_info(logger, "Recibido catch_pokemon de nombre %s", catchPoke->nombre);
 
 			break;
+		}
+		case MENSAJE_RECIBIDO:
+		{
+			t_id_mensaje_recibido* idMensajeEnviado = deserializar_idMensajeRecibido(buffer);
+
+			log_info(logger, "Se ha recibido el id del mensaje enviado: %i", idMensajeEnviado->id_mensajeEnviado);
+			break;
+		}
+		case ACKNOWLEDGEMENT:
+		{
+
 		}
 		default:
 		{

@@ -32,7 +32,7 @@ t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon);
 t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer);
 
 t_paquete* serializar_idMensajeRecibido(t_id_mensaje_recibido* idMensajeRecibido);
-//t_id_mensaje_recibido deserializar_idMensajeRecibido(t_buffer* buffer);
+t_id_mensaje_recibido* deserializar_idMensajeRecibido(t_buffer* buffer);
 #pragma endregion
 
 #pragma region Creacion de Structs
