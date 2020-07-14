@@ -10,38 +10,9 @@ typedef enum
 	CATCH_POKEMON = 3,
 	CAUGHT_POKEMON = 4,
 	GET_POKEMON = 5,
-<<<<<<< HEAD
 	LOCALIZED_POKEMON = 6
 } mq_cod;
 
-=======
-	LOCALIZED_POKEMON = 6,
-    SUSCRIBE = 7
-} mq_cod;
-
-typedef enum
-{
-	ACKNOWLEDGEMENT = 8,
-	CONFIRMACION_MSJ = 9
-} acciones;
-
-//struct que se manda como confirmacion de recibo de mensaje por parte de los modulos hacia el broker
-typedef struct{
-	uint32_t ID_mensaje;
-	uint32_t MessageQueue;
-	bool meLlego;
-} t_confirmacion_mensaje;
-
-typedef struct {
-	uint32_t AKC;
-} t_akc;
-
-typedef struct 
-{
-	uint32_t messageQueue;
-} t_register_module;
-
->>>>>>> 574ee81798e3bd452a8cdf259582c2e9fd92c54e
 typedef struct
 {
 	int size;

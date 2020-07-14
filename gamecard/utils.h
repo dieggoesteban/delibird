@@ -13,12 +13,9 @@
 #include<sys/socket.h>
 #include<netdb.h>
 #include<string.h>
-<<<<<<< HEAD
 #include "models.h"
 #include "commons/collections/dictionary.h"
 #include "serializador.h"
-=======
->>>>>>> 574ee81798e3bd452a8cdf259582c2e9fd92c54e
 
 t_log* logger;
 t_config* config;
@@ -27,7 +24,6 @@ t_config* config;
 uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_mensaje);
 void cortarArgumentos(int lengthArray, char *argumentos[], char *arrayTemp[]);
 uint32_t perteneceAlArray(char* val, char* arr[], uint32_t size);
-<<<<<<< HEAD
 t_dictionary* crearDictionaryDeTexto(char* textoArchivo);
 void add_cofiguration(char *line);
 char *obtenerStringDic(t_dictionary* dic, char *key);
@@ -40,8 +36,5 @@ void setValueDic(t_dictionary *dic, char *key, char *value);
 char* dictionaryToString(t_dictionary* dictionary);
 t_list* dictionaryToListPosiciones(t_dictionary* dictionary);
 uint32_t encontrarSemaforoDelPoke(char* nombrePoke, t_list* listaSem);
-=======
-
->>>>>>> 574ee81798e3bd452a8cdf259582c2e9fd92c54e
 
 #endif /* UTILS_H_ */

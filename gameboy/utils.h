@@ -13,10 +13,7 @@
 #include<sys/socket.h>
 #include<netdb.h>
 #include<string.h>
-<<<<<<< HEAD
 #include "models.h"
-=======
->>>>>>> 574ee81798e3bd452a8cdf259582c2e9fd92c54e
 
 t_log* logger;
 t_config* config;
