@@ -35,6 +35,7 @@ void sendMessageFromQueue(t_message* message, uint32_t socket_cliente);
 void dispatchMessagesFromQueue(t_message_queue* messageQueue);
 void cacheMessage(t_message* message);
 void notifySender(t_message* message, uint32_t socket_cliente);
+void notifySubscriber(uint32_t socket_cliente);
 
 void inicializarCounterMessageId();
 uint32_t asignarMessageId();

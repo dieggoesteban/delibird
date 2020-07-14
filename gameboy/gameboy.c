@@ -10,6 +10,9 @@ int main(int argc, char *argv[])
     logger = log_create("./assets/gameboy.log", "gameboy", true, LOG_LEVEL_INFO);
     gameboy_custom_logger = log_create("./assets/gameboy_custom.log", "gameboy", true, LOG_LEVEL_INFO);
 
+    ipBroker = config_get_string_value(config, "IP_BROKER");
+    puertoBroker = config_get_string_value(config, "PUERTO_BROKER");
+
     if (argc > 2)
     {
         char *proceso = argv[1];
@@ -50,10 +53,7 @@ int main(int argc, char *argv[])
             {
                 paquete = getPaquete(arrayArgumentos, tipo_mensaje);
                 enviarMensaje(paquete, conexion);
-                while(true)
-                {
-                    serve_client(&conexion); //TODO: Hay que hacer que salga del while cuando recibe el ID del mensaje
-                }
+                serve_client(&conexion);
             }          
         }
         else

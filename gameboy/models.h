@@ -20,7 +20,8 @@ typedef enum
 {
     SUBSCRIBE = 7,
 	MENSAJE_RECIBIDO = 8,
-	ACKNOWLEDGEMENT = 9
+	ACKNOWLEDGEMENT = 9,
+	ID_ASIGNADO_SUSCRIPCION = 10
 } operation_cod;
 
 typedef struct {
@@ -160,6 +161,10 @@ typedef struct{
 	uint32_t idMessageReceived;
 	uint32_t mq;
 } t_acknowledgement;
+
+typedef struct{
+	uint32_t idAssigned;
+} t_id_subscriber_assigned;
 #pragma endregion
 
 #pragma region Mensajes_Estructura_Cache

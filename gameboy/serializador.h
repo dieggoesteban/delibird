@@ -39,6 +39,9 @@ t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer);
 t_paquete* serializar_registerModule(t_register_module* registerModule);
 t_register_module* deserializar_registerModule(t_buffer* buffer);
 
+t_paquete* serializar_idSubscriberAssigned(t_id_subscriber_assigned* id);
+t_id_subscriber_assigned* deserializar_idSubscriberAssigned(t_buffer* buffer);
+
 t_paquete* serializar_acknowledgement(t_acknowledgement* akc);
 t_acknowledgement* deserializar_acknowledgement(t_buffer* buffer);
 
@@ -55,5 +58,8 @@ t_catch_pokemon* crearCatchPokemon(uint32_t ID_mensaje_recibido, char* nombre, t
 t_caught_pokemon* crearCaughtPokemon(uint32_t IDMensajeRecibido, uint32_t IDMensajeOriginal, uint32_t catchStatus);
 t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre);
 t_register_module* crearSuscribe(uint32_t ID_message_queue);
+t_acknowledgement* crearAcknowledgement(uint32_t ID_mensaje_recibido, uint32_t mq_cod);
+t_id_mensaje_recibido* crearIdMensajeRecibido(uint32_t id);
+t_id_subscriber_assigned* crearIdSubscriberAssigned(uint32_t socket_cliente);
 
 #endif /* SERIALIZADOR_H_ */

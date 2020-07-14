@@ -14,4 +14,7 @@
 
 void terminar_programa(int, t_log*, t_config*);
 
+char* ipBroker;
+char* puertoBroker;
+
 #endif /* GAMEBOY_H_ */

@@ -209,6 +209,8 @@ void subscribeNewModule(uint32_t idNewModule, uint32_t mq_cod)
 		list_add(messageQueue->subscribers, (void *)idNewModule);
 	pthread_mutex_unlock(&messageQueue->s_subscribers);
 	sem_post(&messageQueue->s_haySuscriptores);
+
+	notifySubscriber(idNewModule);
 }
 
 void addMessageToQueue(t_message* message, t_message_queue* messageQueue)
@@ -315,6 +317,15 @@ void notifySender(t_message* message, uint32_t socket_cliente)
 	t_paquete* paquete = serializar_idMensajeRecibido(idAsignado);
 	enviarMensaje(paquete, socket_cliente);
 	log_info(broker_custom_logger, "Respuesta de id (%i) enviada al cliente %i", message->id, socket_cliente);		
+}
+
+void notifySubscriber(uint32_t socket_cliente)
+{
+	//Se comunica el id al emisor
+	t_id_subscriber_assigned* id = crearIdSubscriberAssigned(socket_cliente);
+	t_paquete* paquete = serializar_idSubscriberAssigned(id);
+	enviarMensaje(paquete, socket_cliente);
+	log_info(broker_custom_logger, "Id de subscriptor asignado (%i) notificado", id->idAssigned);		
 }
 
 void cacheMessage(t_message* message)

@@ -10,6 +10,12 @@ void* serializar_paquete(t_paquete* paquete, int bytes);
 t_paquete* serializar_registerModule(t_register_module* registerModule);
 t_register_module* deserializar_registerModule(t_buffer* buffer);
 
+t_paquete* serializar_idSubscriberAssigned(t_id_subscriber_assigned* id);
+t_id_subscriber_assigned* deserializar_idSubscriberAssigned(t_buffer* buffer);
+
+t_paquete* serializar_idMensajeRecibido(t_id_mensaje_recibido* idMensajeRecibido);
+t_id_mensaje_recibido* deserializar_idMensajeRecibido(t_buffer* buffer);
+
 t_paquete* serializar_acknowledgement(t_acknowledgement* akc);
 t_acknowledgement* deserializar_acknowledgement(t_buffer* buffer);
 
@@ -31,8 +37,6 @@ t_caught_pokemon* deserializar_caughtPokemon(t_buffer* buffer);
 t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon);
 t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer);
 
-t_paquete* serializar_idMensajeRecibido(t_id_mensaje_recibido* idMensajeRecibido);
-t_id_mensaje_recibido* deserializar_idMensajeRecibido(t_buffer* buffer);
 #pragma endregion
 
 #pragma region Creacion de Structs
@@ -47,6 +51,7 @@ t_localized_pokemon* crearLocalizedPokemon(uint32_t IDMensajeRecibido,uint32_t I
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant);
 t_posicion* crearPosicion(uint32_t x, uint32_t y);
 t_id_mensaje_recibido* crearIdMensajeRecibido(uint32_t id);
+t_id_subscriber_assigned* crearIdSubscriberAssigned(uint32_t socket_cliente);
 #pragma endregion
 
 #endif /* SERIALIZADOR_H_ */

@@ -347,6 +347,31 @@ t_register_module* deserializar_registerModule(t_buffer* buffer)
 	return registerModule;
 }
 
+t_paquete* serializar_idSubscriberAssigned(t_id_subscriber_assigned* id) {
+    t_buffer* idAssignedBuffer = malloc(sizeof(t_buffer));
+	idAssignedBuffer->size = sizeof(uint32_t);
+    void* stream = malloc(idAssignedBuffer->size);
+	int offset = 0;
+
+    memcpy(stream + offset, &(id->idAssigned), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+
+    idAssignedBuffer->stream = stream;
+    t_paquete* paquete = crear_paquete(ID_ASIGNADO_SUSCRIPCION, idAssignedBuffer->size, idAssignedBuffer->stream);
+
+    return paquete;
+}
+t_id_subscriber_assigned* deserializar_idSubscriberAssigned(t_buffer* buffer) {
+    t_id_subscriber_assigned* id = malloc(sizeof(t_id_subscriber_assigned));
+
+    void* stream = buffer->stream;
+
+    memcpy(&(id->idAssigned), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
+
+    return id;
+}
+
 t_paquete* serializar_acknowledgement(t_acknowledgement* akc)
 {
 	t_buffer* akcBuffer = malloc(sizeof(t_buffer));
@@ -636,6 +661,29 @@ t_register_module* crearSuscribe(uint32_t ID_message_queue) {
 	return suscribe;
 }
 
+t_acknowledgement* crearAcknowledgement(uint32_t ID_mensaje_recibido, uint32_t mq_cod) {
+	t_acknowledgement* ack = malloc(sizeof(t_acknowledgement));
+	ack->idMessageReceived = ID_mensaje_recibido;
+	ack->mq = mq_cod;
+
+	return ack;
+}
+
+t_id_mensaje_recibido* crearIdMensajeRecibido(uint32_t id) {
+    t_id_mensaje_recibido* mensaje = malloc(sizeof(t_id_mensaje_recibido));
+
+    mensaje->id_mensajeEnviado = id;
+
+    return mensaje;
+}
+
+t_id_subscriber_assigned* crearIdSubscriberAssigned(uint32_t socket_cliente) {
+    t_id_subscriber_assigned* id = malloc(sizeof(t_id_subscriber_assigned));
+
+    id->idAssigned = socket_cliente;
+
+    return id;
+}
 
 
 
