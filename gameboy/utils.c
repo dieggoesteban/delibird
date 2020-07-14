@@ -23,7 +23,6 @@ uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_men
 	{
 		ipAux = config_get_string_value(config, "IP_BROKER");
 		puertoAux = config_get_string_value(config, "PUERTO_BROKER");
-		log_info(logger,"Se va a conectar en BROKER\n");
 		if (perteneceAlArray(tipo_mensaje, brokerCommands, 5) == 1)
 		{
 			isValid = 1;
@@ -33,14 +32,12 @@ uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_men
 	{
 		ipAux = config_get_string_value(config, "IP_BROKER");
 		puertoAux = config_get_string_value(config, "PUERTO_BROKER");
-		log_info(logger,"Se va a conectar en BROKER\n");
 		isValid = 1;
 	}
 	else if (strcmp(proceso, "TEAM") == 0)
 	{
 		ipAux = config_get_string_value(config, "IP_TEAM");
 		puertoAux = config_get_string_value(config, "PUERTO_TEAM");
-		log_info(logger,"Se va a conectar en TEAM");
 		if (perteneceAlArray(tipo_mensaje, teamCommands, 1) == 1)
 		{
 			isValid = 1;
@@ -50,7 +47,6 @@ uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_men
 	{
 		ipAux = config_get_string_value(config, "IP_GAMECARD");
 		puertoAux = config_get_string_value(config, "PUERTO_GAMECARD");
-		log_info(logger,"Se va a conectar en GAMECARD");
 		if (perteneceAlArray(tipo_mensaje, gamecardCommands, 3) == 1)
 		{
 			isValid = 1;

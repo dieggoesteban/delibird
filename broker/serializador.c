@@ -304,7 +304,6 @@ t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon) {
 
 	t_paquete* paquete = crear_paquete(LOCALIZED_POKEMON, buffer->size, buffer->stream);
 
-	printf("codigo de mensaje de serializar poke: %i \n", paquete->codigo_mensaje);
 	return paquete;		
 }
 t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer) {
