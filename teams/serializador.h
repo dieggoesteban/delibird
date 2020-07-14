@@ -283,5 +283,4 @@ t_catch_pokemon* crearCatchPokemon(uint32_t ID_mensaje_recibido, char* nombre, t
 t_caught_pokemon* crearCaughtPokemon(uint32_t IDMensajeRecibido, uint32_t IDMensajeOriginal, uint32_t catchStatus);
 t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre);
 
-
 #endif /* CONNECTION_H_ */

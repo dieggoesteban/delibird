@@ -34,3 +34,17 @@ void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente) {
 	liberarPaquete(paquete);
 	free(stream);
 }
+
+t_buffer *recibir_buffer(uint32_t socket_cliente)
+{
+	t_buffer *buffer = malloc(sizeof(t_buffer));
+	int size;
+
+	recv(socket_cliente, &size, sizeof(int), MSG_WAITALL);
+	printf("Buffer size: %d\n", size);
+	buffer->size = size;
+	buffer->stream = malloc(buffer->size);
+	recv(socket_cliente, buffer->stream, buffer->size, MSG_WAITALL);
+
+	return buffer;
+}

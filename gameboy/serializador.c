@@ -84,11 +84,9 @@ t_new_pokemon* deserializar_newPokemon(t_buffer* buffer){
 
 t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon){
 	t_buffer* buffer = malloc(sizeof(t_buffer));
-	uint32_t sizeListaPos = sizeof(t_posicion)* localizedPokemon->cantidadPosiciones;
-
 	buffer->size = sizeof(uint32_t)*3 //ID_mensaje_recibido + ID_mensaje_original + sizePokemon
 					+ strlen(localizedPokemon->nombre)+1 //nombre pokemon
-					+ sizeListaPos; // se le multiplica la cantidad de items de la lista por su size en bytes
+					+ sizeof(t_posicion)* list_size(localizedPokemon->posicion); // se le multiplica la cantidad de items de la lista por su size en bytes
 
 	void* stream = malloc(buffer->size);
 	int offset = 0;
@@ -101,9 +99,9 @@ t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon){
 	offset += sizeof(uint32_t);
 	memcpy(stream + offset, localizedPokemon->nombre, strlen(localizedPokemon->nombre)+1);
 	offset += strlen(localizedPokemon->nombre)+1;
-	memcpy(stream + offset, &localizedPokemon->cantidadPosiciones, sizeof(uint32_t));
+	memcpy(stream + offset, &localizedPokemon->sizePosicion, sizeof(uint32_t));
 	offset += sizeof(uint32_t);
-	memcpy(stream + offset, localizedPokemon->posiciones, sizeListaPos);
+	memcpy(stream + offset, localizedPokemon->posicion, localizedPokemon->sizePosicion);
 
 	buffer->stream = stream;
 
@@ -117,7 +115,6 @@ t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer){
 	t_localized_pokemon* localizedPokemon = malloc(sizeof(t_localized_pokemon));
 	
 	void* stream = buffer->stream;
-	uint32_t sizeListaPos;
 
 	memcpy(&(localizedPokemon->ID_mensaje_recibido), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
@@ -128,10 +125,9 @@ t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer){
 	localizedPokemon->nombre = malloc(localizedPokemon->sizeNombre);
 	memcpy(localizedPokemon->nombre, stream, localizedPokemon->sizeNombre);
 	stream += localizedPokemon->sizeNombre;
-	memcpy(&(localizedPokemon->cantidadPosiciones), stream, sizeof(uint32_t));
+	memcpy(&(localizedPokemon->sizePosicion), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
-	sizeListaPos = sizeof(t_posicion)* localizedPokemon->cantidadPosiciones;
-	memcpy(localizedPokemon->posiciones, stream, sizeListaPos); //HABIA QUE VER SI ESTO NO GENERA PROBLEMAS COMO EL CHAR* QUE NO SE ENVIABA
+	memcpy(localizedPokemon->posicion, stream, localizedPokemon->sizePosicion); //HABIA QUE VER SI ESTO NO GENERA PROBLEMAS COMO EL CHAR* QUE NO SE ENVIABA
 
 	return localizedPokemon;
 }
@@ -190,7 +186,7 @@ t_paquete* serializar_caughtPokemon(t_caught_pokemon* pokemon){
     t_buffer* pokemon_buffer = malloc(sizeof(t_buffer));
     pokemon_buffer->size = sizeof(uint32_t)*3;
 
-    void* stream = malloc(pokemon_buffer->size);
+    void* stream = malloc(pokemon_buffer->size);TIEMPO_DE_REINTENTO_OPERACION
     int offset = 0;
 
     memcpy(stream + offset, &pokemon->ID_mensaje_recibido, sizeof(uint32_t));
@@ -308,45 +304,73 @@ t_get_pokemon* deserializar_getPokemon(t_buffer* buffer){
 }
 
 //Register Module serialization
-// t_paquete* serializar_registerModule(t_register_module* registerModule)
-// {
-// 	t_buffer* registerModuleBuffer = malloc(sizeof(t_buffer));
-// 	registerModuleBuffer->size = 3 * sizeof(uint32_t);
-// 	void* stream = malloc(sizeof(registerModuleBuffer->size));
-// 	int offset = 0;
+t_paquete* serializar_registerModule(t_register_module* registerModule)
+{
+	printf("Entro a serializar_registerModule\n");
 
-// 	memcpy(stream + offset, &(registerModule->idModuleToRegister), sizeof(uint32_t));
-// 	offset += sizeof(uint32_t);
-// 	memcpy(stream + offset, &(registerModule->messageQueue), sizeof(uint32_t));
-// 	offset += sizeof(uint32_t);
-// 	memcpy(stream + offset, &(registerModule->role), sizeof(uint32_t));
-// 	offset += sizeof(uint32_t);
+	t_buffer* registerModuleBuffer = malloc(sizeof(t_buffer));
+	registerModuleBuffer->size = sizeof(uint32_t);
+	void* stream = malloc(sizeof(registerModuleBuffer->size));
+	int offset = 0;
 
-// 	registerModuleBuffer->stream = stream;
-// 	t_paquete* paquete = crear_paquete(REGISTER, registerModuleBuffer->size, registerModuleBuffer->stream);
-// 	printf("Codigo mensaje, serializar_registerModule: %i\n", paquete->codigo_mensaje);
+	memcpy(stream + offset, &(registerModule->messageQueue), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
 
-// 	return paquete;
-// }
+	registerModuleBuffer->stream = stream;
+	t_paquete* paquete = crear_paquete(SUSCRIBE, registerModuleBuffer->size, registerModuleBuffer->stream);
+
+	printf("Codigo mensaje, serializar_registerModule: %i\n", paquete->codigo_mensaje);
+	return paquete;
+}
 
 //Register Module deserialization
-// t_register_module* deserializar_registerModule(t_buffer* buffer)
-// {
-// 	t_register_module* registerModule = malloc(sizeof(t_register_module));
+t_register_module* deserializar_registerModule(t_buffer* buffer)
+{
+	printf("Entro a deserializar_registerModule\n");
+	t_register_module* registerModule = malloc(sizeof(t_register_module));
 
-// 	void* stream = buffer->stream;
+	void* stream = buffer->stream;
+	printf("Buffer size: %i\n", buffer->size);
 
-// 	memcpy(&(registerModule->idModuleToRegister), stream, sizeof(uint32_t));
-// 	stream += sizeof(uint32_t);
-// 	memcpy(&(registerModule->messageQueue), stream, sizeof(uint32_t));
-// 	stream += sizeof(uint32_t);
-// 	memcpy(&(registerModule->role), stream, sizeof(uint32_t));
-// 	stream += sizeof(uint32_t);
+	memcpy(&(registerModule->messageQueue), stream, sizeof(uint32_t));
+	printf("messageQueue: %i\n", registerModule->messageQueue);
+	stream += sizeof(uint32_t);
 
-// 	return registerModule;
-// }
+	return registerModule;
+}
 
+t_paquete* serializar_akc(t_akc* akc)
+{
+	printf("Entro a serializar_akc\n");
 
+	t_buffer* akcBuffer = malloc(sizeof(t_buffer));
+	akcBuffer->size = sizeof(uint32_t);
+	void* stream = malloc(sizeof(akcBuffer->size));
+	int offset = 0;
+
+	memcpy(stream + offset, &(akc->AKC), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+
+	akcBuffer->stream = stream;
+	t_paquete* paquete = crear_paquete(ACKNOWLEDGEMENT, akcBuffer->size, akcBuffer->stream);
+
+	printf("AKC, serializar_akc: %i\n", paquete->codigo_mensaje);
+	return paquete;
+}
+
+t_akc* deserializar_akc(t_buffer* buffer)
+{
+	printf("Entro a deserializar_akc\n");
+	t_akc* akc = malloc(sizeof(t_akc));
+
+	void* stream = buffer->stream;
+	printf("Buffer size: %i\n", buffer->size);
+
+	memcpy(&(akc->AKC), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
+
+	return akc;
+}
 
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant) {
 	t_posicion_cantidad* position = malloc(sizeof(t_posicion_cantidad));
@@ -379,15 +403,15 @@ t_new_pokemon* crearNewPokemon(uint32_t IDMensajeRecibido, char* nombre, t_posic
 	return newPokemon;
 }
 
-t_localized_pokemon* crearLocalizedPokemon(uint32_t IDMensajeRecibido,uint32_t IDMensajeOriginal, char* nombre, uint32_t cantPosiciones, t_list* posicion){
+t_localized_pokemon* crearLocalizedPokemon(uint32_t IDMensajeRecibido,uint32_t IDMensajeOriginal, char* nombre, uint32_t sizePosicion, t_list* posicion){
 	t_localized_pokemon* localizedPokemon = malloc(sizeof(t_localized_pokemon));
 
 	localizedPokemon->ID_mensaje_recibido = IDMensajeRecibido;
 	localizedPokemon->ID_mensaje_original = IDMensajeOriginal;
 	localizedPokemon->sizeNombre = strlen(nombre)+1;
 	localizedPokemon->nombre = nombre;
-	localizedPokemon->cantidadPosiciones = cantPosiciones;
-	list_add_all(localizedPokemon->posiciones,posicion);
+	localizedPokemon->sizePosicion = sizePosicion;
+	list_add_all(localizedPokemon->posicion,posicion);
 
 	return localizedPokemon;
 }
@@ -436,23 +460,22 @@ t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre){
 
 t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 {
+
 	t_paquete *paquete;
 	// paquete->buffer;
-	// if (strcmp(tipo_mensaje, "REGISTER") == 0)
-	// {
-	// 	log_info(logger, "Entro a Register\n");
+	if (strcmp(tipo_mensaje, "SUSCRIBE") == 0)
+	{
+		log_info(logger, "Entro a Suscribe\n");
 
-	// 	t_register_module* registerModule = malloc(sizeof(t_register_module));
+		t_register_module* registerModule = malloc(sizeof(t_register_module));
 
+		registerModule->idModuleToRegister = 22; //TODO: Deshardcodear
+		registerModule->messageQueue = 1;
 
-	// 	registerModule->idModuleToRegister = 22;
-	// 	registerModule->messageQueue = 1;
-	// 	registerModule->role = 1;
+		paquete = serializar_registerModule(registerModule);
 
-	// 	paquete = serializar_registerModule(registerModule);
-
-	// 	free(registerModule);
-	// }
+		free(registerModule);
+	}
 	if (strcmp(tipo_mensaje, "NEW_POKEMON") == 0)
 	{
 		log_info(logger, "entro a new_pokemon");
@@ -518,6 +541,8 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 	{ //ESTE AL FINAL NO LO HACE GAMEBOY, PARECE SER LA UNICA MQ QUE NO -> PERO LO DEJO IGUAL ASI PRUEBO LA SERIALIZACION Y LA DESERIALIZACION (DESPUES SACAR THO)
 		log_info(logger, "entro a localized_pokemon");
 
+		t_localized_pokemon *localizedPokemon = malloc(sizeof(t_localized_pokemon));
+
 		t_posicion *pos1 = crearPosicion(5, 10);
 		t_posicion *pos2 = crearPosicion(8, 11);
 
@@ -544,6 +569,20 @@ void liberarPaquete(t_paquete* paquete){
 	free(paquete);
 }
 
+t_paquete* modoSuscriptor(uint32_t mq_cod) 
+{
+	t_paquete *paquete;
+	log_info(logger, "Entro a modoSuscriptor\n");
+
+	t_register_module* registerModule = malloc(sizeof(t_register_module));
+
+	registerModule->messageQueue = mq_cod;
+
+	paquete = serializar_registerModule(registerModule);
+
+	free(registerModule);
+	return paquete;
+}
 
 
 

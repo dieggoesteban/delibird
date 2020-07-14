@@ -73,5 +73,4 @@ void inicializarTeam() {
     //comprobar deadlock
     //hacer intercambio
     //finalizar
-
 }

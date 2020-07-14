@@ -1,9 +1,10 @@
-
 #ifndef MODELS_H_
 #define MODELS_H_
-
 #define ERROR -1
 
+#include "global-includes.h"
+
+#pragma region MessageQueue
 typedef enum
 {
 	NEW_POKEMON = 1,
@@ -12,22 +13,52 @@ typedef enum
 	CAUGHT_POKEMON = 4,
 	GET_POKEMON = 5,
 	LOCALIZED_POKEMON = 6,
-    REGISTER = 7
 } mq_cod;
 
-typedef enum
+//Basicamente, las colas de mensaje, tambien representan mensajes
+typedef enum 
 {
-	SUSCRIBER = 1,
-	PUBLISHER = 2
-} registration_role;
+    SUBSCRIBE = 7,
+	MENSAJE_RECIBIDO = 8,
+	ACKNOWLEDGEMENT = 9
+} operation_cod;
 
-typedef struct 
-{
-	uint32_t idModuleToRegister;
-	uint32_t messageQueue;
-	registration_role role;
-} t_register_module;
+typedef struct {
+	char name[50];
+    uint32_t mq_cod;
+    t_list* mensajes;
+    t_list* subscribers;
 
+	//Semaphores
+	pthread_mutex_t s_mensajes;
+	pthread_mutex_t s_subscribers;
+	sem_t s_haySuscriptores;
+	sem_t s_hayMensajes;
+
+	//Threads
+	pthread_t dispatchMessagesThread;
+} t_message_queue;
+
+typedef struct{
+	uint32_t id;
+	uint32_t idCorrelativo;
+	uint32_t mq_cod; //Cada mensaje sabe que tipo es
+	uint32_t cantidadSuscriptoresEnviados;
+	t_list* suscriptoresConfirmados; 
+	void* mensaje; //Contenido del mensaje
+
+	//Semaphores
+	pthread_mutex_t s_cantidadSuscriptoresEnviados;
+	pthread_mutex_t s_suscriptoresConfirmados;
+
+	//Threads
+	pthread_t caching;
+	pthread_t ackReceive;
+	pthread_t deleteFromQueue;
+} t_message;
+#pragma endregion
+
+#pragma region Comunicacion
 typedef struct
 {
 	int size;
@@ -39,7 +70,9 @@ typedef struct
 	mq_cod codigo_mensaje;
 	t_buffer* buffer;
 } t_paquete;
+#pragma endregion
 
+#pragma region Estructuras_Auxiliares
 typedef struct
 {
 	uint32_t posicion_x;
@@ -52,6 +85,25 @@ typedef struct
 	uint32_t posicion_x;
 	uint32_t posicion_y;
 } t_posicion;
+
+typedef struct
+{
+    char* nombre;
+    t_posicion* posicion;
+} t_pokemon_posicion;
+
+typedef struct{
+    char* nombre;
+    uint32_t cantidad;
+}t_pokemon_cantidad;
+#pragma endregion
+
+#pragma region Mensajes_Deserializados
+typedef struct 
+{
+	uint32_t messageQueue;
+} t_register_module;
+
 
 
 typedef struct
@@ -97,27 +149,62 @@ typedef struct{
 	char* nombre;
 } t_get_pokemon;
 
-typedef struct
-{
-    char* nombre;
-    t_posicion* posicion;
-} t_pokemon_posicion;
+//Esta estructura representa al mensaje que envía el broker con el ID del mensaje recibido
+//Se lo envía al emisor del mensaje, como un "número de pedido", por si recibe respuesta.
+typedef struct{
+	uint32_t id_mensajeEnviado;
+} t_id_mensaje_recibido;
 
 typedef struct{
-    char* nombre;
-    uint32_t cantidad;
-}t_pokemon_cantidad;
+	uint32_t idMessageReceived;
+	uint32_t mq;
+} t_acknowledgement;
+#pragma endregion
 
-typedef struct
-{
-	uint32_t id;
-	t_posicion* posicion;
-    t_list* pokemonCapturados;
-    t_list* pokemonObjetivo;
-    uint32_t cantidadObjetivo;
-    t_pokemon_posicion* pokemonPlanificado;
-	bool enEspera;
-    bool deadlock; 
-} t_entrenador;
+#pragma region Mensajes_Estructura_Cache
+
+typedef struct {
+	t_message* message;
+	void* cacheStructure;
+} cache_message;
+
+typedef struct {
+	uint32_t nameLength;
+	char* pokeName;
+	uint32_t posX;
+	uint32_t posY;
+	uint32_t cantidad;
+} cache_new_pokemon;
+
+typedef struct {
+	uint32_t nameLength;
+	char* pokeName;
+	uint32_t cantidadPos;
+	uint32_t* posiciones;
+} cache_localized_pokemon;
+
+typedef struct {
+	uint32_t nameLength;
+	char* pokeName;
+} cache_get_pokemon;
+
+typedef struct {
+	uint32_t nameLength;
+	char* pokeName;
+	uint32_t posX;
+	uint32_t posY;
+} cache_appeared_pokemon;
+
+typedef struct {
+	uint32_t nameLength;
+	char* pokeName;
+	uint32_t posX;
+	uint32_t posY;
+} cache_catch_pokemon;
+
+typedef struct {
+	uint32_t seAtrapo;
+} cache_caught_pokemon;
+#pragma endregion
 
 #endif /* MODELS_H_ */

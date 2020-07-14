@@ -1,0 +1,65 @@
+{
+    // Utilizar IntelliSense para aprender acerca de los posibles atributos.
+    // Mantenga el puntero para ver las descripciones de los existentes atributos 
+    // Para más información, visite: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Broker",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/broker/broker",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/broker",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Gameboy/Suscriptor",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/gameboy/gameboy",
+            "args": ["SUSCRIPTOR", "NEW_POKEMON"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/gameboy",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Gameboy/NewPokemon",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/gameboy/gameboy",
+            "args": ["NEW_POKEMON", "PIKACHU", "5", "25", "10"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/gameboy",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}

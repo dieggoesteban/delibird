@@ -17,15 +17,22 @@ int crear_conexion(char *ip, char *puerto)
 	uint32_t socket_cliente = socket(server_info->ai_family,
 									 server_info->ai_socktype, server_info->ai_protocol);
 
-	int resultadoConexion = connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen);
+	// int resultadoConexion = connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen);
 
-	// if (connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen) == -1)
-	// 	printf("error");
+	// // if (connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen) == -1)
+	// // 	printf("error");
+
+	// freeaddrinfo(server_info);
+	// if(resultadoConexion == ERROR){
+	// 	return -1;
+	// }
+	// 		server_info->ai_socktype, server_info->ai_protocol);
+
+	if (connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen)
+			== -1)
+		printf("error");
 
 	freeaddrinfo(server_info);
-	if(resultadoConexion == ERROR){
-		return -1;
-	}
 
 	return socket_cliente;
 }
