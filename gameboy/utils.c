@@ -12,6 +12,28 @@ void cortarArgumentos(int lengthArray, char *argumentos[], char *arrayTemp[])
 	}
 }
 
+uint32_t getColaDeMensajes(char* queue) {
+	if(strcmp(queue, "NEW_POKEMON") == 0) {
+		return NEW_POKEMON;
+	}
+	if(strcmp(queue, "APPEARED_POKEMON") == 0) {
+		return APPEARED_POKEMON;
+	}
+	if(strcmp(queue, "CATCH_POKEMON") == 0) {
+		return CATCH_POKEMON;
+	}
+	if(strcmp(queue, "CAUGHT_POKEMON") == 0) {
+		return CAUGHT_POKEMON;
+	}
+	if(strcmp(queue, "GET_POKEMON") == 0) {
+		return GET_POKEMON;
+	}
+	if(strcmp(queue, "LOCALIZED_POKEMON") == 0) {
+		return LOCALIZED_POKEMON;
+	}
+	return -1;
+}
+
 uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_mensaje) {
 	uint32_t isValid = 0;
 	char *brokerCommands[] = {"NEW_POKEMON", "APPEARED_POKEMON", "CATCH_POKEMON", "CAUGHT_POKEMON", "GET_POKEMON"};

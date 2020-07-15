@@ -322,12 +322,13 @@ t_get_pokemon* deserializar_getPokemon(t_buffer* buffer)
 t_paquete* serializar_registerModule(t_register_module* registerModule)
 {
 	t_buffer* registerModuleBuffer = malloc(sizeof(t_buffer));
-	registerModuleBuffer->size = sizeof(uint32_t);
-	void* stream = malloc(sizeof(registerModuleBuffer->size));
+	registerModuleBuffer->size = 2*sizeof(uint32_t);
+	void* stream = malloc(registerModuleBuffer->size);
 	int offset = 0;
 
 	memcpy(stream + offset, &(registerModule->messageQueue), sizeof(uint32_t));
 	offset += sizeof(uint32_t);
+	memcpy(stream + offset, &(registerModule->idModule), sizeof(uint32_t));
 
 	registerModuleBuffer->stream = stream;
 	t_paquete* paquete = crear_paquete(SUBSCRIBE, registerModuleBuffer->size, registerModuleBuffer->stream);
@@ -343,6 +344,7 @@ t_register_module* deserializar_registerModule(t_buffer* buffer)
 
 	memcpy(&(registerModule->messageQueue), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
+	memcpy(&(registerModule->idModule), stream, sizeof(uint32_t));
 
 	return registerModule;
 }
@@ -524,17 +526,6 @@ t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre)
 t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 {
 	t_paquete *paquete;
-	// if (strcmp(tipo_mensaje, "SUBSCRIBE") == 0)
-	// {
-	// 	t_register_module* registerModule = malloc(sizeof(t_register_module));
-
-	// 	registerModule->idModuleToRegister = 22; //TODO: Deshardcodear
-	// 	registerModule->messageQueue = 1;
-
-	// 	paquete = serializar_registerModule(registerModule);
-
-	// 	free(registerModule);
-	// }
 	if (strcmp(tipo_mensaje, "NEW_POKEMON") == 0)
 	{
 
@@ -642,21 +633,10 @@ void liberarPaquete(t_paquete* paquete){
 	free(paquete);
 }
 
-t_paquete* modoSuscriptor(uint32_t mq_cod) 
-{
-	t_paquete *paquete;
-	t_register_module* registerModule = malloc(sizeof(t_register_module));
-
-	registerModule->messageQueue = mq_cod;
-	paquete = serializar_registerModule(registerModule);
-
-	free(registerModule);
-	return paquete;
-}
-
-t_register_module* crearSuscribe(uint32_t ID_message_queue) {
+t_register_module* crearSuscribe(uint32_t ID_message_queue, uint32_t ID_module) {
 	t_register_module* suscribe = malloc(sizeof(t_register_module));
 	suscribe->messageQueue = ID_message_queue;
+	suscribe->idModule = ID_module;
 
 	return suscribe;
 }

@@ -37,16 +37,43 @@ void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente) {
 	free(stream);
 }
 
+void modoSuscriptor(char* arg) {
+
+	char* ip = config_get_string_value(config, "IP_BROKER");
+    char* puerto = config_get_string_value(config, "PUERTO_BROKER");
+    uint32_t conexion = crear_conexion(ip, puerto);
+	uint32_t mq = getColaDeMensajes(arg);
+	t_register_module* registerModule = crearSuscribe(mq, 0);
+	t_paquete *paquete = serializar_registerModule(registerModule);
+
+	free(registerModule);
+    enviarMensaje(paquete, conexion);
+
+	while(1) {
+		serve_client(&conexion);
+	}
+
+	liberar_conexion(conexion);
+}
+
+void temporizador (void* tiempo) {
+	uint32_t temp = (uint32_t) tiempo;
+	sleep(temp);
+	pthread_exit(&hiloSuscriptor);
+}
+
 void serve_client(uint32_t* socket)
 {
 	uint32_t cod_op;
-	if(recv(*socket, &cod_op, sizeof(int), MSG_WAITALL) == -1)
+	if(recv(*socket, &cod_op, sizeof(int), 0) == -1){
 		cod_op = -1;
+	}
 	t_buffer *buffer = recibir_buffer(*socket);
 	process_request(buffer, cod_op, *socket);
 }
 
 void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cliente) {
+	printf("Toy aca\n");
 	switch (operation_cod)
 	{
 		case NEW_POKEMON:

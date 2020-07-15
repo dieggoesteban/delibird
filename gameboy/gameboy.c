@@ -25,32 +25,23 @@ int main(int argc, char *argv[])
         cortarArgumentos(argc, argv, arrayArgumentos);
 
         uint32_t isValid = procesarComando(&ip, &puerto, proceso, tipo_mensaje);
-        uint32_t conexion = crear_conexion(ip, puerto);
         if (isValid == 1)
         {
             t_paquete *paquete;
             if (strcmp(proceso, "SUSCRIPTOR") == 0)
             {
-                if(strcmp(tipo_mensaje, "NEW_POKEMON") == 0)               
-                    paquete = modoSuscriptor(1);
-                else if (strcmp(tipo_mensaje, "APPEARED_POKEMON") == 0) 
-                    paquete = modoSuscriptor(2);
-                else if (strcmp(tipo_mensaje, "CATCH_POKEMON") == 0) 
-                    paquete = modoSuscriptor(3);
-                else if (strcmp(tipo_mensaje, "CAUGHT_POKEMON") == 0) 
-                    paquete = modoSuscriptor(4);
-                else if (strcmp(tipo_mensaje, "GET_POKEMON") == 0) 
-                    paquete = modoSuscriptor(5);
-                else if (strcmp(tipo_mensaje, "LOCALIZED_POKEMON") == 0) 
-                    paquete = modoSuscriptor(6);
-                enviarMensaje(paquete, conexion);
-                while(true) //TODO: Aca hay que ver como hacer lo del tiempo con el parametro
-                {
-                    serve_client(&conexion);
-                }
+                terminaConexion = false;
+                temp = atoi(argv[3]);
+                pthread_t hiloTemporizador;
+                sem_init(&tempo, 0, 1);
+                pthread_create(&hiloSuscriptor, NULL, (void*)modoSuscriptor, (void*)tipo_mensaje);
+                pthread_create(&hiloTemporizador, NULL, (void*)temporizador, (void*)atoi(argv[3]));
+
+                pthread_join(hiloTemporizador, NULL);
             }
             else
             {
+                uint32_t conexion = crear_conexion(ip, puerto);
                 paquete = getPaquete(arrayArgumentos, tipo_mensaje);
                 enviarMensaje(paquete, conexion);
                 serve_client(&conexion);

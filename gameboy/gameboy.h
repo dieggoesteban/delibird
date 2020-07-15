@@ -7,6 +7,8 @@
 #include<commons/string.h>
 #include<commons/config.h>
 #include<readline/readline.h>
+#include<pthread.h>
+#include<semaphore.h>
 
 #include "utils.h"
 #include "sockets.h"
@@ -14,7 +16,12 @@
 
 void terminar_programa(int, t_log*, t_config*);
 
+bool terminaConexion;
 char* ipBroker;
 char* puertoBroker;
+
+pthread_t hiloSuscriptor;
+
+uint32_t temp;
 
 #endif /* GAMEBOY_H_ */

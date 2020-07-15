@@ -18,7 +18,6 @@
 
 //PAQUETES
 t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje);
-t_paquete* modoSuscriptor(uint32_t mq_cod);
 void liberarPaquete(t_paquete* paquete);
 void* serializar_paquete(t_paquete* paquete, int bytes);
 
@@ -57,7 +56,7 @@ t_appeared_pokemon* crearAppearedPokemon(uint32_t IDMensajeRecibido, uint32_t ID
 t_catch_pokemon* crearCatchPokemon(uint32_t ID_mensaje_recibido, char* nombre, t_posicion* posicion);
 t_caught_pokemon* crearCaughtPokemon(uint32_t IDMensajeRecibido, uint32_t IDMensajeOriginal, uint32_t catchStatus);
 t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre);
-t_register_module* crearSuscribe(uint32_t ID_message_queue);
+t_register_module* crearSuscribe(uint32_t ID_message_queue, uint32_t ID_module);
 t_acknowledgement* crearAcknowledgement(uint32_t ID_mensaje_recibido, uint32_t mq_cod);
 t_id_mensaje_recibido* crearIdMensajeRecibido(uint32_t id);
 t_id_subscriber_assigned* crearIdSubscriberAssigned(uint32_t socket_cliente);

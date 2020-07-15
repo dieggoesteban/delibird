@@ -2,6 +2,7 @@
 #define MODELS_H_
 #define ERROR -1
 
+#include <pthread.h>
 #include <semaphore.h>
 
 #pragma region MessageQueue
@@ -103,8 +104,8 @@ typedef struct{
 typedef struct 
 {
 	uint32_t messageQueue;
+	uint32_t idModule;
 } t_register_module;
-
 
 
 typedef struct

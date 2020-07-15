@@ -76,7 +76,7 @@ void startCache()
         // free(initialPart2);
     
     #pragma endregion
-
+    /*
     #pragma region Prueba de compactacion
     
         t_partition* partition1 = createPartition(cache, 1024);
@@ -98,6 +98,7 @@ void startCache()
         showPartitions();
         showHoles();
     #pragma endregion
+    */
 }
 
 void memoria_buddySystem(t_message* message) {

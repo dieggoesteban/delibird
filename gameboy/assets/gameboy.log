@@ -23,3 +23,251 @@
 [INFO] 19:49:51:515 gameboy/(27669:27669): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
 [INFO] 19:49:51:516 gameboy/(27669:27669): Recibido new_pokemon de nombre PIKACHU
 [INFO] 19:49:51:519 gameboy/(27684:27684): Se ha recibido el id del mensaje enviado: 5
+[INFO] 21:27:07:486 gameboy/(10519:10520): Id asignado en la suscripcion: 7
+[INFO] 21:27:47:643 gameboy/(10526:10527): Id asignado en la suscripcion: 8
+[INFO] 21:30:24:439 gameboy/(10617:10618): Id asignado en la suscripcion: 9
+[INFO] 21:31:08:317 gameboy/(10839:10840): Id asignado en la suscripcion: 10
+[INFO] 21:32:07:939 gameboy/(10875:10876): Id asignado en la suscripcion: 11
+[INFO] 21:42:43:497 gameboy/(11504:11505): Id asignado en la suscripcion: 12
+[INFO] 21:45:27:875 gameboy/(11579:11580): Id asignado en la suscripcion: 13
+[INFO] 21:47:33:796 gameboy/(11841:11842): Id asignado en la suscripcion: 14
+[INFO] 21:48:42:492 gameboy/(11904:11905): Id asignado en la suscripcion: 15
+[INFO] 21:50:15:661 gameboy/(12239:12240): Id asignado en la suscripcion: 16
+[ERROR] 21:51:47:370 gameboy/(12239:12240): Codigo de operacion desconocido: -1
+[INFO] 21:51:47:372 gameboy/(12368:12368): Se ha recibido el id del mensaje enviado: 1
+[INFO] 21:56:26:44 gameboy/(12506:12507): Id asignado en la suscripcion: 19
+[INFO] 22:05:04:356 gameboy/(13039:13040): Id asignado en la suscripcion: 21
+[INFO] 22:06:09:106 gameboy/(13102:13103): Id asignado en la suscripcion: 22
+[INFO] 22:07:17:626 gameboy/(13309:13310): Id asignado en la suscripcion: 23
+[INFO] 22:10:11:987 gameboy/(13456:13457): Id asignado en la suscripcion: 24
+[ERROR] 22:10:34:287 gameboy/(13474:13474): Codigo de operacion desconocido: 0
+[INFO] 22:12:08:488 gameboy/(16870:16871): Id asignado en la suscripcion: 7
+[INFO] 22:12:23:948 gameboy/(16870:16871): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:12:23:948 gameboy/(16870:16871): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:12:23:951 gameboy/(16874:16874): Se ha recibido el id del mensaje enviado: 1
+[INFO] 22:15:56:46 gameboy/(16909:16910): Id asignado en la suscripcion: 9
+[INFO] 22:15:59:275 gameboy/(16909:16910): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:15:59:276 gameboy/(16909:16910): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:15:59:277 gameboy/(16913:16913): Se ha recibido el id del mensaje enviado: 2
+[ERROR] 22:16:01:343 gameboy/(16917:16917): Codigo de operacion desconocido: 0
+[INFO] 22:18:33:129 gameboy/(19927:19928): Id asignado en la suscripcion: 7
+[INFO] 22:18:46:178 gameboy/(19933:19933): Se ha recibido el id del mensaje enviado: 1
+[INFO] 22:18:46:187 gameboy/(19927:19928): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:18:46:188 gameboy/(19927:19928): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:18:48:63 gameboy/(19927:19928): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:18:48:64 gameboy/(19927:19928): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:18:48:66 gameboy/(19936:19936): Se ha recibido el id del mensaje enviado: 2
+[INFO] 22:18:51:49 gameboy/(19927:19928): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:18:51:49 gameboy/(19927:19928): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:18:51:52 gameboy/(19939:19939): Se ha recibido el id del mensaje enviado: 3
+[INFO] 22:18:52:292 gameboy/(19927:19928): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:18:52:293 gameboy/(19927:19928): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:18:52:300 gameboy/(19947:19947): Se ha recibido el id del mensaje enviado: 4
+[INFO] 22:18:53:323 gameboy/(19927:19928): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:18:53:324 gameboy/(19927:19928): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:18:53:326 gameboy/(19950:19950): Se ha recibido el id del mensaje enviado: 5
+[INFO] 22:18:54:217 gameboy/(19927:19928): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:18:54:218 gameboy/(19927:19928): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:18:54:220 gameboy/(19958:19958): Se ha recibido el id del mensaje enviado: 6
+[INFO] 22:18:55:212 gameboy/(19927:19928): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:18:55:212 gameboy/(19927:19928): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:18:55:214 gameboy/(19971:19971): Se ha recibido el id del mensaje enviado: 7
+[INFO] 22:18:56:131 gameboy/(19927:19928): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:18:56:132 gameboy/(19927:19928): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:18:56:134 gameboy/(19974:19974): Se ha recibido el id del mensaje enviado: 8
+[INFO] 22:18:57:176 gameboy/(19927:19928): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:18:57:176 gameboy/(19927:19928): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:18:57:178 gameboy/(19977:19977): Se ha recibido el id del mensaje enviado: 9
+[INFO] 22:18:58:171 gameboy/(19927:19928): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:18:58:171 gameboy/(19927:19928): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:18:58:174 gameboy/(19985:19985): Se ha recibido el id del mensaje enviado: 10
+[INFO] 22:19:06:537 gameboy/(19927:19928): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:19:06:540 gameboy/(19927:19928): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:19:06:553 gameboy/(20003:20003): Se ha recibido el id del mensaje enviado: 11
+[INFO] 22:22:28:766 gameboy/(20182:20183): Id asignado en la suscripcion: 19
+[INFO] 22:22:55:372 gameboy/(20194:20195): Id asignado en la suscripcion: 20
+[INFO] 22:25:45:958 gameboy/(20431:20432): Id asignado en la suscripcion: 21
+[INFO] 22:26:16:156 gameboy/(20460:20461): Id asignado en la suscripcion: 22
+[INFO] 22:26:59:152 gameboy/(20506:20507): Id asignado en la suscripcion: 23
+[INFO] 22:27:57:229 gameboy/(20546:20547): Id asignado en la suscripcion: 24
+[INFO] 22:27:59:585 gameboy/(20550:20550): Se ha recibido el id del mensaje enviado: 12
+[INFO] 22:27:59:589 gameboy/(20546:20547): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:27:59:589 gameboy/(20546:20547): Recibido new_pokemon de nombre PIKACHU
+[ERROR] 22:28:02:201 gameboy/(20553:20553): Codigo de operacion desconocido: 0
+[INFO] 22:29:21:370 gameboy/(31089:31090): Id asignado en la suscripcion: 7
+[INFO] 22:29:23:994 gameboy/(31089:31090): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:29:23:994 gameboy/(31089:31090): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:29:23:995 gameboy/(31098:31098): Se ha recibido el id del mensaje enviado: 1
+[INFO] 22:29:25:638 gameboy/(31089:31090): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:29:25:638 gameboy/(31089:31090): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:29:25:638 gameboy/(31101:31101): Se ha recibido el id del mensaje enviado: 2
+[INFO] 22:29:26:961 gameboy/(31089:31090): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:29:26:961 gameboy/(31089:31090): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:29:26:963 gameboy/(31104:31104): Se ha recibido el id del mensaje enviado: 3
+[INFO] 22:29:28:182 gameboy/(31089:31090): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:29:28:182 gameboy/(31089:31090): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:29:28:182 gameboy/(31107:31107): Se ha recibido el id del mensaje enviado: 4
+[INFO] 22:29:29:75 gameboy/(31089:31090): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:29:29:75 gameboy/(31089:31090): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:29:29:76 gameboy/(31110:31110): Se ha recibido el id del mensaje enviado: 5
+[INFO] 22:29:30:72 gameboy/(31089:31090): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:29:30:72 gameboy/(31089:31090): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:29:30:73 gameboy/(31113:31113): Se ha recibido el id del mensaje enviado: 6
+[INFO] 22:29:30:979 gameboy/(31089:31090): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:29:30:980 gameboy/(31089:31090): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:29:30:981 gameboy/(31116:31116): Se ha recibido el id del mensaje enviado: 7
+[INFO] 22:29:31:775 gameboy/(31089:31090): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:29:31:775 gameboy/(31089:31090): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:29:31:775 gameboy/(31119:31119): Se ha recibido el id del mensaje enviado: 8
+[INFO] 22:29:32:522 gameboy/(31089:31090): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:29:32:522 gameboy/(31089:31090): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:29:32:523 gameboy/(31122:31122): Se ha recibido el id del mensaje enviado: 9
+[INFO] 22:29:33:173 gameboy/(31089:31090): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:29:33:173 gameboy/(31089:31090): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:29:33:175 gameboy/(31125:31125): Se ha recibido el id del mensaje enviado: 10
+[INFO] 22:29:33:810 gameboy/(31089:31090): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:29:33:810 gameboy/(31089:31090): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:29:33:812 gameboy/(31128:31128): Se ha recibido el id del mensaje enviado: 11
+[INFO] 22:29:34:402 gameboy/(31089:31090): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:29:34:402 gameboy/(31089:31090): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:29:34:404 gameboy/(31131:31131): Se ha recibido el id del mensaje enviado: 12
+[INFO] 22:29:35:20 gameboy/(31089:31090): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:29:35:20 gameboy/(31089:31090): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:29:35:21 gameboy/(31136:31136): Se ha recibido el id del mensaje enviado: 13
+[INFO] 22:29:35:631 gameboy/(31089:31090): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:29:35:631 gameboy/(31089:31090): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:29:35:633 gameboy/(31139:31139): Se ha recibido el id del mensaje enviado: 14
+[INFO] 22:29:36:212 gameboy/(31089:31090): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:29:36:212 gameboy/(31089:31090): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:29:36:214 gameboy/(31142:31142): Se ha recibido el id del mensaje enviado: 15
+[INFO] 22:29:36:831 gameboy/(31089:31090): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:29:36:831 gameboy/(31089:31090): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:29:36:831 gameboy/(31145:31145): Se ha recibido el id del mensaje enviado: 16
+[INFO] 22:29:37:456 gameboy/(31089:31090): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:29:37:456 gameboy/(31089:31090): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:29:37:458 gameboy/(31148:31148): Se ha recibido el id del mensaje enviado: 17
+[INFO] 22:29:59:729 gameboy/(31152:31152): Se ha recibido el id del mensaje enviado: 18
+[ERROR] 22:30:01:678 gameboy/(31155:31155): Codigo de operacion desconocido: 0
+[INFO] 22:31:09:133 gameboy/(6964:6964): Se ha recibido el id del mensaje enviado: 1
+[INFO] 22:31:11:630 gameboy/(6966:6966): Se ha recibido el id del mensaje enviado: 2
+[INFO] 22:31:12:531 gameboy/(6968:6968): Se ha recibido el id del mensaje enviado: 3
+[INFO] 22:31:13:52 gameboy/(6970:6970): Se ha recibido el id del mensaje enviado: 4
+[INFO] 22:31:13:463 gameboy/(6972:6972): Se ha recibido el id del mensaje enviado: 5
+[INFO] 22:31:13:902 gameboy/(6974:6974): Se ha recibido el id del mensaje enviado: 6
+[INFO] 22:31:14:290 gameboy/(6976:6976): Se ha recibido el id del mensaje enviado: 7
+[INFO] 22:31:14:684 gameboy/(6978:6978): Se ha recibido el id del mensaje enviado: 8
+[INFO] 22:31:15:59 gameboy/(6980:6980): Se ha recibido el id del mensaje enviado: 9
+[INFO] 22:31:15:423 gameboy/(6982:6982): Se ha recibido el id del mensaje enviado: 10
+[INFO] 22:31:15:812 gameboy/(6984:6984): Se ha recibido el id del mensaje enviado: 11
+[INFO] 22:31:16:214 gameboy/(6986:6986): Se ha recibido el id del mensaje enviado: 12
+[INFO] 22:31:16:603 gameboy/(6988:6988): Se ha recibido el id del mensaje enviado: 13
+[INFO] 22:31:16:972 gameboy/(6990:6990): Se ha recibido el id del mensaje enviado: 14
+[INFO] 22:31:17:347 gameboy/(6992:6992): Se ha recibido el id del mensaje enviado: 15
+[INFO] 22:31:17:695 gameboy/(6994:6994): Se ha recibido el id del mensaje enviado: 16
+[INFO] 22:31:18:70 gameboy/(6996:6996): Se ha recibido el id del mensaje enviado: 17
+[INFO] 22:31:18:445 gameboy/(6998:6998): Se ha recibido el id del mensaje enviado: 18
+[INFO] 22:31:18:831 gameboy/(7000:7000): Se ha recibido el id del mensaje enviado: 19
+[INFO] 22:31:19:205 gameboy/(7002:7002): Se ha recibido el id del mensaje enviado: 20
+[INFO] 22:31:19:603 gameboy/(7004:7004): Se ha recibido el id del mensaje enviado: 21
+[INFO] 22:31:20:6 gameboy/(7006:7006): Se ha recibido el id del mensaje enviado: 22
+[INFO] 22:31:20:393 gameboy/(7008:7008): Se ha recibido el id del mensaje enviado: 23
+[INFO] 22:31:20:799 gameboy/(7010:7010): Se ha recibido el id del mensaje enviado: 24
+[INFO] 22:31:21:172 gameboy/(7012:7012): Se ha recibido el id del mensaje enviado: 25
+[INFO] 22:31:21:569 gameboy/(7014:7014): Se ha recibido el id del mensaje enviado: 26
+[INFO] 22:31:22:45 gameboy/(7016:7016): Se ha recibido el id del mensaje enviado: 27
+[INFO] 22:31:22:882 gameboy/(7018:7018): Se ha recibido el id del mensaje enviado: 28
+[INFO] 22:31:23:393 gameboy/(7020:7020): Se ha recibido el id del mensaje enviado: 29
+[INFO] 22:31:23:857 gameboy/(7022:7022): Se ha recibido el id del mensaje enviado: 30
+[INFO] 22:31:24:257 gameboy/(7024:7024): Se ha recibido el id del mensaje enviado: 31
+[INFO] 22:31:24:690 gameboy/(7026:7026): Se ha recibido el id del mensaje enviado: 32
+[INFO] 22:31:25:107 gameboy/(7028:7028): Se ha recibido el id del mensaje enviado: 33
+[INFO] 22:31:26:377 gameboy/(7030:7030): Se ha recibido el id del mensaje enviado: 34
+[INFO] 22:31:27:110 gameboy/(7032:7032): Se ha recibido el id del mensaje enviado: 35
+[INFO] 22:31:27:781 gameboy/(7034:7034): Se ha recibido el id del mensaje enviado: 36
+[INFO] 22:31:28:351 gameboy/(7036:7036): Se ha recibido el id del mensaje enviado: 37
+[INFO] 22:31:28:900 gameboy/(7038:7038): Se ha recibido el id del mensaje enviado: 38
+[INFO] 22:31:42:689 gameboy/(7053:7054): Id asignado en la suscripcion: 45
+[INFO] 22:31:42:693 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:699 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:725 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:725 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:746 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:746 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:756 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:756 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:770 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:770 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:779 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:779 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:787 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:787 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:807 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:807 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:830 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:830 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:841 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:841 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:852 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:852 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:862 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:862 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:869 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:869 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:879 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:879 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:891 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:891 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:903 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:903 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:917 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:917 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:921 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:921 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:939 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:939 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:945 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:945 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:949 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:949 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:962 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:962 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:969 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:969 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:979 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:979 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:42:994 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:42:994 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:43:7 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:43:7 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:43:41 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:43:41 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:43:47 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:43:47 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:43:56 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:43:56 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:43:67 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:43:67 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:43:72 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:43:72 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:43:82 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:43:82 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:43:97 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:43:97 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:43:108 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:43:108 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:43:116 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:43:116 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:43:123 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:43:123 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:43:138 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:43:138 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:43:147 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:43:147 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:46:137 gameboy/(7053:7054): Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON
+[INFO] 22:31:46:137 gameboy/(7053:7054): Recibido new_pokemon de nombre PIKACHU
+[INFO] 22:31:46:139 gameboy/(7105:7105): Se ha recibido el id del mensaje enviado: 39
+[INFO] 22:32:07:837 gameboy/(7108:7109): Id asignado en la suscripcion: 47
+[INFO] 22:32:15:296 gameboy/(7112:7112): Se ha recibido el id del mensaje enviado: 40
+[INFO] 22:32:20:998 gameboy/(7135:7136): Id asignado en la suscripcion: 49
+[INFO] 22:32:27:61 gameboy/(7141:7142): Id asignado en la suscripcion: 50
+[ERROR] 22:32:29:174 gameboy/(7155:7155): Codigo de operacion desconocido: 0
