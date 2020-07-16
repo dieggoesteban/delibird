@@ -44,17 +44,18 @@ typedef struct{
 	uint32_t id;
 	uint32_t idCorrelativo;
 	uint32_t mq_cod; //Cada mensaje sabe que tipo es
-	uint32_t cantidadSuscriptoresEnviados;
+	uint32_t cantidadSuscriptoresAEnviar;
 	t_list* suscriptoresConfirmados; 
 	void* mensaje; //Contenido del mensaje
 
+	//Flags
+
 	//Semaphores
-	pthread_mutex_t s_cantidadSuscriptoresEnviados;
 	pthread_mutex_t s_suscriptoresConfirmados;
+	sem_t s_puedeEliminarse;
 
 	//Threads
 	pthread_t caching;
-	pthread_t ackReceive;
 	pthread_t deleteFromQueue;
 } t_message;
 #pragma endregion

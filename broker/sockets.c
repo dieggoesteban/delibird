@@ -6,9 +6,16 @@ void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente) {
 	int sizePaquete = paquete->buffer->size + 2 * sizeof(int);
 	void* stream = serializar_paquete(paquete, sizePaquete);
 	if(send(socket_cliente,stream,sizePaquete,MSG_CONFIRM) == -1)
+	{
 		log_error(broker_custom_logger, "Send error");
+		liberar_conexion(socket_cliente);
+	}
 	liberarPaquete(paquete);
 	free(stream);
+}
+
+void liberar_conexion(uint32_t socket_cliente) {
+	close(socket_cliente);
 }
 
 void liberarPaquete(t_paquete* paquete){
@@ -59,15 +66,24 @@ void esperar_cliente(uint32_t socket_servidor)
 	uint32_t tam_direccion = sizeof(struct sockaddr_in);
 	uint32_t socket_cliente = accept(socket_servidor, (void *)&dir_cliente, &tam_direccion);
 	pthread_create(&serverThread, NULL, (void *)serve_client, &socket_cliente);
-	pthread_detach(serverThread);
+	pthread_join(serverThread, NULL);
 }
 
 void serve_client(uint32_t *socket_cliente)
 {
 	uint32_t operation_cod;
-	if (recv(*socket_cliente, &operation_cod, sizeof(int), MSG_WAITALL) == -1)
+	uint32_t recvResult = recv(*socket_cliente, &operation_cod, sizeof(int), MSG_WAITALL);
+	if (recvResult == -1)
 	{
-		log_error(broker_custom_logger, "Error de Recv");
+		printf("Recv error\n");
+		liberar_conexion(*socket_cliente);
+		exit(1);
+		return;
+	}
+	else if (recvResult == 0)
+	{
+		printf("El cliente %i cerro la conexion\n", *socket_cliente);
+		liberar_conexion(*socket_cliente);
 		return;
 	}
 	else
@@ -76,7 +92,6 @@ void serve_client(uint32_t *socket_cliente)
 
 void process_request(uint32_t operation_cod, uint32_t socket_cliente)
 {
-	printf("\n");
     t_buffer *buffer = recibir_buffer(socket_cliente);
 	processMessage(buffer, operation_cod, socket_cliente);
 }

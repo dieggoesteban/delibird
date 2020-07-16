@@ -51,7 +51,7 @@ void startCache()
     // initial->length = TAMANO_MEMORIA;
     // list_add(holes, initial);
 
-    log_info(broker_custom_logger, "Cache inicializada correctamente");
+    //log_info(broker_custom_logger, "Cache inicializada correctamente");
 
     #pragma region Prueba de consolidacion
 

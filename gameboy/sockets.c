@@ -32,34 +32,40 @@ void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente) {
 	int sizePaquete = paquete->buffer->size + 2 * sizeof(int);
 	void* stream = serializar_paquete(paquete, sizePaquete);
 	if(send(socket_cliente,stream,sizePaquete,MSG_CONFIRM) == -1)
+	{
 		log_error(logger, "Send error");
+		//Desuscribir a ese gil
+		liberar_conexion(socket_cliente);
+		exit(1);
+	}
 	liberarPaquete(paquete);
 	free(stream);
 }
 
 void modoSuscriptor(char* arg) {
 
-	char* ip = config_get_string_value(config, "IP_BROKER");
-    char* puerto = config_get_string_value(config, "PUERTO_BROKER");
-    uint32_t conexion = crear_conexion(ip, puerto);
+    uint32_t conexion = crear_conexion(ipBroker, puertoBroker);
 	uint32_t mq = getColaDeMensajes(arg);
 	t_register_module* registerModule = crearSuscribe(mq, 0);
 	t_paquete *paquete = serializar_registerModule(registerModule);
 
 	free(registerModule);
     enviarMensaje(paquete, conexion);
-
-	while(1) {
+	while(1) 
+	{
 		serve_client(&conexion);
 	}
 
 	liberar_conexion(conexion);
+	log_info(logger, "Conexion con broker finalizada");
 }
+
 
 void temporizador (void* tiempo) {
 	uint32_t temp = (uint32_t) tiempo;
 	sleep(temp);
-	pthread_exit(&hiloSuscriptor);
+	exit(0);
+	//pthread_exit(&hiloSuscriptor);
 }
 
 void serve_client(uint32_t* socket)
@@ -72,22 +78,30 @@ void serve_client(uint32_t* socket)
 	process_request(buffer, cod_op, *socket);
 }
 
+void enviarAck(t_acknowledgement* ack) {
+	t_paquete* paquete = serializar_acknowledgement(ack);
+	free(ack);
+	uint32_t respuestaBroker = crear_conexion(ipBroker, puertoBroker);
+	enviarMensaje(paquete, respuestaBroker);
+	liberar_conexion(respuestaBroker);
+	return;
+}
+
 void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cliente) {
-	printf("Toy aca\n");
 	switch (operation_cod)
 	{
 		case NEW_POKEMON:
 		{
 			t_new_pokemon* newPoke = deserializar_newPokemon(buffer);
 	
-			log_info(logger, "Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON");
 			log_info(logger, "Recibido new_pokemon de nombre %s", newPoke->nombre);
 
-			//t_acknowledgement* ack = crearAcknowledgement(newPoke->ID_mensaje_recibido, NEW_POKEMON);
-			//t_paquete* paquete = serializar_acknowledgement(ack);
-			//free(ack);
-			// uint32_t socketAck = crear_conexion(ipBroker, puertoBroker);
-			// enviarMensaje(paquete, socketAck);
+			 t_acknowledgement* ack = crearAcknowledgement(newPoke->ID_mensaje_recibido, NEW_POKEMON);
+			
+			pthread_t sendAck;
+			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
+			pthread_detach(sendAck);
+
 			break;
 		}
 		case APPEARED_POKEMON:
@@ -155,7 +169,6 @@ void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_c
 		}
 	}
 }
-
 
 t_buffer *recibir_buffer(uint32_t socket_cliente)
 {

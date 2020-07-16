@@ -21,6 +21,7 @@ char* ipBroker;
 char* puertoBroker;
 
 pthread_t hiloSuscriptor;
+pthread_t hiloTemporizador; //Para la suscripcion
 
 uint32_t temp;
 

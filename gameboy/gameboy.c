@@ -32,11 +32,10 @@ int main(int argc, char *argv[])
             {
                 terminaConexion = false;
                 temp = atoi(argv[3]);
-                pthread_t hiloTemporizador;
                 sem_init(&tempo, 0, 1);
                 pthread_create(&hiloSuscriptor, NULL, (void*)modoSuscriptor, (void*)tipo_mensaje);
                 pthread_create(&hiloTemporizador, NULL, (void*)temporizador, (void*)atoi(argv[3]));
-
+                pthread_join(hiloSuscriptor, NULL);
                 pthread_join(hiloTemporizador, NULL);
             }
             else

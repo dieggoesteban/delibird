@@ -363,6 +363,7 @@ t_paquete* serializar_idSubscriberAssigned(t_id_subscriber_assigned* id) {
 
     return paquete;
 }
+
 t_id_subscriber_assigned* deserializar_idSubscriberAssigned(t_buffer* buffer) {
     t_id_subscriber_assigned* id = malloc(sizeof(t_id_subscriber_assigned));
 
@@ -377,11 +378,13 @@ t_id_subscriber_assigned* deserializar_idSubscriberAssigned(t_buffer* buffer) {
 t_paquete* serializar_acknowledgement(t_acknowledgement* akc)
 {
 	t_buffer* akcBuffer = malloc(sizeof(t_buffer));
-	akcBuffer->size = sizeof(uint32_t);
+	akcBuffer->size = sizeof(uint32_t) * 2;
 	void* stream = malloc(akcBuffer->size);
 	int offset = 0;
 
 	memcpy(stream + offset, &(akc->idMessageReceived), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+	memcpy(stream + offset, &(akc->mq), sizeof(uint32_t));
 	offset += sizeof(uint32_t);
 
 	akcBuffer->stream = stream;
@@ -397,6 +400,8 @@ t_acknowledgement* deserializar_acknowledgement(t_buffer* buffer)
 	void* stream = buffer->stream;
 
 	memcpy(&(akc->idMessageReceived), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
+	memcpy(&(akc->mq), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
 
 	return akc;
