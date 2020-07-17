@@ -15,6 +15,8 @@
 #include<string.h>
 #include "models.h"
 
+#include "models.h"
+
 t_log* logger;
 t_config* config;
 
@@ -22,6 +24,8 @@ t_config* config;
 uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_mensaje);
 void cortarArgumentos(int lengthArray, char *argumentos[], char *arrayTemp[]);
 uint32_t perteneceAlArray(char* val, char* arr[], uint32_t size);
+uint32_t arraySize(void* arr[]);
+uint32_t getColaDeMensajes(char* queue);
 
 
 #endif /* UTILS_H_ */

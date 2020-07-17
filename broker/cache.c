@@ -33,14 +33,25 @@ void startCache()
     partitions = list_create();
     holes = list_create();
 
+    s_counterToCompactacion = malloc(sizeof(pthread_mutex_t));
+    s_holes = malloc(sizeof(pthread_mutex_t));
+    s_partitions = malloc(sizeof(pthread_mutex_t));
+    if(pthread_mutex_init(s_counterToCompactacion, NULL) != 0)
+		log_error(broker_custom_logger, "Error mutex init (s_counterToCompactacion) in cache initialization");
+    if(pthread_mutex_init(s_holes, NULL) != 0)
+		log_error(broker_custom_logger, "Error mutex init (s_holes) in cache initialization");
+    if(pthread_mutex_init(s_partitions, NULL) != 0)
+		log_error(broker_custom_logger, "Error mutex init (s_partitions) in cache initialization");
+
+
     //Memory allocation
     cache = malloc(TAMANO_MEMORIA);
-    t_holes* initial = (t_holes*)malloc(sizeof(t_holes));
-    initial->pStart = cache;
-    initial->length = TAMANO_MEMORIA;
-    list_add(holes, initial);
+    // t_holes* initial = (t_holes*)malloc(sizeof(t_holes));
+    // initial->pStart = cache;
+    // initial->length = TAMANO_MEMORIA;
+    // list_add(holes, initial);
 
-    log_info(broker_custom_logger, "Cache inicializada correctamente");
+    //log_info(broker_custom_logger, "Cache inicializada correctamente");
 
     #pragma region Prueba de consolidacion
 
@@ -65,28 +76,29 @@ void startCache()
         // free(initialPart2);
     
     #pragma endregion
-
+    /*
     #pragma region Prueba de compactacion
     
-        // t_partition* partition1 = createPartition(cache, 1024);
-        // t_holes* initialPart1 = createHole(partition1->pLimit + 1, 512);
-        // t_partition* partition2 = createPartition(initialPart1->pLimit + 1, 256);
-        // t_holes* initialPart2 = createHole(partition2->pLimit + 1, 512);
-        // t_partition* partition3 = createPartition(initialPart2->pLimit + 1, 128);
-        // t_holes* initialPart3 = createHole(partition3->pLimit + 1, 512);
+        t_partition* partition1 = createPartition(cache, 1024);
+        t_holes* initialPart1 = createHole(partition1->pLimit + 1, 512);
+        t_partition* partition2 = createPartition(initialPart1->pLimit + 1, 256);
+        t_holes* initialPart2 = createHole(partition2->pLimit + 1, 512);
+        t_partition* partition3 = createPartition(initialPart2->pLimit + 1, 128);
+        t_holes* initialPart3 = createHole(partition3->pLimit + 1, 512);
 
-        // list_add(partitions, partition1);
-        // list_add(partitions, partition2);
-        // list_add(partitions, partition3);
-        // list_add(holes, initialPart1);
-        // list_add(holes, initialPart2);
-        // list_add(holes, initialPart3);
+        list_add(partitions, partition1);
+        list_add(partitions, partition2);
+        list_add(partitions, partition3);
+        list_add(holes, initialPart1);
+        list_add(holes, initialPart2);
+        list_add(holes, initialPart3);
 
-        // compactar();
+        compactar();
 
-        // showPartitions();
-        // showHoles();
+        showPartitions();
+        showHoles();
     #pragma endregion
+    */
 }
 
 void memoria_buddySystem(t_message* message) {
@@ -191,7 +203,6 @@ void compactar()
 
     while (existHolesBetweenPartitions())
     {
-        printf("\n------VUELTA------\n");
         showPartitions();
         showHoles();
         t_holes* hole = (t_holes*)list_get(holes, 0);
@@ -334,12 +345,12 @@ void showPartitions()
     //free(currentPartition);
 }
 
-bool mem_address_menor_a_mayor(t_holes* hole1, t_holes* hole2)
+uint32_t mem_address_menor_a_mayor(t_holes* hole1, t_holes* hole2)
 {
     return hole1->pStart < hole2->pStart;
 }
 
-bool existHolesBetweenPartitions()
+uint32_t existHolesBetweenPartitions()
 {
     pthread_mutex_lock(s_holes);
     pthread_mutex_lock(s_partitions);
