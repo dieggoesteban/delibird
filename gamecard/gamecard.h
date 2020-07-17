@@ -33,13 +33,17 @@ t_bitarray* bitmapArr;
 uint32_t cantBloques;
 uint32_t sizeBloque;
 char* magicNumber;
+pthread_t threadSERVER;
+pthread_t threadSUSCRIBE_CATCH;
+pthread_t threadSUSCRIBE_NEW;
+pthread_t threadSUSCRIBE_GET;
 
 //SEMAFOROS
 sem_t semReconexion;
 
 //PROGRAMA
 void inicializarGamecard();
-void terminar_programa(int, t_log*, t_config*);
+void terminar_programa(t_log* logger, t_config* config);
 
 //CONEXION BROKER
 void* escuchaPermanenteBroker(void* idConexionPermanente);

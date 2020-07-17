@@ -51,8 +51,12 @@ void esperar_cliente(uint32_t socket_servidor);
 void serve_client(uint32_t* socket);
 void process_request(uint32_t cod_op, uint32_t cliente_fd);
 t_buffer* recibir_buffer(uint32_t socket_cliente);
+void suscribe(void* message_queue);
 
 //MESSAGE QUEUE MANAGER
 t_message_queue* getMessageQueueById(mq_cod id);
+
+
+sem_t semReconexion;
 
 #endif /* SOCKETS_H_ */

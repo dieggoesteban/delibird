@@ -547,7 +547,7 @@ void* atenderNewPokemon(void* newPokemonParam){
             log_info(logger,"entra en IF de si esta open");
             pthread_t hiloRecuperacion;
             pthread_create(&hiloRecuperacion, NULL, reintentarOperacion,metadataPoke);
-            pthread_join(hiloRecuperacion,NULL);
+            pthread_detach(hiloRecuperacion);
         }
         indexSemaforo = encontrarSemaforoDelPoke(newPokemon->nombre,semaforosPokemon);
         log_info(logger,"el index de la lista de semaforos en el else: %i",indexSemaforo);

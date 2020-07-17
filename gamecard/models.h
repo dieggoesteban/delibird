@@ -45,9 +45,10 @@ typedef struct{
 	void* mensaje; //el struct que toque
 } t_message;
 
-typedef struct {
-	uint32_t AKC;
-} t_akc;
+typedef struct{
+	uint32_t idMessageReceived;
+	uint32_t mq;
+} t_acknowledgement;
 
 typedef struct 
 {

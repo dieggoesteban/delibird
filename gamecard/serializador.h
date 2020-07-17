@@ -43,8 +43,8 @@ t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer);
 t_paquete* serializar_registerModule(t_register_module* registerModule);
 t_register_module* deserializar_registerModule(t_buffer* buffer);
 
-t_paquete* serializar_akc(t_akc* akc);
-t_akc* deserializar_akc(t_buffer* buffer);
+t_paquete* serializar_acknowledgement(t_acknowledgement* akc);
+t_acknowledgement* deserializar_acknowledgement(t_buffer* buffer);
 
 t_paquete* serializar_confirmacionMensaje(t_confirmacion_mensaje* confirmacion);
 t_confirmacion_mensaje* deserializar_confirmacionMensaje(t_buffer* buffer);
@@ -60,7 +60,9 @@ t_caught_pokemon* crearCaughtPokemon(uint32_t IDMensajeRecibido, uint32_t IDMens
 t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre);
 t_message* crearMessage(void* mensajeRecibido);
 t_confirmacion_mensaje* crearConfirmacionMensaje(uint32_t ID_mensaje, uint32_t colaMensajes, bool meLlego);
+t_register_module* crearSuscribe(uint32_t ID_message_queue);
 t_semaforo_pokemon* crearSemaforoPokemon(char* nombrePoke);
+t_acknowledgement* crearAcknowledgement(uint32_t ID_mensaje_recibido, uint32_t mq_cod);
 
 
 #endif /* CONNECTION_H_ */

@@ -340,34 +340,33 @@ t_register_module* deserializar_registerModule(t_buffer* buffer)
 	return registerModule;
 }
 
-t_paquete* serializar_akc(t_akc* akc)
+t_paquete* serializar_acknowledgement(t_acknowledgement* akc)
 {
-	printf("Entro a serializar_akc\n");
-
 	t_buffer* akcBuffer = malloc(sizeof(t_buffer));
-	akcBuffer->size = sizeof(uint32_t);
+	akcBuffer->size = sizeof(uint32_t) * 2;
 	void* stream = malloc(akcBuffer->size);
 	int offset = 0;
 
-	memcpy(stream + offset, &(akc->AKC), sizeof(uint32_t));
+	memcpy(stream + offset, &(akc->idMessageReceived), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+	memcpy(stream + offset, &(akc->mq), sizeof(uint32_t));
 	offset += sizeof(uint32_t);
 
 	akcBuffer->stream = stream;
 	t_paquete* paquete = crear_paquete(ACKNOWLEDGEMENT, akcBuffer->size, akcBuffer->stream);
 
-	printf("AKC, serializar_akc: %i\n", paquete->codigo_mensaje);
 	return paquete;
 }
 
-t_akc* deserializar_akc(t_buffer* buffer)
+t_acknowledgement* deserializar_acknowledgement(t_buffer* buffer)
 {
-	printf("Entro a deserializar_akc\n");
-	t_akc* akc = malloc(sizeof(t_akc));
+	t_acknowledgement* akc = malloc(sizeof(t_acknowledgement));
 
 	void* stream = buffer->stream;
-	printf("Buffer size: %i\n", buffer->size);
 
-	memcpy(&(akc->AKC), stream, sizeof(uint32_t));
+	memcpy(&(akc->idMessageReceived), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
+	memcpy(&(akc->mq), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
 
 	return akc;
@@ -516,6 +515,13 @@ t_confirmacion_mensaje* crearConfirmacionMensaje(uint32_t ID_mensaje, uint32_t c
 	return confirmacion;
 }
 
+t_register_module* crearSuscribe(uint32_t ID_message_queue) {
+	t_register_module* suscribe = malloc(sizeof(t_register_module));
+	suscribe->messageQueue = ID_message_queue;
+
+	return suscribe;
+}
+
 t_semaforo_pokemon* crearSemaforoPokemon(char* nombrePoke){
 	t_semaforo_pokemon* semaforoPoke = malloc(sizeof(t_semaforo_pokemon));
 	sem_t semaforo;
@@ -526,6 +532,13 @@ t_semaforo_pokemon* crearSemaforoPokemon(char* nombrePoke){
 	return semaforoPoke;
 }
 
+t_acknowledgement* crearAcknowledgement(uint32_t ID_mensaje_recibido, uint32_t mq_cod) {
+	t_acknowledgement* ack = malloc(sizeof(t_acknowledgement));
+	ack->idMessageReceived = ID_mensaje_recibido;
+	ack->mq = mq_cod;
+
+	return ack;
+}
 
 t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 {

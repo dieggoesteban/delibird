@@ -51,6 +51,34 @@ void enviarMensaje(t_paquete *paquete, uint32_t socket_cliente)
 	free(stream);
 }
 
+void suscribe(void* message_queue) {
+	char* ip = config_get_string_value(config, "IP_BROKER");
+    char* puerto = config_get_string_value(config, "PUERTO_BROKER");
+    uint32_t conexion = crear_conexion(ip, puerto);
+	
+	uint32_t mq = (uint32_t) message_queue;
+	t_register_module* suscribe = crearSuscribe(mq);
+	t_paquete* paquete = serializar_registerModule(suscribe);
+	printf("SUSCRIBE %i \n", mq);
+	free(suscribe);
+	enviarMensaje(paquete, conexion);
+
+	while(1) {
+		serve_client(&conexion);
+	}
+}
+
+void enviarAck(t_acknowledgement* ack) {
+	char* ip = config_get_string_value(config, "IP_BROKER");
+    char* puerto = config_get_string_value(config, "PUERTO_BROKER");
+	t_paquete* paquete = serializar_acknowledgement(ack);
+	free(ack);
+	uint32_t respuestaBroker = crear_conexion(ip, puerto);
+	enviarMensaje(paquete, respuestaBroker);
+	liberar_conexion(respuestaBroker);
+	return;
+}
+
 /*SERVER SIDE*/
 
 void iniciar_servidor(void)
@@ -96,7 +124,7 @@ void esperar_cliente(uint32_t socket_servidor)
 	uint32_t socket_cliente = accept(socket_servidor, (void *)&dir_cliente, &tam_direccion);
 
 	pthread_create(&thread, NULL, (void *)serve_client, &socket_cliente);
-	pthread_join(thread, NULL);
+	pthread_detach(thread);
 }
 
 void serve_client(uint32_t *socket)
@@ -129,10 +157,15 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd)
 		log_info(logger, "SIZE BUFFER EN NEW: %i\n", buffer->size);
 		t_new_pokemon *newPoke = deserializar_newPokemon(buffer);
 		printf("Nombre del poke new: %s\n", newPoke->nombre);
+		t_acknowledgement* ack = crearAcknowledgement(newPoke->ID_mensaje_recibido, NEW_POKEMON);
+			
+		pthread_t sendAck;
+		pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
+		pthread_detach(sendAck);
 		pthread_t hiloAtenderPoke;
 		pthread_create(&hiloAtenderPoke, NULL, atenderNewPokemon,(void*)newPoke);
-    	pthread_join(hiloAtenderPoke,NULL);
-		// atenderNewPokemon(newPoke);
+    	pthread_detach(hiloAtenderPoke);
+		// atenderNewPokemon((void*)newPoke);
 		log_info(logger, newPoke->nombre);
 		t_posicion* posicion = crearPosicion(newPoke->posicionCantidad->posicion_x, newPoke->posicionCantidad->posicion_y);
 		t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(0, newPoke->ID_mensaje_recibido, newPoke->nombre, posicion);
@@ -225,16 +258,32 @@ uint32_t escuchaBroker(){
 	return crear_conexion(IP_BROKER, PUERTO_BROKER);
 }
 
-// recv(socket_cliente, &size, sizeof(int), MSG_WAITALL);
-// 		mensaje = malloc(size);
-// 		recv(socket_cliente, mensaje, size, MSG_WAITALL);
-// void* recibir_buffer(uint32_t* size, uint32_t socket_cliente)
-// {
-// 	void * buffer;
-
-// 	recv(socket_cliente, size, sizeof(uint32_t), MSG_WAITALL);
-// 	buffer = malloc(*size);
-// 	recv(socket_cliente, buffer, *size, MSG_WAITALL);
-
-// 	return buffer;
+// void* escuchaPermanenteBroker(void* idConexionPermanente){
+//     uint32_t* idCon = (uint32_t*)idConexionPermanente;
+//     // log_info(logger,"idCOnecsdcPermanente: %i", (uint32_t)idConexionPermanente);
+//     uint32_t cod_op;
+//     while(1){
+//         int result = recv((uint32_t)idConexionPermanente, &cod_op, sizeof(uint32_t), MSG_WAITALL);
+//         if(result == ERROR){
+//             sem_wait(&semReconexion);
+//             pthread_t hiloReconexion;
+//             log_info(logger,"a punto de entrar a rec");
+//             pthread_create(&hiloReconexion,NULL,reconexionBroker,NULL);
+//             // uint32_t idNuevaConexion;
+//             pthread_join(hiloReconexion,(void**)&idCon); 
+//         }
+//     }
 // }
+
+// void* reconexionBroker(){
+//     log_info(logger,"entro a rec");
+//     uint32_t idCon = -1;
+//     while(idCon == ERROR){
+//         idCon = escuchaBroker();
+//         log_info(logger,"idConexion en reintento: %i", idCon);
+//         sleep(tiempoReintentoConexion);
+//     }
+//     pthread_exit((void*)idCon);
+//     sem_post(&semReconexion);
+// }
+
