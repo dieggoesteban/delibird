@@ -319,60 +319,59 @@ t_get_pokemon* deserializar_getPokemon(t_buffer* buffer)
     return pokemon;
 }
 
-t_paquete* serializar_registerModule(t_register_module* registerModule)
-{
+t_paquete* serializar_registerModule(t_register_module* registerModule) {
 	t_buffer* registerModuleBuffer = malloc(sizeof(t_buffer));
-	registerModuleBuffer->size = 2*sizeof(uint32_t);
+	registerModuleBuffer->size = sizeof(uint32_t) * 2;
 	void* stream = malloc(registerModuleBuffer->size);
 	int offset = 0;
 
 	memcpy(stream + offset, &(registerModule->messageQueue), sizeof(uint32_t));
 	offset += sizeof(uint32_t);
-	memcpy(stream + offset, &(registerModule->idModule), sizeof(uint32_t));
+    memcpy(stream + offset, &(registerModule->moduleId), sizeof(uint32_t));
+    offset += sizeof(uint32_t);
 
 	registerModuleBuffer->stream = stream;
 	t_paquete* paquete = crear_paquete(SUBSCRIBE, registerModuleBuffer->size, registerModuleBuffer->stream);
 
 	return paquete;
 }
-
-t_register_module* deserializar_registerModule(t_buffer* buffer)
-{
+t_register_module* deserializar_registerModule(t_buffer* buffer) {
 	t_register_module* registerModule = malloc(sizeof(t_register_module));
-
 	void* stream = buffer->stream;
-
 	memcpy(&(registerModule->messageQueue), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
-	memcpy(&(registerModule->idModule), stream, sizeof(uint32_t));
-
+    memcpy(&(registerModule->moduleId), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
 	return registerModule;
 }
 
-t_paquete* serializar_idSubscriberAssigned(t_id_subscriber_assigned* id) {
-    t_buffer* idAssignedBuffer = malloc(sizeof(t_buffer));
-	idAssignedBuffer->size = sizeof(uint32_t);
-    void* stream = malloc(idAssignedBuffer->size);
+t_paquete* serializar_suscripcion(t_suscripcion* suscripcion) {
+    t_buffer* suscripcionBuffer = malloc(sizeof(t_buffer));
+	suscripcionBuffer->size = sizeof(uint32_t) * 2;
+    void* stream = malloc(suscripcionBuffer->size);
 	int offset = 0;
 
-    memcpy(stream + offset, &(id->idAssigned), sizeof(uint32_t));
+    memcpy(stream + offset, &(suscripcion->idModule), sizeof(uint32_t));
 	offset += sizeof(uint32_t);
+    memcpy(stream + offset, &(suscripcion->socket), sizeof(uint32_t));
+    offset += sizeof(uint32_t);
 
-    idAssignedBuffer->stream = stream;
-    t_paquete* paquete = crear_paquete(ID_ASIGNADO_SUSCRIPCION, idAssignedBuffer->size, idAssignedBuffer->stream);
+    suscripcionBuffer->stream = stream;
+    t_paquete* paquete = crear_paquete(SUBSCRIBE, suscripcionBuffer->size, suscripcionBuffer->stream);
 
     return paquete;
 }
-
-t_id_subscriber_assigned* deserializar_idSubscriberAssigned(t_buffer* buffer) {
-    t_id_subscriber_assigned* id = malloc(sizeof(t_id_subscriber_assigned));
+t_suscripcion* deserializar_suscripcion(t_buffer* buffer) {
+    t_suscripcion* suscripcion = malloc(sizeof(t_suscripcion));
 
     void* stream = buffer->stream;
 
-    memcpy(&(id->idAssigned), stream, sizeof(uint32_t));
+    memcpy(&(suscripcion->idModule), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
+    memcpy(&(suscripcion->socket), stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
 
-    return id;
+    return suscripcion;
 }
 
 t_paquete* serializar_acknowledgement(t_acknowledgement* akc)
@@ -641,7 +640,7 @@ void liberarPaquete(t_paquete* paquete){
 t_register_module* crearSuscribe(uint32_t ID_message_queue, uint32_t ID_module) {
 	t_register_module* suscribe = malloc(sizeof(t_register_module));
 	suscribe->messageQueue = ID_message_queue;
-	suscribe->idModule = ID_module;
+	suscribe->moduleId = ID_module;
 
 	return suscribe;
 }
@@ -662,12 +661,13 @@ t_id_mensaje_recibido* crearIdMensajeRecibido(uint32_t id) {
     return mensaje;
 }
 
-t_id_subscriber_assigned* crearIdSubscriberAssigned(uint32_t socket_cliente) {
-    t_id_subscriber_assigned* id = malloc(sizeof(t_id_subscriber_assigned));
+t_suscripcion* crearSuscripcion(uint32_t idAssigned, uint32_t socket_cliente) {
+    t_suscripcion* suscripcion = malloc(sizeof(t_suscripcion));
 
-    id->idAssigned = socket_cliente;
+    suscripcion->idModule = idAssigned;
+    suscripcion->socket = socket_cliente;
 
-    return id;
+    return suscripcion;
 }
 
 
