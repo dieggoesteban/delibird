@@ -920,3 +920,24 @@
 [INFO] 00:55:18:294 gameboy/(21089:21090): Recibido new_pokemon de nombre PIKACHU
 [INFO] 00:55:18:295 gameboy/(21089:21090): Recibido new_pokemon de nombre PIKACHU
 [INFO] 00:55:18:298 gameboy/(21089:21090): Id asignado en la suscripcion: 9
+[INFO] 23:58:38:579 gameboy/(11071:11071): Se ha recibido el id del mensaje enviado: 1
+[INFO] 00:02:36:386 gameboy/(11280:11280): Se ha recibido el id del mensaje enviado: 1
+[INFO] 00:06:33:691 gameboy/(11674:11674): Se ha recibido el id del mensaje enviado: 1
+[INFO] 00:08:09:7 gameboy/(11771:11771): Se ha recibido el id del mensaje enviado: 1
+[INFO] 00:08:34:438 gameboy/(11779:11779): Se ha recibido el id del mensaje enviado: 2
+[INFO] 00:09:41:453 gameboy/(11851:11851): Se ha recibido el id del mensaje enviado: 1
+[INFO] 00:10:40:140 gameboy/(12069:12069): Se ha recibido el id del mensaje enviado: 1
+[INFO] 00:11:00:569 gameboy/(12075:12075): Se ha recibido el id del mensaje enviado: 2
+[INFO] 00:11:05:82 gameboy/(12084:12084): Se ha recibido el id del mensaje enviado: 3
+[INFO] 00:19:59:169 gameboy/(12551:12551): Se ha recibido el id del mensaje enviado: 1
+[INFO] 00:24:29:245 gameboy/(12679:12679): Se ha recibido el id del mensaje enviado: 1
+[INFO] 00:25:27:700 gameboy/(12731:12731): Se ha recibido el id del mensaje enviado: 1
+[INFO] 00:27:54:27 gameboy/(12856:12856): Se ha recibido el id del mensaje enviado: 1
+[INFO] 00:28:21:104 gameboy/(12875:12875): Se ha recibido el id del mensaje enviado: 2
+[INFO] 00:28:21:927 gameboy/(12882:12882): Se ha recibido el id del mensaje enviado: 3
+[INFO] 00:28:38:581 gameboy/(12890:12890): Se ha recibido el id del mensaje enviado: 4
+[INFO] 00:28:40:594 gameboy/(12897:12897): Se ha recibido el id del mensaje enviado: 5
+[INFO] 00:30:03:445 gameboy/(12959:12959): Se ha recibido el id del mensaje enviado: 1
+[INFO] 00:30:04:457 gameboy/(12966:12966): Se ha recibido el id del mensaje enviado: 2
+[INFO] 00:30:06:819 gameboy/(12973:12973): Se ha recibido el id del mensaje enviado: 3
+[INFO] 00:30:09:427 gameboy/(12980:12980): Se ha recibido el id del mensaje enviado: 4

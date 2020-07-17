@@ -5,6 +5,7 @@
 #define ERROR -1
 #include "semaphore.h"
 
+
 typedef enum
 {
 	NEW_POKEMON = 1,
@@ -13,14 +14,17 @@ typedef enum
 	CAUGHT_POKEMON = 4,
 	GET_POKEMON = 5,
 	LOCALIZED_POKEMON = 6,
-    SUSCRIBE = 7
 } mq_cod;
 
-typedef enum
+//Basicamente, las colas de mensaje, tambien representan mensajes
+typedef enum 
 {
-	ACKNOWLEDGEMENT = 8,
-	CONFIRMACION_MSJ = 9
-} acciones;
+    SUBSCRIBE = 7,
+	MENSAJE_RECIBIDO = 8,
+	ACKNOWLEDGEMENT = 9,
+	ID_ASIGNADO_SUSCRIPCION = 10
+} operation_cod;
+
 
 typedef struct{
 	sem_t semPoke;

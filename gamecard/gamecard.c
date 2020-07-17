@@ -81,4 +81,6 @@ void inicializarGamecard(){
     bitmapArr = crear_bitmap_en_disco(pathBitmap, cantBloques);
     // }
     semaforosPokemon = list_create();
+    pthread_mutex_init(&mutexBitmap, NULL);
 
+}

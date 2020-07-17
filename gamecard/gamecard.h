@@ -37,7 +37,7 @@ pthread_t threadSERVER;
 pthread_t threadSUSCRIBE_CATCH;
 pthread_t threadSUSCRIBE_NEW;
 pthread_t threadSUSCRIBE_GET;
-
+pthread_mutex_t mutexBitmap;
 //SEMAFOROS
 sem_t semReconexion;
 

@@ -46,6 +46,8 @@ t_list* semaforosPokemon;
 uint32_t tiempoReintentoConexion;
 uint32_t tiempoOperacion;
 
+pthread_mutex_t mutexBitmap;
+
 //CREAR
 bool crearDirectorio(char* rutaDirectorio);
 t_bitarray* crear_bitmap_en_disco(char* archivo, size_t size);

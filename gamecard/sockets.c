@@ -142,92 +142,82 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd)
 	t_buffer *buffer = recibir_buffer(cliente_fd);
 	switch (cod_op)
 	{
-	case CONFIRMACION_MSJ:
-	{
-		log_info(logger, "SIZE BUFFER EN CONFIRMACION MENSAJE: %i\n", buffer->size);
-		t_confirmacion_mensaje* confirmacion = deserializar_confirmacionMensaje(buffer);
-		printf("llego la confirmacion de mensaje del suscriptor: %i, del mensaje de ID: %i, para la cola: %i, con el resultado: %i\n", cliente_fd, confirmacion->ID_mensaje, confirmacion->MessageQueue, confirmacion->meLlego);
-		free(confirmacion);
-		// free(buffer->stream);
-		// free(buffer);
-		break;
-	}
-	case NEW_POKEMON:
-	{
-		log_info(logger, "SIZE BUFFER EN NEW: %i\n", buffer->size);
-		t_new_pokemon *newPoke = deserializar_newPokemon(buffer);
-		printf("Nombre del poke new: %s\n", newPoke->nombre);
-		t_acknowledgement* ack = crearAcknowledgement(newPoke->ID_mensaje_recibido, NEW_POKEMON);
+		case NEW_POKEMON:
+		{
+			log_info(logger, "SIZE BUFFER EN NEW: %i\n", buffer->size);
+			t_new_pokemon *newPoke = deserializar_newPokemon(buffer);
+			printf("Nombre del poke new: %s\n", newPoke->nombre);
+			t_acknowledgement* ack = crearAcknowledgement(newPoke->ID_mensaje_recibido, NEW_POKEMON);
+				
+			pthread_t sendAck;
+			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
+			pthread_detach(sendAck);
+			pthread_t hiloAtenderPoke;
+			pthread_create(&hiloAtenderPoke, NULL, atenderNewPokemon,(void*)newPoke);
+			pthread_detach(hiloAtenderPoke);
+			// atenderNewPokemon((void*)newPoke);
+			log_info(logger, newPoke->nombre);
+			t_posicion* posicion = crearPosicion(newPoke->posicionCantidad->posicion_x, newPoke->posicionCantidad->posicion_y);
+			t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(0, newPoke->ID_mensaje_recibido, newPoke->nombre, posicion);
+			//podria generar la conexion con broker desde un principio, por donde se le va a enviar los appeared, caught y localized ,pero que sea el servidor que reciba las requests
+			//enviar a broker
 			
-		pthread_t sendAck;
-		pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
-		pthread_detach(sendAck);
-		pthread_t hiloAtenderPoke;
-		pthread_create(&hiloAtenderPoke, NULL, atenderNewPokemon,(void*)newPoke);
-    	pthread_detach(hiloAtenderPoke);
-		// atenderNewPokemon((void*)newPoke);
-		log_info(logger, newPoke->nombre);
-		t_posicion* posicion = crearPosicion(newPoke->posicionCantidad->posicion_x, newPoke->posicionCantidad->posicion_y);
-		t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(0, newPoke->ID_mensaje_recibido, newPoke->nombre, posicion);
-		//podria generar la conexion con broker desde un principio, por donde se le va a enviar los appeared, caught y localized ,pero que sea el servidor que reciba las requests
-		//enviar a broker
+			// free(newPoke);
+
+			break;
+		}
+		case APPEARED_POKEMON:
+		{
+			log_info(logger, "SIZE BUFFER EN NEW: %i", buffer->size);
+			// deserializar_appearedPokemon(buffer);
+			t_appeared_pokemon *appearedPoke = deserializar_appearedPokemon(buffer);
+			printf("pos x de poke: %i", appearedPoke->posicion->posicion_x);
+			log_info(logger, appearedPoke->nombre);
+
+			free(appearedPoke);
+			// free(buffer->stream);
+			// free(buffer);
+			break;
+		}
+		case CATCH_POKEMON:
+		{
+			log_info(logger, "SIZE BUFFER EN NEW: %i\n", buffer->size);
+			t_catch_pokemon *catchPoke = deserializar_catchPokemon(buffer);
+			printf("Nombre del poke a atrapar: %s\n", catchPoke->nombre);
+			atenderCatchPokemon(catchPoke);
+			t_caught_pokemon* caughtPoke = crearCaughtPokemon(0,catchPoke->ID_mensaje_recibido,1);
+			//enviar a broker
+
+			log_info(logger, catchPoke->nombre);
+			free(catchPoke);
 		
-		free(newPoke);
-
-		break;
-	}
-	case APPEARED_POKEMON:
-	{
-		log_info(logger, "SIZE BUFFER EN NEW: %i", buffer->size);
-		// deserializar_appearedPokemon(buffer);
-		t_appeared_pokemon *appearedPoke = deserializar_appearedPokemon(buffer);
-		printf("pos x de poke: %i", appearedPoke->posicion->posicion_x);
-		log_info(logger, appearedPoke->nombre);
-
-		free(appearedPoke);
-		// free(buffer->stream);
-		// free(buffer);
-		break;
-	}
-	case CATCH_POKEMON:
-	{
-		log_info(logger, "SIZE BUFFER EN NEW: %i\n", buffer->size);
-		t_catch_pokemon *catchPoke = deserializar_catchPokemon(buffer);
-		printf("Nombre del poke a atrapar: %s\n", catchPoke->nombre);
-		atenderCatchPokemon(catchPoke);
-		t_caught_pokemon* caughtPoke = crearCaughtPokemon(0,catchPoke->ID_mensaje_recibido,1);
-		//enviar a broker
-
-		log_info(logger, catchPoke->nombre);
-		free(catchPoke);
-	
-		break;
-	}
-	case CAUGHT_POKEMON:
-	{
+			break;
+		}
+		case CAUGHT_POKEMON:
+		{
 
 
-		
-		break;
-	}
-	case GET_POKEMON:
-	{
-		t_get_pokemon *getPoke = deserializar_getPokemon(buffer);
-		log_info(logger, getPoke->nombre);
-		t_localized_pokemon* localizedPoke = atenderGetPokemon(getPoke);
-		
-		
-		//enviar a broker
+			
+			break;
+		}
+		case GET_POKEMON:
+		{
+			t_get_pokemon *getPoke = deserializar_getPokemon(buffer);
+			log_info(logger, getPoke->nombre);
+			t_localized_pokemon* localizedPoke = atenderGetPokemon(getPoke);
+			
+			
+			//enviar a broker
 
 
-		free(getPoke);
-		
-		break;
-	}
-	case 0:
-		pthread_exit(NULL);
-	case -1:
-		pthread_exit(NULL);
+			free(getPoke);
+			
+			break;
+		}
+		case 0:
+			pthread_exit(NULL);
+		case -1:
+			pthread_exit(NULL);
 	}
 	free(buffer->stream);
 	free(buffer);

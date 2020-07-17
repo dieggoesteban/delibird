@@ -5,15 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Broker",
+            "name": "Gamecard",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/broker/broker",
+            "program": "${workspaceFolder}/gamecard/gamecard",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/broker",
+            "cwd": "${workspaceFolder}/gamecard",
             "environment": [],
-            "externalConsole": true,
+            "externalConsole": false,
             "MIMode": "gdb",
             "setupCommands": [
                 {

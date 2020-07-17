@@ -242,8 +242,10 @@ void modificarBloquesNewPoke(char* textoCompleto, char* pathMetadataPoke){
 
 
 
-uint32_t buscarBloqueEInsertarEnArchivo(t_config* metadataPoke){
+uint32_t buscarBloqueEInsertarEnArchivo(t_config* metadataPoke){ 
+    pthread_mutex_lock(&mutexBitmap);
     uint32_t bloqueLibre = buscarBloqueLibre();
+    pthread_mutex_unlock(&mutexBitmap);
     insertarBloqueEnArchivo(metadataPoke, config_get_array_value(metadataPoke,"BLOCKS"),bloqueLibre);
     config_destroy(metadataPoke);
     return bloqueLibre;
@@ -556,11 +558,10 @@ void* atenderNewPokemon(void* newPokemonParam){
         modificarOpenArchivo(pathMetadataPoke,"Y");
     }
     escribirNewPokemon(newPokemonATexto(newPokemon), pathMetadataPoke);
-    sem_post(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, indexSemaforo))->semPoke)); 
     sleep(tiempoOperacion);
+    sem_post(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, indexSemaforo))->semPoke)); 
     modificarOpenArchivo(pathMetadataPoke,"N");
     printf("termino la operacioon\n");
-    sleep(tiempoOperacion);
     return NULL;
 }
 
