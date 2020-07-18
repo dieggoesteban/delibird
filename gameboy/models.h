@@ -113,6 +113,7 @@ typedef struct{
 } t_id_mensaje_recibido;
 
 typedef struct{
+	uint32_t idModule;
 	uint32_t idMessageReceived;
 	uint32_t mq;
 } t_acknowledgement;

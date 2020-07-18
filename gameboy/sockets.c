@@ -46,7 +46,7 @@ void modoSuscriptor(char* arg) {
 
     uint32_t conexion = crear_conexion(ipBroker, puertoBroker);
 	uint32_t mq = getColaDeMensajes(arg);
-	t_register_module* registerModule = crearSuscribe(mq, 33); //TODO: Tomar del config
+	t_register_module* registerModule = crearSuscribe(mq, ID_MODULE); //TODO: Tomar del config
 	t_paquete *paquete = serializar_registerModule(registerModule);
 
 	free(registerModule);
@@ -64,8 +64,8 @@ void modoSuscriptor(char* arg) {
 void temporizador (void* tiempo) {
 	uint32_t temp = (uint32_t) tiempo;
 	sleep(temp);
-	exit(0);
-	//pthread_exit(&hiloSuscriptor);
+	//exit(0);
+	pthread_exit(&hiloSuscriptor);
 }
 
 void serve_client(uint32_t* socket)
@@ -96,7 +96,7 @@ void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_c
 	
 			log_info(logger, "Recibido new_pokemon de nombre %s", newPoke->nombre);
 
-			 t_acknowledgement* ack = crearAcknowledgement(newPoke->ID_mensaje_recibido, NEW_POKEMON);
+			t_acknowledgement* ack = crearAcknowledgement(ID_MODULE, newPoke->ID_mensaje_recibido, NEW_POKEMON);
 			
 			pthread_t sendAck;
 			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);

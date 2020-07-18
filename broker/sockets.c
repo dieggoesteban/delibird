@@ -14,6 +14,22 @@ void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente) {
 	free(stream);
 }
 
+uint32_t enviarMensaje_returnResult(t_paquete* paquete, uint32_t socket_cliente) {
+	int sizePaquete = paquete->buffer->size + 2 * sizeof(int);
+	void* stream = serializar_paquete(paquete, sizePaquete);
+	uint32_t sendResult = send(socket_cliente,stream,sizePaquete,MSG_CONFIRM);
+	if(sendResult == -1)
+	{
+		log_error(broker_custom_logger, "Send error");
+		liberarPaquete(paquete);
+		free(stream);
+		return 1;
+	}
+	liberarPaquete(paquete);
+	free(stream);
+	return 0;
+}
+
 void liberar_conexion(uint32_t socket_cliente) {
 	close(socket_cliente);
 }
@@ -72,13 +88,12 @@ void esperar_cliente(uint32_t socket_servidor)
 void serve_client(uint32_t *socket_cliente)
 {
 	uint32_t operation_cod;
-	uint32_t recvResult = recv(*socket_cliente, &operation_cod, sizeof(int), MSG_WAITALL);
+	uint32_t recvResult = recv(*socket_cliente, &operation_cod, sizeof(uint32_t), MSG_WAITALL);
 	if (recvResult == -1)
 	{
 		printf("Recv error\n");
 		liberar_conexion(*socket_cliente);
 		exit(1);
-		return;
 	}
 	else if (recvResult == 0)
 	{

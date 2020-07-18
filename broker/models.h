@@ -42,6 +42,7 @@ typedef struct{
 	uint32_t id;
 	uint32_t idCorrelativo;
 	uint32_t mq_cod; //Cada mensaje sabe que tipo es
+	uint32_t countSuscriptoresObjetivo;
 	
 	t_list* suscriptoresEnviados;
 	t_list* suscriptoresConfirmados; 
@@ -111,6 +112,7 @@ typedef struct{
 } t_id_mensaje_recibido;
 
 typedef struct{
+	uint32_t idModule;
 	uint32_t idMessageReceived;
 	uint32_t mq;
 } t_acknowledgement;

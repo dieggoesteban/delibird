@@ -57,7 +57,7 @@ t_catch_pokemon* crearCatchPokemon(uint32_t ID_mensaje_recibido, char* nombre, t
 t_caught_pokemon* crearCaughtPokemon(uint32_t IDMensajeRecibido, uint32_t IDMensajeOriginal, uint32_t catchStatus);
 t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre);
 t_register_module* crearSuscribe(uint32_t ID_message_queue, uint32_t ID_module);
-t_acknowledgement* crearAcknowledgement(uint32_t ID_mensaje_recibido, uint32_t mq_cod);
+t_acknowledgement* crearAcknowledgement(uint32_t idModule, uint32_t ID_mensaje_recibido, uint32_t mq_cod);
 t_id_mensaje_recibido* crearIdMensajeRecibido(uint32_t id);
 t_suscripcion* crearSuscripcion(uint32_t idAssigned, uint32_t socket_cliente);
 #endif /* SERIALIZADOR_H_ */

@@ -31,7 +31,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 void receiveAcknowledgement(t_acknowledgement* ack, uint32_t socket_cliente);
 void subscribeNewModule(uint32_t idNewModule, uint32_t socket_cliente, uint32_t mq_cod);
 void addMessageToQueue(t_message* message, t_message_queue* messageQueue);
-void sendMessageFromQueue(t_message* message, uint32_t socket_cliente);
+void sendMessageFromQueue(t_message* message, t_suscripcion* suscriptor);
 void dispatchMessagesFromQueue(t_message_queue* messageQueue);
 void deleteFromQueue(t_message* message);
 void cacheMessage(t_message* message);
