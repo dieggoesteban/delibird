@@ -1,10 +1,19 @@
 #include "broker.h"
+#include <signal.h>
 
 pthread_t serverThread;
 pthread_t cacheThread;
 
+void finish()
+{
+    sem_post(&waitForFinish);
+}
+
 int main() 
 {
+    signal(SIGINT, finish);
+    
+    sem_init(&waitForFinish, 0, 0);
     //Inicializar parámetros
     config = config_create("./assets/broker.config");
 	logger = log_create("./assets/broker.log", "broker", true, LOG_LEVEL_INFO);
@@ -16,12 +25,15 @@ int main()
 
     //Instanciación de las colas de mensajes
     newPokemonMessageQueue = crearMessageQueue(NEW_POKEMON);
-    appearedPokemonMessageQueue = crearMessageQueue(APPEARED_POKEMON);
-    catchPokemonMessageQueue = crearMessageQueue(CATCH_POKEMON);
-    getPokemonMessageQueue = crearMessageQueue(GET_POKEMON);
-    localizedPokemonMessageQueue = crearMessageQueue(LOCALIZED_POKEMON);
-    caughtPokemonMessageQueue = crearMessageQueue(CAUGHT_POKEMON);
+    // appearedPokemonMessageQueue = crearMessageQueue(APPEARED_POKEMON);
+    // catchPokemonMessageQueue = crearMessageQueue(CATCH_POKEMON);
+    // getPokemonMessageQueue = crearMessageQueue(GET_POKEMON);
+    // localizedPokemonMessageQueue = crearMessageQueue(LOCALIZED_POKEMON);
+    // caughtPokemonMessageQueue = crearMessageQueue(CAUGHT_POKEMON);
     
+    pthread_create(&t_finishProgram, NULL, (void*)terminarPrograma, NULL);
+    pthread_detach(t_finishProgram);
+
     //Iniciar servidor
     pthread_create(&serverThread, NULL, (void *)iniciar_servidor, NULL);
 
@@ -30,24 +42,24 @@ int main()
     
     //Activar envio de mensajes en las colas
     pthread_create(&newPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromQueue, newPokemonMessageQueue);
-    pthread_create(&appearedPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromQueue, appearedPokemonMessageQueue);
-    pthread_create(&catchPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromQueue, catchPokemonMessageQueue);
-    pthread_create(&caughtPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromQueue, caughtPokemonMessageQueue);
-    pthread_create(&getPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromQueue, getPokemonMessageQueue);
-    pthread_create(&localizedPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromQueue, localizedPokemonMessageQueue);
+    // pthread_create(&appearedPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromQueue, appearedPokemonMessageQueue);
+    // pthread_create(&catchPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromQueue, catchPokemonMessageQueue);
+    // pthread_create(&caughtPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromQueue, caughtPokemonMessageQueue);
+    // pthread_create(&getPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromQueue, getPokemonMessageQueue);
+    // pthread_create(&localizedPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromQueue, localizedPokemonMessageQueue);
     
-    log_info(broker_custom_logger, "Broker inicializado correctamente...");
 
+    log_info(broker_custom_logger, "Broker inicializado correctamente...");
     //Cierre de threads
     pthread_join(serverThread, NULL);
     pthread_join(cacheThread, NULL);
 
     pthread_join(newPokemonMessageQueue->dispatchMessagesThread, NULL);
-    pthread_join(appearedPokemonMessageQueue->dispatchMessagesThread, NULL);
-    pthread_join(catchPokemonMessageQueue->dispatchMessagesThread, NULL);
-    pthread_join(caughtPokemonMessageQueue->dispatchMessagesThread, NULL);
-    pthread_join(getPokemonMessageQueue->dispatchMessagesThread, NULL);
-    pthread_join(localizedPokemonMessageQueue->dispatchMessagesThread, NULL);
+    // pthread_join(appearedPokemonMessageQueue->dispatchMessagesThread, NULL);
+    // pthread_join(catchPokemonMessageQueue->dispatchMessagesThread, NULL);
+    // pthread_join(caughtPokemonMessageQueue->dispatchMessagesThread, NULL);
+    // pthread_join(getPokemonMessageQueue->dispatchMessagesThread, NULL);
+    // pthread_join(localizedPokemonMessageQueue->dispatchMessagesThread, NULL);
 
     terminarPrograma();
     return 0;
@@ -55,15 +67,21 @@ int main()
 
 void terminarPrograma()
 {
-    log_info(broker_custom_logger, "Terminando programa...");
-    free(logger);
-    free(broker_custom_logger);
-    free(config);
+    sem_wait(&waitForFinish);
+    
+    log_info(broker_custom_logger, "Finalizando broker...");
+
     free(newPokemonMessageQueue);
-    free(appearedPokemonMessageQueue);
-    free(catchPokemonMessageQueue);
-    free(caughtPokemonMessageQueue);
-    free(getPokemonMessageQueue);
-    free(localizedPokemonMessageQueue);
-    log_info(broker_custom_logger, "Programa terminado correctamente");
+    // free(appearedPokemonMessageQueue);
+    // free(catchPokemonMessageQueue);
+    // free(caughtPokemonMessageQueue);
+    // free(getPokemonMessageQueue);
+    // free(localizedPokemonMessageQueue);
+
+    log_info(broker_custom_logger, "Broker finalizado correctamente");
+
+    free(broker_custom_logger);
+    free(logger);
+    free(config);
+    exit(0);
 }

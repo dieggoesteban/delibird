@@ -55,6 +55,9 @@ t_paquete* serializar_suscripcion(t_suscripcion* suscripcion) {
     suscripcionBuffer->stream = stream;
     t_paquete* paquete = crear_paquete(SUBSCRIBE, suscripcionBuffer->size, suscripcionBuffer->stream);
 
+    free(suscripcionBuffer->stream);
+    free(suscripcion);
+    free(stream);
     return paquete;
 }
 t_suscripcion* deserializar_suscripcion(t_buffer* buffer) {
@@ -86,7 +89,10 @@ t_paquete* serializar_acknowledgement(t_acknowledgement* akc)
 
 	akcBuffer->stream = stream;
 	t_paquete* paquete = crear_paquete(ACKNOWLEDGEMENT, akcBuffer->size, akcBuffer->stream);
-
+    
+    free(stream);
+    free(akcBuffer->stream);
+    free(akcBuffer);
 	return paquete;
 }
 

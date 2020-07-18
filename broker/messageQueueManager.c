@@ -269,7 +269,7 @@ void receiveAcknowledgement(t_acknowledgement* ack, uint32_t socket_cliente)
 		pthread_mutex_unlock(&targetMessage->s_suscriptoresConfirmados);
 	}
 	else
-	log_warning(broker_custom_logger, "Mensaje con id %i no encontrado en la cola %s", ack->idMessageReceived, messageQueue->name);
+		log_warning(broker_custom_logger, "Mensaje con id %i no encontrado en la cola %s", ack->idMessageReceived, messageQueue->name);
 }
 
 void subscribeNewModule(uint32_t idNewModule, uint32_t socket_cliente, uint32_t mq_cod)
@@ -381,7 +381,7 @@ void sendMessageFromQueue(t_message* message, t_suscripcion* suscriptor)
 void dispatchMessagesFromQueue(t_message_queue* messageQueue)
 {
 	t_message* message;
-	t_suscripcion* currentSubscriber = (t_suscripcion*)malloc(sizeof(t_suscripcion));
+	t_suscripcion* currentSubscriber;
 	uint32_t subscribersCount;
 	while(true)
 	{
@@ -406,7 +406,6 @@ void dispatchMessagesFromQueue(t_message_queue* messageQueue)
 		if(pthread_detach(message->deleteFromQueue) != 0)
 			log_error(broker_custom_logger, "Error in pthread_join deleteFromQueue");
 	}
-	free(message);
 }
 
 void deleteFromQueue(t_message* message) 
@@ -431,8 +430,8 @@ void deleteFromQueue(t_message* message)
 			list_remove(messageQueue->mensajes, targetIndex);			
 			log_warning(broker_custom_logger, "Mensaje eliminado de la cola");
 		}
+		free(current);
 	pthread_mutex_unlock(&messageQueue->s_mensajes);
-	free(current);
 }
 
 void notifySender(t_message* message, uint32_t socket_cliente)

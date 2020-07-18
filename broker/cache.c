@@ -33,9 +33,6 @@ void startCache()
     partitions = list_create();
     holes = list_create();
 
-    s_counterToCompactacion = malloc(sizeof(pthread_mutex_t));
-    s_holes = malloc(sizeof(pthread_mutex_t));
-    s_partitions = malloc(sizeof(pthread_mutex_t));
     if(pthread_mutex_init(s_counterToCompactacion, NULL) != 0)
 		log_error(broker_custom_logger, "Error mutex init (s_counterToCompactacion) in cache initialization");
     if(pthread_mutex_init(s_holes, NULL) != 0)
@@ -76,8 +73,8 @@ void startCache()
         // free(initialPart2);
     
     #pragma endregion
-    /*
     #pragma region Prueba de compactacion
+    /*
     
         t_partition* partition1 = createPartition(cache, 1024);
         t_holes* initialPart1 = createHole(partition1->pLimit + 1, 512);
@@ -96,9 +93,10 @@ void startCache()
         compactar();
 
         showPartitions();
-        showHoles();
+        showHoles();*/
     #pragma endregion
-    */
+    
+    //free(cache);
 }
 
 void memoria_buddySystem(t_message* message) {
@@ -110,9 +108,38 @@ void memoria_buddySystem(t_message* message) {
 void memoria_particiones(t_message* message) {
     log_info(broker_custom_logger, "Dynamic Partitions Algorithm\n");
 
+    cache_message administrative;
+    switch (message->mq_cod)
+    {
+        case NEW_POKEMON:
+        {
+            t_new_pokemon* newPoke = (t_new_pokemon*)message->mensaje;
+            cache_new_pokemon cache_newPoke;
+            cache_newPoke.nameLength = newPoke->sizeNombre;
+            cache_newPoke.pokeName = newPoke->nombre;
+            cache_newPoke.cantidad = newPoke->posicionCantidad->cantidad;
+            cache_newPoke.posX = newPoke->posicionCantidad->posicion_x;
+            cache_newPoke.posY = newPoke->posicionCantidad->posicion_y;
+            
+            administrative.idMessage = newPoke->ID_mensaje_recibido;
+            administrative.mq_cod = NEW_POKEMON;
+            administrative.length = sizeof(cache_newPoke);
+            break;
+        }
+        case APPEARED_POKEMON:
+            break;
+        case CATCH_POKEMON:
+            break;
+        case CAUGHT_POKEMON:
+            break;
+        case GET_POKEMON:
+            break;
+        case LOCALIZED_POKEMON: 
+            break;
+    }
+
     //Etapa 1: Buscar partición libre
-    t_partition* targetPartition = (t_partition*)malloc(sizeof(t_partition));
-    targetPartition = algoritmo_particion_libre(4);
+    t_partition* targetPartition = algoritmo_particion_libre(administrative.length);
 
     while(targetPartition == NULL)
     {
@@ -130,7 +157,7 @@ void memoria_particiones(t_message* message) {
             pthread_mutex_unlock(s_holes);
 
             counterToCompactacion = 0;
-            targetPartition = algoritmo_particion_libre(4);
+            targetPartition = algoritmo_particion_libre(administrative.length);
             continue;
         }
         pthread_mutex_unlock(s_counterToCompactacion);
@@ -140,11 +167,13 @@ void memoria_particiones(t_message* message) {
         pthread_mutex_lock(s_holes);
             consolidar();
         pthread_mutex_unlock(s_holes);
-        targetPartition = algoritmo_particion_libre(4);
+        targetPartition = algoritmo_particion_libre(administrative.length);
     }
     
+    administrative.startAddress = targetPartition->pStart;
     //Cuando el targetPartition ya esté ubicado se meten los datos donde corresponda
     
+    //DO the memcpy
 }
 
 void reemplazo_fifo(){}

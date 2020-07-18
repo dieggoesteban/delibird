@@ -171,8 +171,14 @@ typedef struct{
 #pragma region Mensajes_Estructura_Cache
 
 typedef struct {
-	t_message* message;
-	void* cacheStructure;
+	uint32_t idMessage;
+	uint32_t idCorrelational;
+	uint32_t mq_cod;
+	void* startAddress;
+	uint32_t length;
+
+	t_list* suscriptoresConfirmados;
+	t_list* suscriptoresEnviados;
 } cache_message;
 
 typedef struct {
