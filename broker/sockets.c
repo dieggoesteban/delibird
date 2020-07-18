@@ -5,10 +5,35 @@
 void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente) {
 	int sizePaquete = paquete->buffer->size + 2 * sizeof(int);
 	void* stream = serializar_paquete(paquete, sizePaquete);
-	send(socket_cliente,stream,sizePaquete,MSG_CONFIRM);
+	if(send(socket_cliente,stream,sizePaquete,MSG_CONFIRM) == -1)
+	{
+		log_error(broker_custom_logger, "Send error");
+		liberar_conexion(socket_cliente);
+	}
 	liberarPaquete(paquete);
 	free(stream);
 }
+
+uint32_t enviarMensaje_returnResult(t_paquete* paquete, uint32_t socket_cliente) {
+	int sizePaquete = paquete->buffer->size + 2 * sizeof(int);
+	void* stream = serializar_paquete(paquete, sizePaquete);
+	uint32_t sendResult = send(socket_cliente,stream,sizePaquete,MSG_CONFIRM);
+	if(sendResult == -1)
+	{
+		log_error(broker_custom_logger, "Send error");
+		liberarPaquete(paquete);
+		free(stream);
+		return 1;
+	}
+	liberarPaquete(paquete);
+	free(stream);
+	return 0;
+}
+
+void liberar_conexion(uint32_t socket_cliente) {
+	close(socket_cliente);
+}
+
 void liberarPaquete(t_paquete* paquete){
 	free(paquete->buffer->stream);
 	free(paquete->buffer);	
@@ -57,16 +82,27 @@ void esperar_cliente(uint32_t socket_servidor)
 	uint32_t tam_direccion = sizeof(struct sockaddr_in);
 	uint32_t socket_cliente = accept(socket_servidor, (void *)&dir_cliente, &tam_direccion);
 	pthread_create(&serverThread, NULL, (void *)serve_client, &socket_cliente);
-	pthread_detach(serverThread);
+	pthread_join(serverThread, NULL);
 }
 
 void serve_client(uint32_t *socket_cliente)
 {
 	uint32_t operation_cod;
-	if (recv(*socket_cliente, &operation_cod, sizeof(int), MSG_WAITALL) == -1)
-		operation_cod = -1;
-	printf("\nCodigo de operacion: %i\n", operation_cod);
-	process_request(operation_cod, *socket_cliente);
+	uint32_t recvResult = recv(*socket_cliente, &operation_cod, sizeof(uint32_t), MSG_WAITALL);
+	if (recvResult == -1)
+	{
+		printf("Recv error\n");
+		liberar_conexion(*socket_cliente);
+		exit(1);
+	}
+	else if (recvResult == 0)
+	{
+		printf("El cliente %i cerro la conexion\n", *socket_cliente);
+		liberar_conexion(*socket_cliente);
+		return;
+	}
+	else
+		process_request(operation_cod, *socket_cliente);
 }
 
 void process_request(uint32_t operation_cod, uint32_t socket_cliente)
@@ -78,7 +114,7 @@ void process_request(uint32_t operation_cod, uint32_t socket_cliente)
 t_buffer *recibir_buffer(uint32_t socket_cliente)
 {
 	t_buffer *buffer = malloc(sizeof(t_buffer));
-	int size = 0;
+	int size;
 
 	recv(socket_cliente, &size, sizeof(int), MSG_WAITALL);
 	buffer->size = size;

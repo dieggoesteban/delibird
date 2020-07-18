@@ -12,6 +12,28 @@ void cortarArgumentos(int lengthArray, char *argumentos[], char *arrayTemp[])
 	}
 }
 
+uint32_t getColaDeMensajes(char* queue) {
+	if(strcmp(queue, "NEW_POKEMON") == 0) {
+		return NEW_POKEMON;
+	}
+	if(strcmp(queue, "APPEARED_POKEMON") == 0) {
+		return APPEARED_POKEMON;
+	}
+	if(strcmp(queue, "CATCH_POKEMON") == 0) {
+		return CATCH_POKEMON;
+	}
+	if(strcmp(queue, "CAUGHT_POKEMON") == 0) {
+		return CAUGHT_POKEMON;
+	}
+	if(strcmp(queue, "GET_POKEMON") == 0) {
+		return GET_POKEMON;
+	}
+	if(strcmp(queue, "LOCALIZED_POKEMON") == 0) {
+		return LOCALIZED_POKEMON;
+	}
+	return -1;
+}
+
 uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_mensaje) {
 	uint32_t isValid = 0;
 	char *brokerCommands[] = {"NEW_POKEMON", "APPEARED_POKEMON", "CATCH_POKEMON", "CAUGHT_POKEMON", "GET_POKEMON"};
@@ -23,7 +45,6 @@ uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_men
 	{
 		ipAux = config_get_string_value(config, "IP_BROKER");
 		puertoAux = config_get_string_value(config, "PUERTO_BROKER");
-		log_info(logger,"Se va a conectar en BROKER\n");
 		if (perteneceAlArray(tipo_mensaje, brokerCommands, 5) == 1)
 		{
 			isValid = 1;
@@ -33,14 +54,12 @@ uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_men
 	{
 		ipAux = config_get_string_value(config, "IP_BROKER");
 		puertoAux = config_get_string_value(config, "PUERTO_BROKER");
-		log_info(logger,"Se va a conectar en BROKER\n");
 		isValid = 1;
 	}
 	else if (strcmp(proceso, "TEAM") == 0)
 	{
 		ipAux = config_get_string_value(config, "IP_TEAM");
 		puertoAux = config_get_string_value(config, "PUERTO_TEAM");
-		log_info(logger,"Se va a conectar en TEAM");
 		if (perteneceAlArray(tipo_mensaje, teamCommands, 1) == 1)
 		{
 			isValid = 1;
@@ -50,7 +69,6 @@ uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_men
 	{
 		ipAux = config_get_string_value(config, "IP_GAMECARD");
 		puertoAux = config_get_string_value(config, "PUERTO_GAMECARD");
-		log_info(logger,"Se va a conectar en GAMECARD");
 		if (perteneceAlArray(tipo_mensaje, gamecardCommands, 3) == 1)
 		{
 			isValid = 1;
@@ -76,3 +94,10 @@ uint32_t perteneceAlArray(char *val, char *arr[], uint32_t size)
 	return 0;
 }
 
+uint32_t arraySize(void* arr[]) {
+	uint32_t size = 0;
+	while(arr[size] != NULL) {
+		size++;
+	}
+	return size;
+}

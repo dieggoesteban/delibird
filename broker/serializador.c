@@ -15,15 +15,16 @@ void* serializar_paquete(t_paquete* paquete, int bytes) {
 	return magic;
 }
 
-
 t_paquete* serializar_registerModule(t_register_module* registerModule) {
 	t_buffer* registerModuleBuffer = malloc(sizeof(t_buffer));
-	registerModuleBuffer->size = sizeof(uint32_t);
+	registerModuleBuffer->size = sizeof(uint32_t) * 2;
 	void* stream = malloc(registerModuleBuffer->size);
 	int offset = 0;
 
 	memcpy(stream + offset, &(registerModule->messageQueue), sizeof(uint32_t));
 	offset += sizeof(uint32_t);
+    memcpy(stream + offset, &(registerModule->moduleId), sizeof(uint32_t));
+    offset += sizeof(uint32_t);
 
 	registerModuleBuffer->stream = stream;
 	t_paquete* paquete = crear_paquete(SUBSCRIBE, registerModuleBuffer->size, registerModuleBuffer->stream);
@@ -35,8 +36,74 @@ t_register_module* deserializar_registerModule(t_buffer* buffer) {
 	void* stream = buffer->stream;
 	memcpy(&(registerModule->messageQueue), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
-
+    memcpy(&(registerModule->moduleId), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
 	return registerModule;
+}
+
+t_paquete* serializar_suscripcion(t_suscripcion* suscripcion) {
+    t_buffer* suscripcionBuffer = malloc(sizeof(t_buffer));
+	suscripcionBuffer->size = sizeof(uint32_t) * 2;
+    void* stream = malloc(suscripcionBuffer->size);
+	int offset = 0;
+
+    memcpy(stream + offset, &(suscripcion->idModule), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+    memcpy(stream + offset, &(suscripcion->socket), sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+
+    suscripcionBuffer->stream = stream;
+    t_paquete* paquete = crear_paquete(SUBSCRIBE, suscripcionBuffer->size, suscripcionBuffer->stream);
+
+    return paquete;
+}
+t_suscripcion* deserializar_suscripcion(t_buffer* buffer) {
+    t_suscripcion* suscripcion = malloc(sizeof(t_suscripcion));
+
+    void* stream = buffer->stream;
+
+    memcpy(&(suscripcion->idModule), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
+    memcpy(&(suscripcion->socket), stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+
+    return suscripcion;
+}
+
+t_paquete* serializar_acknowledgement(t_acknowledgement* akc)
+{
+	t_buffer* akcBuffer = malloc(sizeof(t_buffer));
+	akcBuffer->size = sizeof(uint32_t) * 3;
+	void* stream = malloc(akcBuffer->size);
+	int offset = 0;
+
+    memcpy(stream + offset, &(akc->idModule), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+	memcpy(stream + offset, &(akc->idMessageReceived), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+	memcpy(stream + offset, &(akc->mq), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+
+	akcBuffer->stream = stream;
+	t_paquete* paquete = crear_paquete(ACKNOWLEDGEMENT, akcBuffer->size, akcBuffer->stream);
+
+	return paquete;
+}
+
+t_acknowledgement* deserializar_acknowledgement(t_buffer* buffer)
+{
+	t_acknowledgement* akc = malloc(sizeof(t_acknowledgement));
+
+	void* stream = buffer->stream;
+
+    memcpy(&(akc->idModule), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
+	memcpy(&(akc->idMessageReceived), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
+	memcpy(&(akc->mq), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
+
+	return akc;
 }
 
 t_paquete* serializar_newPokemon(t_new_pokemon* newPokemon) {
@@ -143,7 +210,6 @@ t_paquete* serializar_appearedPokemon(t_appeared_pokemon* pokemon) {
 
 	t_paquete* paquete = crear_paquete(APPEARED_POKEMON, pokemon_buffer->size, pokemon_buffer->stream);
 
-	printf("Codigo de mensaje en serialziar poke: %i\n", paquete->codigo_mensaje);
     return paquete;
 }
 t_appeared_pokemon* deserializar_appearedPokemon(t_buffer* buffer) {
@@ -189,7 +255,6 @@ t_paquete* serializar_catchPokemon(t_catch_pokemon* pokemon) {
 
     t_paquete* paquete = crear_paquete(CATCH_POKEMON, pokemon_buffer->size, pokemon_buffer->stream);
 
-    printf("Codigo de mensaje en serializar poke: %i\n", paquete->codigo_mensaje);
     return paquete;
 }
 t_catch_pokemon* deserializar_catchPokemon(t_buffer* buffer) {
@@ -229,7 +294,6 @@ t_paquete* serializar_caughtPokemon(t_caught_pokemon* pokemon) {
 
     t_paquete* paquete = crear_paquete(CAUGHT_POKEMON, pokemon_buffer->size, pokemon_buffer->stream);
 
-    printf("Codigo de mensaje en serialziar poke: %i\n", paquete->codigo_mensaje);
     return paquete;
 }
 t_caught_pokemon* deserializar_caughtPokemon(t_buffer* buffer) {
@@ -273,7 +337,6 @@ t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon) {
 
 	t_paquete* paquete = crear_paquete(LOCALIZED_POKEMON, buffer->size, buffer->stream);
 
-	printf("codigo de mensaje de serializar poke: %i \n", paquete->codigo_mensaje);
 	return paquete;		
 }
 t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer) {
@@ -310,6 +373,16 @@ t_paquete* serializar_idMensajeRecibido(t_id_mensaje_recibido* idMensajeRecibido
     t_paquete* paquete = crear_paquete(MENSAJE_RECIBIDO, buffer->size, buffer->stream);
 
     return paquete;
+}
+t_id_mensaje_recibido* deserializar_idMensajeRecibido(t_buffer* buffer) {
+    t_id_mensaje_recibido* idMensajeEnviado = malloc(sizeof(t_id_mensaje_recibido)); //Enviado para el que lo deserializa
+
+    void* stream = buffer->stream;
+
+    memcpy(&(idMensajeEnviado->id_mensajeEnviado), stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+
+    return idMensajeEnviado;
 }
 
 #pragma endregion
@@ -410,4 +483,14 @@ t_id_mensaje_recibido* crearIdMensajeRecibido(uint32_t id) {
 
     return mensaje;
 }
+
+t_suscripcion* crearSuscripcion(uint32_t idAssigned, uint32_t socket_cliente) {
+    t_suscripcion* suscripcion = malloc(sizeof(t_suscripcion));
+
+    suscripcion->idModule = idAssigned;
+    suscripcion->socket = socket_cliente;
+
+    return suscripcion;
+}
+
 #pragma endregion

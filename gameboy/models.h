@@ -2,7 +2,8 @@
 #define MODELS_H_
 #define ERROR -1
 
-#include "global-includes.h"
+#include <pthread.h>
+#include <semaphore.h>
 
 #pragma region MessageQueue
 typedef enum
@@ -20,7 +21,7 @@ typedef enum
 {
     SUBSCRIBE = 7,
 	MENSAJE_RECIBIDO = 8,
-	ACKNOWLEDGEMENT = 9
+	ACKNOWLEDGEMENT = 9,
 } operation_cod;
 
 typedef struct {
@@ -32,6 +33,7 @@ typedef struct {
 	//Semaphores
 	pthread_mutex_t s_mensajes;
 	pthread_mutex_t s_subscribers;
+	sem_t s_haySuscriptores;
 	sem_t s_hayMensajes;
 
 	//Threads
@@ -42,21 +44,18 @@ typedef struct{
 	uint32_t id;
 	uint32_t idCorrelativo;
 	uint32_t mq_cod; //Cada mensaje sabe que tipo es
-	uint32_t countSuscriptoresObjetivo;
-	
-	t_list* suscriptoresEnviados;
+	uint32_t cantidadSuscriptoresEnviados;
 	t_list* suscriptoresConfirmados; 
 	void* mensaje; //Contenido del mensaje
-	
+
 	//Semaphores
-	pthread_mutex_t s_suscriptoresEnviados;
+	pthread_mutex_t s_cantidadSuscriptoresEnviados;
 	pthread_mutex_t s_suscriptoresConfirmados;
-	sem_t s_puedeEliminarse;
 
 	//Threads
 	pthread_t caching;
+	pthread_t ackReceive;
 	pthread_t deleteFromQueue;
-	
 } t_message;
 #pragma endregion
 
@@ -101,12 +100,14 @@ typedef struct{
 #pragma endregion
 
 #pragma region Mensajes_Deserializados
-
-typedef struct {
+typedef struct 
+{
 	uint32_t messageQueue;
 	uint32_t moduleId;
 } t_register_module;
 
+//Esta estructura representa al mensaje que envía el broker con el ID del mensaje recibido
+//Se lo envía al emisor del mensaje, como un "número de pedido", por si recibe respuesta.
 typedef struct{
 	uint32_t id_mensajeEnviado;
 } t_id_mensaje_recibido;
@@ -121,8 +122,6 @@ typedef struct{
 	uint32_t idModule;
 	uint32_t socket;
 } t_suscripcion;
-
-//Colas de mensajes
 
 typedef struct
 {
@@ -143,6 +142,7 @@ typedef struct{
 
 typedef struct{
 	uint32_t ID_mensaje_recibido;
+	uint32_t ID_mensaje_original;
 	uint32_t sizeNombre;
 	char* nombre;
 	t_posicion* posicion;
@@ -166,6 +166,7 @@ typedef struct{
 	uint32_t sizeNombre;
 	char* nombre;
 } t_get_pokemon;
+
 #pragma endregion
 
 #pragma region Mensajes_Estructura_Cache
