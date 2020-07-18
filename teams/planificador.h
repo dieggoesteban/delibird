@@ -9,40 +9,49 @@
 #include<netdb.h>
 #include<string.h>
 #include <commons/collections/list.h>
+#include <commons/collections/queue.h>
 
-#include "serializador.h"
+#include "models.h"
+#include "utils.h"
+#include "algoritmos.h"
+#include "sockets.h"
 
-uint32_t pid;
+typedef t_entrenador* (AlgoritmoFunc)(t_entrenador*);
 
-typedef struct
-{
-    char* nombre;
-    t_posicion* posicion;
-} t_pokemon;
+//GLOBALES
+t_list* colaNEW;
+t_list* colaREADY;
+t_list* colaEXEC;
+t_list* colaBLOCKED;
+t_list* colaEXIT;
 
-typedef struct{
-    char* nombre;
-    uint32_t cantidad;
-}t_pokemon_cantidad;
+sem_t mutexNEW;
+sem_t mutexREADY;
+sem_t mutexEXEC;
+sem_t mutexBLOCKED;
+sem_t mutexEXIT;
 
-typedef struct
-{
-	uint32_t id;
-	t_posicion* posicion;
-    t_list* pokemonCapturados;
-    t_list* pokemonObjetivo;
-    uint32_t cantidadObjetivo;
-    t_pokemon* pokemonPlanificado;
-    uint32_t deadlock; // 0 y 1 por ahora, es solo un mockup
-} t_entrenador;
+sem_t counterPokesEnMapa;
 
-void inicializarPid();
-uint32_t getNuevoPid();
+t_list* pokemonesEnMapa; // lucario pikachu pikachu pikachu squirtle
+t_list* objetivoGlobal; //3 lucario 1 pikachu 2 squirtle
 
-//METODOS DE CONEXION
-// int crear_conexion(char* ip, char* puerto);
-// void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente);
-// char* recibir_mensaje(int socket_cliente);
-// void liberar_conexion(int socket_cliente);
+uint32_t cicloCPU;
+bool desalojo;
+
+//INICIALIZACION HILOS
+
+t_entrenador *getEntrenadorMejorPosicionado(t_pokemon_posicion *pokemon, t_list* entrenadores);
+bool moverEntrenadorDeCola(t_list* colaReceptora, t_list* colaEmisora, t_entrenador* entrenador);
+bool asignarPokemonAEntrenador();
+t_entrenador* asignarAEntrenador(t_pokemon_posicion* pokemon);
+bool pokemonEnObjetivoGlobal(t_pokemon_posicion* pokemon);
+void planificarFIFO();
+void ejecutarEntrenador(t_entrenador* entrenador);
+void mandarCATCH(t_entrenador* entrenador);
+
+
+void* planificadorREADY();
+void* planificadorEXEC(void*);
 
 #endif /* PLANIFICADOR_H_ */

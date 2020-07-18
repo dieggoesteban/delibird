@@ -1,53 +1,65 @@
 #include "gameboy.h"
+#include <time.h>
 
-t_log* logger;
-t_config* config;
+t_log *logger;
+t_log *gameboy_custom_logger;
+t_config *config;
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char *argv[])
+{   
+    srand(time(NULL));
+    ID_MODULE = rand() % 40;
     config = config_create("./assets/gameboy.config");
+    logger = log_create("./assets/gameboy.log", "gameboy", true, LOG_LEVEL_INFO);
+    gameboy_custom_logger = log_create("./assets/gameboy_custom.log", "gameboy", true, LOG_LEVEL_INFO);
 
-	logger = log_create("./assets/gameboy.log","gameboy",true,LOG_LEVEL_INFO);
+    ipBroker = config_get_string_value(config, "IP_BROKER");
+    puertoBroker = config_get_string_value(config, "PUERTO_BROKER");
 
-    if(argc > 2) {
+    if (argc > 2)
+    {
         char *proceso = argv[1];
-	    char *tipo_mensaje = argv[2];
+        char *tipo_mensaje = argv[2];
         char *ip;
-	    char *puerto;
+        char *puerto;
         char *arrayArgumentos[argc - 3];
-        printf("%s",tipo_mensaje);
-	    cortarArgumentos(argc, argv, arrayArgumentos);        
+        cortarArgumentos(argc, argv, arrayArgumentos);
+        uint32_t isValid = procesarComando(&ip, &puerto, proceso, tipo_mensaje);
 
-        uint32_t isValid = procesarComando(&ip,&puerto,proceso,tipo_mensaje);
-        uint32_t conexion = crear_conexion(ip,puerto);
-        printf("%i\n",conexion);
-        if(isValid == 1) {
-            log_info(logger,ip);
-	        log_info(logger,puerto);
-            t_paquete* paquete = getPaquete(arrayArgumentos,tipo_mensaje);
-            printf("el size del buffer es: %i", paquete->buffer->size);
-            enviarMensaje(paquete,conexion);
+        if (isValid == 1)
+        {
+            uint32_t conexion = crear_conexion(ip, puerto);
+            t_paquete *paquete;
+            if (strcmp(proceso, "SUSCRIPTOR") == 0)
+            {
+                uint32_t mq = getColaDeMensajes(tipo_mensaje);
+                temp = atoi(argv[3]);
+                t_suscribe_gameboy* suscribe = crearSuscribeGameboy(conexion,mq);
 
-        } else {
-            printf("El comando no es valido para el proceso %s",proceso);
+                pthread_create(&hiloSuscriptor, NULL, (void*)modoSuscriptor, (void*)suscribe);
+                pthread_create(&hiloTemporizador, NULL, (void*)temporizador, (void*)temp);
+                pthread_detach(hiloSuscriptor);
+                pthread_join(hiloTemporizador, NULL);
+                log_info(logger, "Conexion con broker finalizada");
+            }
+            else
+            {
+                paquete = getPaquete(arrayArgumentos, tipo_mensaje);
+                enviarMensaje(paquete, conexion);
+                
+                //serve_client(&conexion);
+            }
+            printf("Liberamos conexion\n");
+            liberar_conexion(conexion);
         }
-
-    } else {
-        printf("La cantidad de argumentos es invalida\n");
+        else
+        {
+            log_error(gameboy_custom_logger, "Comando no valido para el proceso %s", proceso);
+        }
+    }
+    else
+    {
+        log_error(gameboy_custom_logger, "La cantidad de argumentos es invalida");
     }
     return 0;
 }
-
-
-/*
-
-    TEAM 1 --> CATCH PIKACHU
-    TEAM 2 --> CATCH PIKACHU
-
-    BROKER --> RECIBO, PONGO ID Y ENVIAR EL ID QUE SE LE PUSO <-> ES DE TEAM
-
-    BROKER --> GESTION DE IDs
-
-    TEAM 1 Y 2 --> SE BLOQUEA EL HILO A LA ESPERA DE LA RESPUESTA CON EL ID ASIGNADO
-
-*/

@@ -70,3 +70,10 @@ uint32_t perteneceAlArray(char *val, char *arr[], uint32_t size)
 	return 0;
 }
 
+uint32_t arraySize(void* arr[]) {
+	uint32_t size = 0;
+	while(arr[size] != NULL) {
+		size++;
+	}
+	return size;
+}

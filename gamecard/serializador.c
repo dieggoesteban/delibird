@@ -95,7 +95,7 @@ t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon){
 
 	buffer->size = sizeof(uint32_t)*3 //ID_mensaje_recibido + ID_mensaje_original + sizePokemon
 					+ strlen(localizedPokemon->nombre)+1 //nombre pokemon
-					+ sizeListaPos; // se le multiplica la cantidad de items de la lista por su size en bytes
+					+ sizeof(t_posicion)* list_size(localizedPokemon->posicion); // se le multiplica la cantidad de items de la lista por su size en bytes
 
 	void* stream = malloc(buffer->size);
 	int offset = 0;
@@ -108,9 +108,9 @@ t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon){
 	offset += sizeof(uint32_t);
 	memcpy(stream + offset, localizedPokemon->nombre, strlen(localizedPokemon->nombre)+1);
 	offset += strlen(localizedPokemon->nombre)+1;
-	memcpy(stream + offset, &localizedPokemon->cantidadPosiciones, sizeof(uint32_t));
+	memcpy(stream + offset, &localizedPokemon->sizePosicion, sizeof(uint32_t));
 	offset += sizeof(uint32_t);
-	memcpy(stream + offset, localizedPokemon->posiciones, sizeListaPos);
+	memcpy(stream + offset, localizedPokemon->posicion, localizedPokemon->sizePosicion);
 
 	buffer->stream = stream;
 
@@ -135,10 +135,9 @@ t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer){
 	localizedPokemon->nombre = malloc(localizedPokemon->sizeNombre);
 	memcpy(localizedPokemon->nombre, stream, localizedPokemon->sizeNombre);
 	stream += localizedPokemon->sizeNombre;
-	memcpy(&(localizedPokemon->cantidadPosiciones), stream, sizeof(uint32_t));
+	memcpy(&(localizedPokemon->sizePosicion), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
-	sizeListaPos = sizeof(t_posicion)* localizedPokemon->cantidadPosiciones;
-	memcpy(localizedPokemon->posiciones, stream, sizeListaPos); //HABIA QUE VER SI ESTO NO GENERA PROBLEMAS COMO EL CHAR* QUE NO SE ENVIABA
+	memcpy(localizedPokemon->posicion, stream, localizedPokemon->sizePosicion); //HABIA QUE VER SI ESTO NO GENERA PROBLEMAS COMO EL CHAR* QUE NO SE ENVIABA
 
 	return localizedPokemon;
 }
@@ -345,15 +344,15 @@ t_new_pokemon* crearNewPokemon(uint32_t IDMensajeRecibido, char* nombre, t_posic
 	return newPokemon;
 }
 
-t_localized_pokemon* crearLocalizedPokemon(uint32_t IDMensajeRecibido,uint32_t IDMensajeOriginal, char* nombre, uint32_t cantPosiciones, t_list* posicion){
+t_localized_pokemon* crearLocalizedPokemon(uint32_t IDMensajeRecibido,uint32_t IDMensajeOriginal, char* nombre, uint32_t sizePosicion, t_list* posicion){
 	t_localized_pokemon* localizedPokemon = malloc(sizeof(t_localized_pokemon));
 
 	localizedPokemon->ID_mensaje_recibido = IDMensajeRecibido;
 	localizedPokemon->ID_mensaje_original = IDMensajeOriginal;
 	localizedPokemon->sizeNombre = strlen(nombre)+1;
 	localizedPokemon->nombre = nombre;
-	localizedPokemon->cantidadPosiciones = cantPosiciones;
-	list_add_all(localizedPokemon->posiciones,posicion);
+	localizedPokemon->sizePosicion = sizePosicion;
+	list_add_all(localizedPokemon->posicion,posicion);
 
 	return localizedPokemon;
 }
@@ -477,6 +476,8 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 	{ //ESTE AL FINAL NO LO HACE GAMEBOY, PARECE SER LA UNICA MQ QUE NO -> PERO LO DEJO IGUAL ASI PRUEBO LA SERIALIZACION Y LA DESERIALIZACION (DESPUES SACAR THO)
 		log_info(logger, "entro a localized_pokemon");
 
+		t_localized_pokemon *localizedPokemon = malloc(sizeof(t_localized_pokemon));
+
 		t_posicion *pos1 = crearPosicion(5, 10);
 		t_posicion *pos2 = crearPosicion(8, 11);
 
@@ -484,9 +485,14 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 		list_add(listPos, pos1);
 		list_add(listPos, pos2);
 
-		t_localized_pokemon *localizedPokemon = crearLocalizedPokemon(0,0,"lucario", 2, listPos);
+		localizedPokemon->ID_mensaje_recibido = 23411;
+		localizedPokemon->ID_mensaje_original = 12342;
+		localizedPokemon->nombre = "lucario";
+		localizedPokemon->sizeNombre = strlen(localizedPokemon->nombre) + 1;
+		localizedPokemon->sizePosicion = list_size(listPos) * sizeof(t_posicion);
+		localizedPokemon->posicion = list_duplicate(listPos);
 		
-		paquete = serializar_localizedPokemon(localizedPokemon); 		
+		paquete = serializar_localizedPokemon(localizedPokemon); 
 
 		free(pos1);
 		free(pos2);

@@ -96,5 +96,6 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
-*.log
 
+broker/broker
+broker/core

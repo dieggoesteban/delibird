@@ -1,4 +1,4 @@
-TARGET = broker
+TARGET = main
 LIBS = -lreadline -lpthread -lcommons
 CC = gcc
 CFLAGS = -g -Wall -Wno-unknown-pragmas

@@ -2,24 +2,81 @@
 #include "utils.h"
 
 
-uint32_t perteneceAlArray(char *val, char *arr[], uint32_t size)
+void inicializarPid() {
+    pid = 0;
+}
+
+uint32_t getNuevoPid() {
+    uint32_t nuevoPid = pid++;
+
+    return nuevoPid;
+}
+
+
+bool perteneceAlArray(char *val, char *arr[], uint32_t size)
 {
 	for (uint32_t i = 0; i < size; i++)
 	{
 		if (strcmp(arr[i], val) == 0)
-			return 1;
+			return true;
 	}
-	return 0;
+	return false;
 }
 
-uint32_t perteneceALista(char *val, t_list* lista) {
+bool perteneceALista(char *val, t_list* lista) {
 	for (uint32_t i = 0; i < list_size(lista); i++) {
 		char* word = list_get(lista, i);
 		if (strcmp(word, val) == 0) {
-			return 1;
+			return true;
 		}
 	}
-	return 0;
+	return false;
+}
+
+t_queue* listToQueue(t_list* lista){
+	t_queue* queue = queue_create();
+	for(uint32_t i = 0; i < list_size(lista); i++){
+		queue_push(queue, list_get(lista, i));
+	}
+	return queue;
+}
+
+
+uint32_t pokemonCantidadPerteneceALista(t_pokemon_cantidad* pokemon, t_list* lista){
+	for(uint32_t i = 0; i < list_size(lista); i++){
+		if(strcmp(((t_pokemon_cantidad*)list_get(lista, i))->nombre,pokemon->nombre) == 0){
+			return i;
+		}
+	}
+	return ERROR;
+}
+
+uint32_t pokemonPosicionPerteneceALista(t_pokemon_posicion* pokemon, t_list* lista){
+	for(uint32_t i = 0; i < list_size(lista); i++){
+		if(strcmp(((t_pokemon_posicion*)list_get(lista, i))->nombre,pokemon->nombre) == 0){
+			return i;
+		}
+	}
+	return ERROR;
+}
+
+uint32_t entrenadorPerteneceALista(t_entrenador* entrenador, t_list* lista){
+	for(uint32_t i = 0; i < list_size(lista); i++){
+		if(entrenador->id == (((t_entrenador*)list_get(lista,i))->id))
+			return i;
+	}
+	return ERROR;
+}
+
+t_list* obtenerEntrenadoresSinDeadlock(){
+	t_list* entrenadoresSinDeadlock = list_create();
+	for(uint32_t i = 0; i < list_size(colaBLOCKED); i++){
+		if(((t_entrenador*)list_get(colaBLOCKED, i))->deadlock == false){
+			list_add(entrenadoresSinDeadlock, (t_entrenador*)list_get(colaBLOCKED, i));
+			return entrenadoresSinDeadlock;
+		}
+	}
+	return entrenadoresSinDeadlock;
 }
 
 uint32_t perteneceAListaContador(char *val, t_list* lista) {
@@ -33,124 +90,119 @@ uint32_t perteneceAListaContador(char *val, t_list* lista) {
 	return counter;
 }
 
-u_int32_t getCantidadEntrenadores() {
-	char** posicionesEntrenadores = config_get_array_value(config,"POSICIONES_ENTRENADORES");
+uint32_t arraySize(void* arr[]) {
 	uint32_t size = 0;
-	while(posicionesEntrenadores[size] != NULL) {
+	while(arr[size] != NULL) {
 		size++;
 	}
-	free(posicionesEntrenadores);
-	return size/2;
+	return size;
 }
 
-t_list* inicializarEntrenadores() {
+t_list* arrayToList(void* arr[]) {
+	t_list* list = list_create();
+	for(uint32_t i = 0; i < arraySize(arr); i++) {
+		list_add(list, arr[i]);
+	}
+	return list;
+}
 
+bool ordenarEntrenador(void* a, void* b) {
+	t_entrenador* tr1 = (t_entrenador*) a;
+	t_entrenador* tr2 = (t_entrenador*) b;
+
+	if((tr1->posicion->posicion_x == tr2->posicion->posicion_x)) {
+		return (tr1->posicion->posicion_y < tr2->posicion->posicion_y);
+	} else 
+		return (tr1->posicion->posicion_x < tr2->posicion->posicion_x);
+}
+
+bool ordenarPokemon(void* a, void* b) {
+	t_pokemon_posicion* pk1 = (t_pokemon_posicion*) a;
+	t_pokemon_posicion* pk2 = (t_pokemon_posicion*) b;
+
+	if((pk1->posicion->posicion_x == pk2->posicion->posicion_x)) {
+		return (pk1->posicion->posicion_y < pk2->posicion->posicion_y);
+	} else 
+		return (pk1->posicion->posicion_x < pk2->posicion->posicion_x);
+}
+
+void inicializarEntrenadores() {
 	char** objetivosEntrenadores = config_get_array_value(config,"OBJETIVOS_ENTRENADORES"); //Obtiene el array desde config, pero mal. Labura como un split de un string, separa por comas y eso es un elemento del array que genera. Por eso mismo el algoritmo feo de abajo
 	char** pokemonEntrenadores = config_get_array_value(config,"POKEMON_ENTRENADORES");
 	char** posicionesEntrenadores = config_get_array_value(config,"POSICIONES_ENTRENADORES");
 
-	t_list* entrenadores = list_create();
+	for(uint32_t i = 0; i < arraySize((void*)objetivosEntrenadores); i++) {
 
-	uint32_t sizeTotal = getCantidadEntrenadores(); //sabemos que las posiciones siempre van en pares, por eso contamos cuantos elementos hay en el array traido de config y lo dividimos por dos
-	uint32_t j=0; uint32_t k=0;	uint32_t l=0; //j es para objetivos de los entrenadores
-											 // k es para las posiciones de los entrenadores
-											//  l es para los pokemones de los entrenadores
-	uint32_t sizeAux = 0;
+		t_list* objetivos = arrayToList((void*)string_split(objetivosEntrenadores[i],"|"));
+		t_list* pokemon = arrayToList((void*)string_split(pokemonEntrenadores[i],"|"));
+		
+		char** coordenadas = string_split(posicionesEntrenadores[i],"|");
+		t_posicion* posicion = crearPosicion((uint32_t)atoi(coordenadas[0]),(uint32_t)atoi(coordenadas[1]));
 
-	printf("Size total: %i\n",sizeTotal);
-
-	for(uint32_t i=0; i < sizeTotal; i++) {
-		t_list* objetivos = list_create();
-		t_list* pokemon = list_create();
-		char* x = string_substring(posicionesEntrenadores[k], 1, 2); k++; //empieza el substring en 1 ya que queremos sacar el [ que queda pegado al elemento en el array traido del config
-		char* y = string_substring(posicionesEntrenadores[k], 0, 1); k++; //empieza el substring en 0 y hace length de un solo caracter para sacar el ] que queda pegado al elemento en el array traido del config
-		t_posicion* posicion = crearPosicion((uint32_t)atoi(x), (uint32_t)atoi(y));
-
-		if((string_starts_with(objetivosEntrenadores[j],"[") == 1) && (string_ends_with(objetivosEntrenadores[j],"]") == 1)) { //este if considera el caso en el entrenador solo tiene un pokemon objetivo, es decir que viene asi del array: [Bulbasaur]
-			char* objetivoAlone = string_substring(objetivosEntrenadores[j], 1, strlen(objetivosEntrenadores[j]));
-			list_add(objetivos, string_substring(objetivoAlone, 0, strlen(objetivoAlone)-1));
-		} else {
-			list_add(objetivos, string_substring(objetivosEntrenadores[j], 1, strlen(objetivosEntrenadores[j]))); //este contempla el primer elemento del array, que viene con '['
-			j++;
-			while(string_ends_with(objetivosEntrenadores[j],"]") != 1) { //se hace el while mientras no se llegue al elemento final
-				list_add(objetivos, objetivosEntrenadores[j]); //este contempla el caso de los elementos que estan en el medio, que no contienen ni '[' ó ']'
-				j++;
-			}
-			list_add(objetivos, string_substring(objetivosEntrenadores[j], 0, strlen(objetivosEntrenadores[j])-1)); //agrega el ultimo elemento del array
-		}
-		j++;
-
-		uint32_t sizeObjetivos = j - sizeAux; //sirve para poder determinar la cantidad maxima que puede tener un entrenador
-		sizeAux = j;
-
-
-		if((string_starts_with(pokemonEntrenadores[l],"[") == 1) && (string_ends_with(pokemonEntrenadores[l],"]") == 1)) {//este if considera el caso en el entrenador solo tiene un pokemon objetivo, es decir que viene asi del array: [Bulbasaur]
-			char* pokemonAlone = string_substring(pokemonEntrenadores[l], 1, strlen(pokemonEntrenadores[l]));
-			list_add(pokemon, string_substring(pokemonAlone, 0, strlen(pokemonAlone)-1));
-		} else {
-			list_add(pokemon, string_substring(pokemonEntrenadores[l], 1, strlen(pokemonEntrenadores[l]))); //este contempla el primer elemento del array, que viene con '['
-			l++;
-			while(string_ends_with(pokemonEntrenadores[l],"]") != 1) { //se hace el while mientras no se llegue al elemento final
-				list_add(pokemon, pokemonEntrenadores[l]); //este contempla el caso de los elementos que estan en el medio, que no contienen ni '[' ó ']'
-				l++;
-			}
-			list_add(pokemon, string_substring(pokemonEntrenadores[l], 0, strlen(pokemonEntrenadores[l])-1)); //agrega el ultimo elemento del array
-		}
-		l++;
+		uint32_t sizeObjetivos = arraySize((void*)string_split(objetivosEntrenadores[i],"|"));
 
 		t_entrenador* entrenador = crearEntrenador(posicion, objetivos, pokemon, sizeObjetivos);
 
+		sem_init(&entrenador->mutex, 0, 0);
 
-		list_add(entrenadores, entrenador);
-
-		printf("valor final en la iteracion %i: \n", i);
-		printf("Objetivos j: %i \n",j);
-		printf("Posiciones k: %i \n",k);
-		printf("Entrenadores l: %i \n",l);
+		list_add(colaNEW, entrenador);
 
 		list_destroy(objetivos);
 		list_destroy(pokemon);
+		free(coordenadas);
 	}
-
-	return entrenadores;	
 }
 
+uint32_t maxNum(uint32_t a, uint32_t b) {
+	if(a-b >= 0) {
+		return a-b;
+	} else return 0;
+}
 
-void setObjetivoGlobal(t_list* entrenadores){
-	t_list* pokemonesObjetivos = list_create();
-
-	t_list* objetivoGlobal = list_create();
-	t_list* globalAux = list_create();
-
-	for(uint32_t i = 0; i < list_size(entrenadores); i++){
-		list_add_all(pokemonesObjetivos, ((t_entrenador*)list_get(entrenadores, i))->pokemonObjetivo);
+t_list* getCaughtPokemon() {
+	t_list* aux = list_create();
+	for(uint32_t i = 0; i < list_size(colaNEW); i++){
+		list_add_all(aux, ((t_entrenador*)list_get(colaNEW, i))->pokemonCapturados);
 	}
 
-	for(uint32_t i = 0; i < list_size(entrenadores); i++){
-		t_list* pokemon = list_duplicate(((t_entrenador*)list_get(entrenadores, i))->pokemonObjetivo);
+	return aux;
+}
+
+void setObjetivoGlobal(){
+	t_list* pokemonesObjetivos = list_create();
+	t_list* globalAux = list_create();
+
+	objetivoGlobal = list_create();
+
+	t_list* caughtPokes = getCaughtPokemon();
+
+	for(uint32_t i = 0; i < list_size(colaNEW); i++){
+		list_add_all(pokemonesObjetivos, ((t_entrenador*)list_get(colaNEW, i))->pokemonObjetivo);
+	}
+
+	for(uint32_t i = 0; i < list_size(colaNEW); i++){
+		t_list* pokemon = list_duplicate(((t_entrenador*)list_get(colaNEW, i))->pokemonObjetivo);
 
 		for(uint32_t j = 0; j < list_size(pokemon); j++){
-			printf("%s\n",(char*)list_get(pokemon, j));
 			if(perteneceALista(list_get(pokemon, j),globalAux) == 0) {
 				uint32_t cant = perteneceAListaContador(list_get(pokemon, j),pokemonesObjetivos);
-				list_add(objetivoGlobal, setPokemonCantidad(list_get(pokemon, j), cant));
+				uint32_t cantidad = perteneceAListaContador(list_get(pokemon,j),caughtPokes);
+				printf("Hay %i %s capturado/s \n", cantidad, (char*)list_get(pokemon, j));
+				list_add(objetivoGlobal, setPokemonCantidad(list_get(pokemon, j), maxNum(cant, cantidad)));
 				list_add(globalAux, list_get(pokemon, j));
 			}
 		}
 		free(pokemon);
 	}
 
+	printf("-OBJETIVO GLOBAL-\n");
+	for(uint32_t i = 0; i < list_size(objetivoGlobal); i++) {
+		t_pokemon_cantidad* poke = (t_pokemon_cantidad*)list_get(objetivoGlobal,i); 
+		printf("%s -- %i\n", (char*)poke->nombre, (uint32_t)poke->cantidad);
+	}
+
 	free(pokemonesObjetivos);
 	free(globalAux);
-
-	printf("Objetivo Global \n");
-
-	for (uint32_t i = 0; i < list_size(objetivoGlobal); i++) {
-		t_pokemon_cantidad* poke = (t_pokemon_cantidad*)list_get(objetivoGlobal, i);
-		
-		printf("Objetivo %i: %s cantidad %i \n",i+1,(char*)poke->nombre,(uint32_t)poke->cantidad);
-	}
-	
 }
 
 t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* pokemon, uint32_t cantObjetivos) {
@@ -162,9 +214,19 @@ t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* p
     entrenador->pokemonObjetivo = list_duplicate(objetivos);
     entrenador->pokemonPlanificado = NULL;
 	entrenador->cantidadObjetivo = cantObjetivos;
-    entrenador->deadlock = 0;
+	entrenador->enEspera = false;
+	entrenador->deadlock = entrenadorEnDeadlock(entrenador);
 
     return entrenador;
+}
+
+t_pokemon_posicion* crearPokemonPosicion(char* nombre, t_posicion* posicion){
+	t_pokemon_posicion* pokemon = malloc(sizeof(t_pokemon_posicion));
+
+	pokemon->nombre = nombre;
+	pokemon->posicion = posicion;
+
+	return pokemon;
 }
 
 t_pokemon_cantidad* setPokemonCantidad(char* nombre, uint32_t cantidad) {
@@ -174,4 +236,123 @@ t_pokemon_cantidad* setPokemonCantidad(char* nombre, uint32_t cantidad) {
 	pokemon->cantidad = cantidad;
 
 	return pokemon;
+}
+
+bool list_equals(t_list* list1, t_list* list2) {
+	if(list_size(list1) == list_size(list2)) {
+		for(uint32_t i = 0; i < list_size(list1); i++) {
+			if(strcmp(list_get(list1,i),list_get(list1,2)) != 0) {
+				return false;
+			}
+		}
+		return true;
+	} else return false;
+}
+
+bool entrenadorEnDeadlock(t_entrenador* entrenador){
+	if(!entrenadorCumplioObjetivo(entrenador) && entrenador->cantidadObjetivo == list_size(entrenador->pokemonCapturados)) {
+		return true;
+	}
+	return false;
+}
+
+bool entrenadorCumplioObjetivo(t_entrenador* entrenador) {
+	if(list_equals(entrenador->pokemonObjetivo,entrenador->pokemonCapturados)) {
+		return true;
+	}
+	return false;
+}
+
+bool entrenadorDisponible(void* entrenador) {
+	t_entrenador* trainer = (t_entrenador*) entrenador;
+
+	return (!entrenadorEnDeadlock(trainer) && !trainer->enEspera);
+}
+
+t_entrenador* cambiarPosicionEntrenador(t_entrenador* entrenador, uint32_t posX, uint32_t posY){
+	entrenador->posicion->posicion_x = posX;
+	entrenador->posicion->posicion_y = posY;
+	return entrenador;
+}
+
+uint32_t turnosHastaPokemon(t_pokemon_posicion* pokemon, t_entrenador* entrenador){
+	return abs(pokemon->posicion->posicion_x - entrenador->posicion->posicion_x) + abs(pokemon->posicion->posicion_y - entrenador->posicion->posicion_y);
+}
+
+bool entrenadorPuedeCapturar(void* entrenador) {
+	t_entrenador* trainer = (t_entrenador*) entrenador;
+
+	return (turnosHastaPokemon(trainer->pokemonPlanificado,trainer) == 0);
+}
+
+void moverEntrenadorAPokemon(t_entrenador* entrenador){ 
+    uint32_t entrenadorPosX = entrenador->posicion->posicion_x;
+    uint32_t entrenadorPosY = entrenador->posicion->posicion_y; 
+    uint32_t pokePosX = entrenador->pokemonPlanificado->posicion->posicion_x;
+    uint32_t pokePosY = entrenador->pokemonPlanificado->posicion->posicion_y;
+
+    if((pokePosX - entrenadorPosX) == 0){
+        if(pokePosY > entrenadorPosY)
+            entrenador = cambiarPosicionEntrenador(entrenador, entrenadorPosX, entrenadorPosY+1);
+        else
+            entrenador = cambiarPosicionEntrenador(entrenador, entrenadorPosX, entrenadorPosY-1);
+    }
+    else {
+        if(entrenador->pokemonPlanificado->posicion->posicion_x > entrenadorPosX)
+            entrenador = cambiarPosicionEntrenador(entrenador, entrenadorPosX+1, entrenadorPosY);
+        else
+            entrenador = cambiarPosicionEntrenador(entrenador, entrenadorPosX-1, entrenadorPosY);
+    }
+	printf("Entrenador %i se movio a %i:%i \n", (uint32_t)entrenador->id, (uint32_t)entrenador->posicion->posicion_x, (uint32_t)entrenador->posicion->posicion_y);
+	actualizarPosicion(entrenador);
+}
+
+void actualizarPosicion(t_entrenador* entrenador) {
+	sem_wait(&mutexEXEC);
+	list_remove(colaEXEC,0);
+	list_add(colaEXEC, entrenador);
+	sem_post(&mutexEXEC);
+}
+
+bool tardaMenos(void* trA, void* trB) {
+	t_entrenador* trainerA = (t_entrenador*) trA;
+	t_entrenador* trainerB = (t_entrenador*) trB;
+
+	uint32_t cantTurnosA = turnosHastaPokemon(trainerA->pokemonPlanificado,trainerA);
+	uint32_t cantTurnosB = turnosHastaPokemon(trainerB->pokemonPlanificado,trainerB);
+
+	return cantTurnosA < cantTurnosB;
+}
+
+bool pokemonEnObjetivoGlobal(t_pokemon_posicion* pokemon) {
+    uint32_t index = pokemonPosicionPerteneceALista(pokemon,objetivoGlobal);
+    if(index != ERROR) {
+        if(((t_pokemon_cantidad*)list_get(objetivoGlobal,index))->cantidad > 0)
+            return true;
+    }
+    return false;
+}
+
+void insertPokeEnMapa(t_pokemon_posicion* poke) {
+	if(pokemonEnObjetivoGlobal(poke)) {
+		sem_wait(&mutexPokesEnMapa);
+        list_add(pokemonesEnMapa, poke);
+		printf("Aparecio un %s salvaje!! \n", poke->nombre);
+        sem_post(&mutexPokesEnMapa);
+		sem_post(&counterPokesEnMapa);
+	} else {
+		free(poke);
+	}
+}
+
+t_suscribe* getSuscribe(uint32_t mq) {
+	t_suscribe* suscribe = malloc(sizeof(t_suscribe));
+	char* ip = config_get_string_value(config, "IP_BROKER");
+    char* puerto = config_get_string_value(config, "PUERTO_BROKER");
+    uint32_t conexion = crear_conexion(ip, puerto);
+
+	suscribe->conexion = conexion;
+	suscribe->messageQueue = mq;
+
+	return suscribe;
 }

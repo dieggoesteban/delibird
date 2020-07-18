@@ -9,85 +9,7 @@
 #include<netdb.h>
 #include<string.h>
 #include "utils.h"
-
-typedef enum
-{
-	NEW_POKEMON = 1,
-	APPEARED_POKEMON = 2,
-	CATCH_POKEMON = 3,
-	CAUGHT_POKEMON = 4,
-	GET_POKEMON = 5,
-	LOCALIZED_POKEMON = 6
-} mq_cod;
-
-typedef struct
-{
-	int size;
-	void* stream;
-} t_buffer;
-
-typedef struct
-{
-	mq_cod codigo_mensaje;
-	t_buffer* buffer;
-} t_paquete;
-
-typedef struct
-{
-	uint32_t posicion_x;
-	uint32_t posicion_y;
-	uint32_t cantidad;
-} t_posicion_cantidad;
-
-typedef struct
-{
-	uint32_t posicion_x;
-	uint32_t posicion_y;
-} t_posicion;
-
-typedef struct
-{
-	uint32_t ID_mensaje_recibido;
-	uint32_t sizeNombre;
-	char* nombre;
-	t_posicion_cantidad* posicionCantidad;
-} t_new_pokemon;
-
-typedef struct{
-	uint32_t ID_mensaje_recibido;
-	uint32_t ID_mensaje_original;
-	uint32_t sizeNombre;
-	char* nombre;
-	uint32_t cantidadPosiciones; 
-	t_list* posiciones; //una lista de t_posicion
-}t_localized_pokemon;
-
-typedef struct{
-	uint32_t ID_mensaje_recibido;
-	uint32_t sizeNombre;
-	char* nombre;
-	t_posicion* posicion;
-} t_appeared_pokemon;
-
-typedef struct{
-	uint32_t ID_mensaje_recibido;
-	uint32_t sizeNombre;
-	char* nombre;
-	t_posicion* posicion;
-}t_catch_pokemon;
-
-typedef struct{
-	uint32_t ID_mensaje_recibido;
-	uint32_t ID_mensaje_original;
-	uint32_t catchStatus; 
-}t_caught_pokemon;
-
-typedef struct{
-	uint32_t ID_mensaje_recibido;
-	uint32_t sizeNombre;
-	char* nombre;
-} t_get_pokemon;
-
+#include "models.h"
 //METODOS DE CONEXION
 // int crear_conexion(char* ip, char* puerto);
 // void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente);
@@ -113,21 +35,29 @@ t_get_pokemon* deserializar_getPokemon(t_buffer* buffer);
 t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon);
 t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer);
 
+t_paquete* serializar_registerModule(t_register_module* registerModule);
+t_register_module* deserializar_registerModule(t_buffer* buffer);
+
+t_paquete* serializar_suscripcion(t_suscripcion* suscripcion);
+t_suscripcion* deserializar_suscripcion(t_buffer* buffer);
+
+t_paquete* serializar_acknowledgement(t_acknowledgement* akc);
+t_acknowledgement* deserializar_acknowledgement(t_buffer* buffer);
+
+t_paquete* serializar_idMensajeRecibido(t_id_mensaje_recibido* idMensajeRecibido);
+t_id_mensaje_recibido* deserializar_idMensajeRecibido(t_buffer* buffer);
+
 //CREACION DE LOS STRUCTS
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant);
 t_posicion* crearPosicion(uint32_t x, uint32_t y);
 t_new_pokemon* crearNewPokemon(uint32_t IDMensajeRecibido, char* nombre, t_posicion_cantidad* posicionCantidad);
-t_localized_pokemon* crearLocalizedPokemon(uint32_t IDMensajeRecibido,uint32_t IDMensajeOriginal, char* nombre, uint32_t cantPosiciones, t_list* posicion);
-t_appeared_pokemon* crearAppearedPokemon(uint32_t IDMensajeRecibido, char* nombre, t_posicion* posicion);
+t_localized_pokemon* crearLocalizedPokemon(uint32_t IDMensajeRecibido,uint32_t IDMensajeOriginal, char* nombre, uint32_t sizePosicionCantidad, t_list* posicion);
+t_appeared_pokemon* crearAppearedPokemon(uint32_t IDMensajeRecibido, uint32_t IDMensajeOriginal, char* nombre, t_posicion* posicion);
 t_catch_pokemon* crearCatchPokemon(uint32_t ID_mensaje_recibido, char* nombre, t_posicion* posicion);
 t_caught_pokemon* crearCaughtPokemon(uint32_t IDMensajeRecibido, uint32_t IDMensajeOriginal, uint32_t catchStatus);
 t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre);
-
-//FREE
-// void freeNewPokemon(t_new_pokemon* newPokemon);
-// void freeAppearedPokemon(t_appeared_pokemon* appearedPokemon);
-// void freeCatchPokemon(t_catch_pokemon* catchPokemon);
-// void freeCaughtPokemon(t_caught_pokemon* caughtPokemon);
-// void freeGetPokemon(t_get_pokemon* getPokemon);
-// void freeLocalizedPokemon(t_localized_pokemon* localizedPokemon);
+t_register_module* crearSuscribe(uint32_t ID_message_queue, uint32_t ID_module);
+t_acknowledgement* crearAcknowledgement(uint32_t idModule, uint32_t ID_mensaje_recibido, uint32_t mq_cod);
+t_id_mensaje_recibido* crearIdMensajeRecibido(uint32_t id);
+t_suscripcion* crearSuscripcion(uint32_t idAssigned, uint32_t socket_cliente);
 #endif /* SERIALIZADOR_H_ */

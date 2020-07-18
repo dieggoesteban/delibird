@@ -31,8 +31,44 @@ void liberar_conexion(uint32_t socket_cliente) {
 
 void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente) {
 	uint32_t sizePaquete = paquete->buffer->size + 2 * sizeof(uint32_t);
-	send(socket_cliente,paquete,sizePaquete,0);
+	void* stream = serializar_paquete(paquete, sizePaquete);
+	send(socket_cliente,stream,sizePaquete,0);
 	liberarPaquete(paquete);
+	free(stream);
+}
+
+void mandarGET() {
+
+	char* ip = config_get_string_value(config, "IP_BROKER");
+    char* puerto = config_get_string_value(config, "PUERTO_BROKER");
+    uint32_t conexion = crear_conexion(ip, puerto);
+
+	for(uint32_t i=0;i<list_size(objetivoGlobal);i++) {
+		t_pokemon_cantidad* poke = (t_pokemon_cantidad*)list_get(objetivoGlobal,i);
+		if(poke->cantidad > 0) {
+			//sendGET(poke->nombre);
+			t_get_pokemon* getPokemon = crearGetPokemon(11, poke->nombre);
+			t_paquete* paquete = serializar_getPokemon(getPokemon);
+			printf("GET %s\n",poke->nombre);
+			free(getPokemon);
+			enviarMensaje(paquete, conexion);
+		}
+	}
+	liberar_conexion(conexion);
+}
+
+void suscribe(void* structSuscribe) {
+	t_suscribe* s = (t_suscribe*) structSuscribe;
+
+	t_register_module* suscribe = crearSuscribe(s->messageQueue);
+	t_paquete* paquete = serializar_registerModule(suscribe);
+	printf("SUSCRIBE %i \n", s->messageQueue);
+	free(suscribe);
+	enviarMensaje(paquete, s->conexion);
+
+	while(1) {
+		serve_client(&s->conexion);
+	}
 }
 
 /*SERVER SIDE*/
@@ -66,6 +102,7 @@ void iniciar_servidor(void)
 
     freeaddrinfo(servinfo);
 
+	printf("Iniciando servidor...\n");
     while(1)
     	esperar_cliente(socket_servidor);
 }
@@ -89,7 +126,7 @@ void serve_client(uint32_t* socket)
 	uint32_t cod_op;
 	if(recv(*socket, &cod_op, sizeof(int), MSG_WAITALL) == -1)
 		cod_op = -1;
-	printf("codigo de op: %i", cod_op);
+	//printf("codigo de op: %i", cod_op);
 	process_request(cod_op, *socket);
 }
 
@@ -98,11 +135,12 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd) {
 	switch (cod_op) {
 		case APPEARED_POKEMON:
 			{
-				log_info(logger, "SIZE BUFFER EN NEW: %i", buffer->size);
+				//log_info(logger, "SIZE BUFFER EN NEW: %i", buffer->size);
 				// deserializar_appearedPokemon(buffer);
 				t_appeared_pokemon* appearedPoke = deserializar_appearedPokemon(buffer);
-				printf("pos x de poke: %i", appearedPoke->posicion->posicion_x);
-				log_info(logger, appearedPoke->nombre);
+				t_pokemon_posicion* poke = crearPokemonPosicion(appearedPoke->nombre, appearedPoke->posicion);
+				printf("Llego un poke %s\n", poke->nombre);
+				insertPokeEnMapa(poke);
 
 				free(appearedPoke);
 				free(buffer->stream);
@@ -137,11 +175,18 @@ t_buffer* recibir_buffer(uint32_t socket_cliente)
 	int size;
     
     recv(socket_cliente, &size, sizeof(int), MSG_WAITALL);
-	printf("size buffer: %d", size);
+	printf("size buffer: %d\n", size);
     buffer->size = size;
 	buffer->stream = malloc(buffer->size);
 	recv(socket_cliente, buffer->stream, buffer->size, MSG_WAITALL);
 
 	return buffer;
+}
+
+uint32_t escuchaBroker(){
+	char* IP_BROKER = config_get_string_value(config,"IP_BROKER");
+    char* PUERTO_BROKER = config_get_string_value(config,"PUERTO_BROKER");
+
+	return crear_conexion(IP_BROKER, PUERTO_BROKER);
 }
 
