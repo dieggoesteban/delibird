@@ -22,6 +22,8 @@ char* LOG;
 char* ALGORITMO;
 
 //GLOBALES
+uint32_t idModule;
+
 t_list* objetivoGlobal;
 t_list* pokemonesEnMapa;
 

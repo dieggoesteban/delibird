@@ -89,6 +89,7 @@ typedef struct{
 
 typedef struct{
 	uint32_t ID_mensaje_recibido;
+	uint32_t ID_mensaje_original;
 	uint32_t sizeNombre;
 	char* nombre;
 	t_posicion* posicion;
@@ -99,13 +100,13 @@ typedef struct{
 	uint32_t sizeNombre;
 	char* nombre;
 	t_posicion* posicion;
-}t_catch_pokemon;
+} t_catch_pokemon;
 
 typedef struct{
 	uint32_t ID_mensaje_recibido;
 	uint32_t ID_mensaje_original;
 	uint32_t catchStatus; 
-}t_caught_pokemon;
+} t_caught_pokemon;
 
 typedef struct{
 	uint32_t ID_mensaje_recibido;

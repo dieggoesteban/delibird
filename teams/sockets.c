@@ -139,6 +139,7 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd) {
 				// deserializar_appearedPokemon(buffer);
 				t_appeared_pokemon* appearedPoke = deserializar_appearedPokemon(buffer);
 				t_pokemon_posicion* poke = crearPokemonPosicion(appearedPoke->nombre, appearedPoke->posicion);
+				printf("Llego un poke %s\n", poke->nombre);
 				insertPokeEnMapa(poke);
 
 				free(appearedPoke);
