@@ -97,3 +97,5 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
+broker/broker
+broker/core
