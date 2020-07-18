@@ -173,18 +173,15 @@ void separarTextoEnBloques(char *textoArchivo, char* pathMetadataPoke, bool modi
 }
 
 uint32_t verQueBloqueEscribir(char* pathMetadataPoke,int* sizeAEscribirPrimerBloque, bool modificarBloques, uint32_t j){
-    // uint32_t cantElementos;
     t_config* metadataPoke = config_create(pathMetadataPoke);
     char** arrBloques = config_get_array_value(metadataPoke,"BLOCKS");
 
      if(atoi(arrBloques[0]) == -1){
         return buscarBloqueEInsertarEnArchivo(metadataPoke);
     }else{
-        // cantElementos = arraySize((void*)arrBloques);
         uint32_t sizeArchivo = config_get_int_value(metadataPoke,"SIZE");
         *sizeAEscribirPrimerBloque = calculoBytesSobrantes(arrBloques, sizeArchivo);
         printf("size a escribir: %i y cantidad de elementos: %i y el sizeArchivo: %i\n", *sizeAEscribirPrimerBloque, arraySize((void*)arrBloques), sizeArchivo);
-        // sizeBloque*cantElementos - sizeArchivo; //calculo para ver cuanto espacio le queda al ultimo bloque del archivo, para decirle al separador que separe por eso la primera vez
         
         if(modificarBloques){
             return atoi(arrBloques[j]);
@@ -543,7 +540,6 @@ void* atenderNewPokemon(void* newPokemonParam){
         modificarOpenArchivo(pathMetadataPoke,"Y");
         indexSemaforo = list_add(semaforosPokemon,semPoke);
         log_info(logger,"el index de la lista de semaforos en el if: %i",indexSemaforo);
-        // escribirNewPokemon(newPokemonATexto(newPokemon), pathMetadataPoke);
     }else{
         if(estaOpen(metadataPoke)){
             log_info(logger,"entra en IF de si esta open");
