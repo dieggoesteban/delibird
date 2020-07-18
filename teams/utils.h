@@ -17,7 +17,7 @@
 
 #include "models.h"
 #include "serializador.h"
-// #include "planificador.h"
+#include "sockets.h"
 
 //GLOBAL
 t_log* logger;
@@ -60,6 +60,7 @@ bool perteneceALista(char *val, t_list* lista);
 uint32_t perteneceAListaContador(char *val, t_list* lista);
 bool list_equals(t_list* list1, t_list* list2);
 t_queue* listToQueue(t_list* lista);
+t_suscribe* getSuscribe(uint32_t mq);
 
 //STRUCTS PERTENECEN A LISTA
 uint32_t pokemonCantidadPerteneceALista(t_pokemon_cantidad* pokemon, t_list* lista);

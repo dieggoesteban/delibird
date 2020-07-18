@@ -31,13 +31,23 @@ t_list* colaEXEC;
 t_list* colaBLOCKED;
 t_list* colaEXIT;
 
+t_suscribe* suscribeCaught;
+t_suscribe* suscribeAppeared;
+t_suscribe* suscribeLocalized;
+
+pthread_t threadREADY;
+pthread_t threadEXEC;
+pthread_t threadSERVER;
+pthread_t threadSUSCRIBE_CAUGHT;
+pthread_t threadSUSCRIBE_APPEARED;
+pthread_t threadSUSCRIBE_LOCALIZED;
+
 sem_t mutexNEW;
 sem_t mutexREADY;
 sem_t mutexEXEC;
 sem_t mutexBLOCKED;
 sem_t mutexEXIT;
 sem_t mutexPokesEnMapa;
-
 sem_t counterPokesEnMapa;
 
 uint32_t cicloCPU;
@@ -46,6 +56,6 @@ uint32_t currentQuantum;
 
 //INICIALIZACION Y TERMINACION DEL MODULO
 void inicializarTeam();
-void terminar_programa(int, t_log*, t_config*);
+void terminar_programa();
 
 #endif /* TEAM_H_ */

@@ -57,20 +57,17 @@ void mandarGET() {
 	liberar_conexion(conexion);
 }
 
-void suscribe(void* message_queue) {
-	char* ip = config_get_string_value(config, "IP_BROKER");
-    char* puerto = config_get_string_value(config, "PUERTO_BROKER");
-    uint32_t conexion = crear_conexion(ip, puerto);
-	
-	uint32_t mq = (uint32_t) message_queue;
-	t_register_module* suscribe = crearSuscribe(mq);
+void suscribe(void* structSuscribe) {
+	t_suscribe* s = (t_suscribe*) structSuscribe;
+
+	t_register_module* suscribe = crearSuscribe(s->messageQueue);
 	t_paquete* paquete = serializar_registerModule(suscribe);
-	printf("SUSCRIBE %i \n", mq);
+	printf("SUSCRIBE %i \n", s->messageQueue);
 	free(suscribe);
-	enviarMensaje(paquete, conexion);
+	enviarMensaje(paquete, s->conexion);
 
 	while(1) {
-		serve_client(&conexion);
+		serve_client(&s->conexion);
 	}
 }
 

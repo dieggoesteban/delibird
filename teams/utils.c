@@ -344,3 +344,15 @@ void insertPokeEnMapa(t_pokemon_posicion* poke) {
 		free(poke);
 	}
 }
+
+t_suscribe* getSuscribe(uint32_t mq) {
+	t_suscribe* suscribe = malloc(sizeof(t_suscribe));
+	char* ip = config_get_string_value(config, "IP_BROKER");
+    char* puerto = config_get_string_value(config, "PUERTO_BROKER");
+    uint32_t conexion = crear_conexion(ip, puerto);
+
+	suscribe->conexion = conexion;
+	suscribe->messageQueue = mq;
+
+	return suscribe;
+}

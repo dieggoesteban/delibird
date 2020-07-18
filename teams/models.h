@@ -46,6 +46,12 @@ typedef struct
 
 typedef struct
 {
+	uint32_t conexion;
+	uint32_t messageQueue;
+} t_suscribe;
+
+typedef struct
+{
 	mq_cod codigo_mensaje;
 	t_buffer* buffer;
 } t_paquete;
