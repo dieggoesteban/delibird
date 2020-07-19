@@ -65,7 +65,7 @@ void reconectarBroker() {
 		establecerConexionBroker();
 	}
 }
-
+ 
 void detectarDesconexion() {
 	while(1) {
 		sem_wait(&detectorDesconexion);
@@ -113,7 +113,7 @@ void suscribe(void* structSuscribe) {
 	printf("SUSCRIBE %i \n", s->messageQueue);
 	free(suscribe);
 	enviarMensaje(paquete, s->conexion);
-
+	
 	while(1) {
 		serve_suscribe(&s->conexion);
 	}
@@ -175,7 +175,7 @@ void serve_client(uint32_t* socket)
 	t_buffer* buffer;
 	if(recv(*socket, &cod_op, sizeof(int), MSG_WAITALL) == -1)
 		cod_op = -1;
-	if(cod_op > 0 && cod_op < 8) {
+	if(cod_op > 0 && cod_op < 11) {
 		buffer = recibir_buffer(*socket);
 	}
 	process_request(cod_op, buffer, *socket);
@@ -225,7 +225,7 @@ void serve_suscribe(uint32_t* socket)
 	t_buffer* buffer;
 	if(recv(*socket, &cod_op, sizeof(int), MSG_WAITALL) == -1)
 		cod_op = -1;
-	if(cod_op > 0 && cod_op < 8) {
+	if(cod_op > 0 && cod_op < 11) {
 		buffer = recibir_buffer(*socket);
 	}
 	process_suscribe_request(cod_op, buffer, *socket);
@@ -264,7 +264,6 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 			}
 		default:
 			{
-				printf("Se corto la conexion\n");
 				sem_post(&detectorDesconexion);
 				pthread_exit(&threadSUSCRIBE_CAUGHT);
 				pthread_exit(&threadSUSCRIBE_APPEARED);

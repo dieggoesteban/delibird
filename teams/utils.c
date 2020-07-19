@@ -371,3 +371,12 @@ t_suscribe* getSuscribe(uint32_t mq) {
 
 	return suscribe;
 }
+
+t_entrenador_catch* crearEntrenadorCatch(uint32_t mID, uint32_t trID) {
+	t_entrenador_catch* entrenador = malloc(sizeof(t_entrenador_catch));
+
+	entrenador->entrenadorID = trID;
+	entrenador->mensajeId = mID;
+
+	return entrenador;
+}

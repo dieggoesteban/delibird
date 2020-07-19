@@ -381,6 +381,30 @@ t_confirmacion_mensaje* deserializar_confirmacionMensaje(t_buffer* buffer){
 	return confirmacion;
 }
 
+t_paquete* serializar_idMensajeRecibido(t_id_mensaje_recibido* idMensajeRecibido) {
+    t_buffer* buffer = malloc(sizeof(t_buffer));
+	buffer->size = sizeof(uint32_t);
+    void* stream = malloc(buffer->size);
+
+    memcpy(stream, &(idMensajeRecibido->id_mensajeEnviado), sizeof(uint32_t));
+
+    buffer->stream = stream;
+    t_paquete* paquete = crear_paquete(MENSAJE_RECIBIDO, buffer->size, buffer->stream);
+
+    return paquete;
+}
+
+t_id_mensaje_recibido* deserializar_idMensajeRecibido(t_buffer* buffer) {
+    t_id_mensaje_recibido* idMensajeEnviado = malloc(sizeof(t_id_mensaje_recibido)); //Enviado para el que lo deserializa
+
+    void* stream = buffer->stream;
+
+    memcpy(&(idMensajeEnviado->id_mensajeEnviado), stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+
+    return idMensajeEnviado;
+}
+
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant) {
 	t_posicion_cantidad* position = malloc(sizeof(t_posicion_cantidad));
 

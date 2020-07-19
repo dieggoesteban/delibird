@@ -26,6 +26,7 @@ uint32_t idModule;
 
 t_list* objetivoGlobal;
 t_list* pokemonesEnMapa;
+t_list* entrenadoresCatch;
 
 t_list* colaNEW;
 t_list* colaREADY;
@@ -56,6 +57,7 @@ sem_t mutexPokesEnMapa;
 sem_t counterPokesEnMapa;
 sem_t waitForFinish;
 sem_t mutexReconnect;
+sem_t mutexEntrenadoresCatch;
 
 uint32_t cicloCPU;
 uint32_t quantum;

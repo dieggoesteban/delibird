@@ -120,6 +120,8 @@ t_paquete* serializar_getPokemon(t_get_pokemon* pokemon);
 t_get_pokemon* deserializar_getPokemon(t_buffer* buffer);
 t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon);
 t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer);
+t_paquete* serializar_idMensajeRecibido(t_id_mensaje_recibido* idMensajeRecibido);
+t_id_mensaje_recibido* deserializar_idMensajeRecibido(t_buffer* buffer);
 
 t_paquete* serializar_registerModule(t_register_module* registerModule);
 t_register_module* deserializar_registerModule(t_buffer* buffer);

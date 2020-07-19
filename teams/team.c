@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
     colaEXEC = list_create();
     colaEXIT = list_create();
     pokemonesEnMapa = list_create();
+    entrenadoresCatch = list_create();
 
 
     sem_init(&mutexNEW, 0, 1);
@@ -47,6 +48,7 @@ int main(int argc, char *argv[])
     sem_init(&mutexPokesEnMapa, 0, 1);
     sem_init(&counterPokesEnMapa, 0, 0);
     sem_init(&mutexReconnect, 0, 0);
+    sem_init(&mutexEntrenadoresCatch, 0, 1);
     
     inicializarTeam();
     establecerConexionBroker();

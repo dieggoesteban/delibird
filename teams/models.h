@@ -16,11 +16,13 @@ typedef enum
     SUSCRIBE = 7
 } mq_cod;
 
-typedef enum
+typedef enum 
 {
-	ACKNOWLEDGEMENT = 8,
-	CONFIRMACION_MSJ = 9
-} acciones;
+    SUBSCRIBE = 7,
+	MENSAJE_RECIBIDO = 8,
+	ACKNOWLEDGEMENT = 9,
+	CONFIRMACION_MSJ = 10
+} operation_cod;
 
 //struct que se manda como confirmacion de recibo de mensaje por parte de los modulos hacia el broker
 typedef struct{
@@ -28,6 +30,10 @@ typedef struct{
 	uint32_t MessageQueue;
 	bool meLlego;
 } t_confirmacion_mensaje;
+
+typedef struct {
+	uint32_t id_mensajeEnviado;
+} t_id_mensaje_recibido;
 
 typedef struct {
 	uint32_t AKC;
@@ -137,5 +143,11 @@ typedef struct
     bool deadlock;
 	sem_t mutex;
 } t_entrenador;
+
+typedef struct
+{
+	uint32_t entrenadorID;
+	uint32_t mensajeId;
+} t_entrenador_catch;
 
 #endif /* MODELS_H_ */
