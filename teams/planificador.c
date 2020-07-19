@@ -103,6 +103,13 @@ void* planificadorREADY() {
     }
 }
 
+void* planificadorBLOCKED() {
+    printf("Hilo BLOCKED ejecutando\n");
+    while(1) {
+
+    }
+}
+
 void* planificadorEXEC(void* arg) {
     AlgoritmoFunc* alg = (AlgoritmoFunc*) arg;
     printf("Hilo EXEC ejecutando\n");

@@ -47,6 +47,7 @@ int main(int argc, char *argv[])
     sem_init(&mutexEXIT, 0, 1);
     sem_init(&mutexPokesEnMapa, 0, 1);
     sem_init(&counterPokesEnMapa, 0, 0);
+    sem_init(&counterEntrenadoresCatch, 0, 0);
     sem_init(&mutexReconnect, 0, 0);
     sem_init(&mutexEntrenadoresCatch, 0, 1);
     
@@ -76,6 +77,7 @@ int main(int argc, char *argv[])
     pthread_join(threadEXEC, NULL);
     pthread_join(threadRECONNECT, NULL);
     pthread_join(threadSERVER, NULL);
+    pthread_join(threadDETECT_DISCON, NULL);
 
     terminar_programa();
     return 0;

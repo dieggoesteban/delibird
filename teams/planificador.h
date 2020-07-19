@@ -31,6 +31,7 @@ sem_t mutexEXEC;
 sem_t mutexBLOCKED;
 sem_t mutexEXIT;
 sem_t counterPokesEnMapa;
+sem_t counterEntrenadoresCatch;
 sem_t mutexEntrenadoresCatch;
 
 t_list* pokemonesEnMapa; // lucario pikachu pikachu pikachu squirtle

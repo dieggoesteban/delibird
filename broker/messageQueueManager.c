@@ -174,6 +174,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 		{
 			t_message_queue* messageQueue = getMessageQueueById(operation_cod);
 			t_caught_pokemon* caughtPoke = deserializar_caughtPokemon(buffer);
+			printf("Recibi un caught: mID-> %i con el estado: %i\n", (uint32_t)caughtPoke->ID_mensaje_original, (uint32_t)caughtPoke->catchStatus);
 			t_message* message = crearMessage(caughtPoke, CAUGHT_POKEMON);
 
 			message->id = asignarMessageId();
@@ -414,7 +415,7 @@ void deleteFromQueue(t_message* message)
 	sem_wait(&message->s_puedeEliminarse); //Cache
 	sem_wait(&message->s_puedeEliminarse); //Ack
 	t_message_queue* messageQueue = getMessageQueueById(message->mq_cod);
-	t_message* current = (t_message*)malloc(sizeof(t_message));;
+	t_message* current = (t_message*)malloc(sizeof(t_message));
 	uint32_t targetIndex;
 	pthread_mutex_lock(&messageQueue->s_mensajes);
 		for(uint32_t i = 0; i < list_size(messageQueue->mensajes); i++)

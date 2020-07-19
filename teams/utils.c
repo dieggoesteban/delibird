@@ -380,3 +380,55 @@ t_entrenador_catch* crearEntrenadorCatch(uint32_t mID, uint32_t trID) {
 
 	return entrenador;
 }
+
+t_entrenador_catch* getEntrenadorCatch(t_caught_pokemon* poke) {
+	sem_wait(&mutexEntrenadoresCatch);
+	t_list* esperandoCaught = list_duplicate(entrenadoresCatch);
+	sem_post(&mutexEntrenadoresCatch);
+
+	for(uint32_t i = 0; i < list_size(esperandoCaught); i++) {
+		t_entrenador_catch* entrenador = (t_entrenador_catch*) list_get(esperandoCaught, i);
+		if(entrenador->mensajeId == poke->ID_mensaje_original) {
+			return entrenador;
+		}
+	}
+
+	return NULL;
+}
+
+uint32_t getEntrenadorByID(uint32_t id, t_list* lista) {
+	for(uint32_t i = 0; i < list_size(lista); i++) {
+		t_entrenador* entrenador = list_get(lista, i);
+		if(entrenador->id == id) {
+			return i;
+		}
+	}
+	return ERROR;
+}
+
+void procesarMensajeCaught(t_caught_pokemon* caughtPoke) {
+	t_entrenador_catch* entrenador = getEntrenadorCatch(caughtPoke);
+	printf("Entre a procesar Mensaje\n");
+	if(entrenador && entrenador != NULL) {
+		printf("Entro al if \n");
+		uint32_t index = getEntrenadorByID(entrenador->entrenadorID, colaBLOCKED);
+		sem_wait(&mutexBLOCKED);
+		t_entrenador* tr = (t_entrenador*)list_remove(colaBLOCKED,index);
+		sem_post(&mutexBLOCKED);
+		tr->enEspera = false;
+		char* poke = malloc(strlen(tr->pokemonPlanificado->nombre)+1);
+		memcpy(poke, tr->pokemonPlanificado->nombre, strlen(tr->pokemonPlanificado->nombre)+1);
+		if(caughtPoke->catchStatus == 1) {
+			printf("El entrenador %i pudo capturar a %s\n", tr->id, poke);
+			list_add(tr->pokemonCapturados, poke);
+		} else {
+			printf("El entrenador %i no pudo capturar a %s\n", tr->id, poke);
+		}
+		tr->pokemonPlanificado = NULL;
+		sem_wait(&mutexBLOCKED);
+		list_add(colaBLOCKED,tr);
+		sem_post(&mutexBLOCKED);
+	} else {
+		printf("El mensaje no corresponde a ningun entrenador de este Team\n");
+	}
+}

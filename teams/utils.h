@@ -37,8 +37,11 @@ void setObjetivoGlobal();
 //SEMAFOROS
 
 sem_t mutexEXEC;
+sem_t mutexBLOCKED;
 sem_t mutexPokesEnMapa;
 sem_t counterPokesEnMapa;
+sem_t mutexEntrenadoresCatch;
+sem_t counterEntrenadoresCatch;
 
 //CREAR
 t_pokemon_posicion* crearPokemonPosicion(char* nombre, t_posicion* posicion);
@@ -53,6 +56,7 @@ t_list* colaREADY;
 t_list* colaEXEC;
 t_list* colaBLOCKED;
 t_list* colaEXIT;
+t_list* entrenadoresCatch;
 
 //UTILIDADES ARRAYS/LISTS/QUEUE
 uint32_t arraySize(void* arr[]);
@@ -74,6 +78,8 @@ t_list* obtenerEntrenadoresSinDeadlock(); //obtiene de colaBlocked
 //DE POKEMON
 bool pokemonEnObjetivoGlobal(t_pokemon_posicion* pokemon);
 void insertPokeEnMapa(t_pokemon_posicion* poke);
+
+void procesarMensajeCaught(t_caught_pokemon* caughtPoke);
 
 //DE ENTRENADOR
 bool entrenadorEnDeadlock(t_entrenador* entrenador);

@@ -374,6 +374,7 @@ t_paquete* serializar_idMensajeRecibido(t_id_mensaje_recibido* idMensajeRecibido
 
     return paquete;
 }
+
 t_id_mensaje_recibido* deserializar_idMensajeRecibido(t_buffer* buffer) {
     t_id_mensaje_recibido* idMensajeEnviado = malloc(sizeof(t_id_mensaje_recibido)); //Enviado para el que lo deserializa
 

@@ -37,6 +37,7 @@ pthread_t threadSUSCRIBE_APPEARED;
 pthread_t threadSUSCRIBE_LOCALIZED;
 
 sem_t counterPokesEnMapa;
+sem_t counterEntrenadoresCatch;
 sem_t mutexPokesEnMapa;
 sem_t mutexReconnect;
 sem_t detectorDesconexion;
@@ -53,6 +54,7 @@ void establecerConexionBroker();
 void reconectarBroker();
 
 void mandarGET();
+void enviarAck(t_acknowledgement* ack);
 
 //SERVER
 void iniciar_servidor(void);

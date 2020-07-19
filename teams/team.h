@@ -55,6 +55,7 @@ sem_t mutexBLOCKED;
 sem_t mutexEXIT;
 sem_t mutexPokesEnMapa;
 sem_t counterPokesEnMapa;
+sem_t counterEntrenadoresCatch;
 sem_t waitForFinish;
 sem_t mutexReconnect;
 sem_t mutexEntrenadoresCatch;

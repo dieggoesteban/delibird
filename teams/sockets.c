@@ -200,14 +200,7 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd) {
 		case CAUGHT_POKEMON:
 			{
 				t_caught_pokemon* caughtPoke = deserializar_caughtPokemon(buffer);
-				printf("\nEl pokemon del mensaje '%i'", caughtPoke->ID_mensaje_original);
-				if(caughtPoke->catchStatus == 1) {
-					printf(" ha sido capturado\n");
-				} else {
-					printf(" no se pudo capturar\n");
-				}
-
-				free(caughtPoke);
+				procesarMensajeCaught(caughtPoke);
 				free(buffer->stream);
 				free(buffer);
 				break;
@@ -241,7 +234,8 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 				t_pokemon_posicion* poke = crearPokemonPosicion(appearedPoke->nombre, appearedPoke->posicion);
 				printf("Llego un poke %s\n", poke->nombre);
 				insertPokeEnMapa(poke);
-
+				t_acknowledgement* ack = crearAcknowledgement(idModule, appearedPoke->ID_mensaje_recibido,APPEARED_POKEMON);
+				enviarAck(ack);
 				free(appearedPoke);
 				free(buffer->stream);
 				free(buffer);
@@ -250,14 +244,10 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 		case CAUGHT_POKEMON:
 			{
 				t_caught_pokemon* caughtPoke = deserializar_caughtPokemon(buffer);
-				printf("\nEl pokemon del mensaje '%i'", caughtPoke->ID_mensaje_original);
-				if(caughtPoke->catchStatus == 1) {
-					printf(" ha sido capturado\n");
-				} else {
-					printf(" no se pudo capturar\n");
-				}
-
-				free(caughtPoke);
+				printf("Me llego este mensaje con id correlativo %i\n", caughtPoke->ID_mensaje_original);
+				procesarMensajeCaught(caughtPoke);
+				t_acknowledgement* ack = crearAcknowledgement(idModule, caughtPoke->ID_mensaje_recibido,CAUGHT_POKEMON);
+				enviarAck(ack);
 				free(buffer->stream);
 				free(buffer);
 				break;
@@ -294,3 +284,10 @@ uint32_t escuchaBroker(){
 	return crear_conexion(IP_BROKER, PUERTO_BROKER);
 }
 
+void enviarAck(t_acknowledgement* ack) {
+	t_paquete* paquete = serializar_acknowledgement(ack);
+	free(ack);
+	uint32_t conexion = escuchaBroker();
+	enviarMensaje(paquete, conexion);
+	liberar_conexion(conexion);
+}

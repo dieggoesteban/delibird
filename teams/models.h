@@ -109,6 +109,12 @@ typedef struct{
 } t_catch_pokemon;
 
 typedef struct{
+	uint32_t idModule;
+	uint32_t idMessageReceived;
+	uint32_t mq;
+} t_acknowledgement;
+
+typedef struct{
 	uint32_t ID_mensaje_recibido;
 	uint32_t ID_mensaje_original;
 	uint32_t catchStatus; 
