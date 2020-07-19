@@ -319,43 +319,33 @@ t_get_pokemon* deserializar_getPokemon(t_buffer* buffer){
 }
 
 //Register Module serialization
-t_paquete* serializar_registerModule(t_register_module* registerModule)
-{
-	printf("Entro a serializar_registerModule\n");
-
+t_paquete* serializar_registerModule(t_register_module* registerModule) {
 	t_buffer* registerModuleBuffer = malloc(sizeof(t_buffer));
-	registerModuleBuffer->size = sizeof(uint32_t);
-	void* stream = malloc(sizeof(registerModuleBuffer->size));
+	registerModuleBuffer->size = sizeof(uint32_t) * 2;
+	void* stream = malloc(registerModuleBuffer->size);
 	int offset = 0;
 
 	memcpy(stream + offset, &(registerModule->messageQueue), sizeof(uint32_t));
 	offset += sizeof(uint32_t);
+    memcpy(stream + offset, &(registerModule->moduleId), sizeof(uint32_t));
+    offset += sizeof(uint32_t);
 
 	registerModuleBuffer->stream = stream;
 	t_paquete* paquete = crear_paquete(SUSCRIBE, registerModuleBuffer->size, registerModuleBuffer->stream);
 
-	printf("Codigo mensaje, serializar_registerModule: %i\n", paquete->codigo_mensaje);
 	return paquete;
 }
-
-//Register Module deserialization
-t_register_module* deserializar_registerModule(t_buffer* buffer)
-{
-	printf("Entro a deserializar_registerModule\n");
+t_register_module* deserializar_registerModule(t_buffer* buffer) {
 	t_register_module* registerModule = malloc(sizeof(t_register_module));
-
 	void* stream = buffer->stream;
-	printf("Buffer size: %i\n", buffer->size);
-
 	memcpy(&(registerModule->messageQueue), stream, sizeof(uint32_t));
-	printf("messageQueue: %i\n", registerModule->messageQueue);
 	stream += sizeof(uint32_t);
-
+    memcpy(&(registerModule->moduleId), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
 	return registerModule;
 }
 
 t_paquete* serializar_confirmacionMensaje(t_confirmacion_mensaje* confirmacion){
-	printf("Entro a serializar_confirmacionMensaje\n");
 	t_buffer* confirmacionBuffer = malloc(sizeof(t_buffer));
 	confirmacionBuffer->size = sizeof(uint32_t)*2 + sizeof(bool);
 	void* stream = malloc(confirmacionBuffer->size);
@@ -376,7 +366,6 @@ t_paquete* serializar_confirmacionMensaje(t_confirmacion_mensaje* confirmacion){
 }
 
 t_confirmacion_mensaje* deserializar_confirmacionMensaje(t_buffer* buffer){
-	printf("ENtro a deserializar_confirmacion\n");
 	t_confirmacion_mensaje* confirmacion = malloc(sizeof(t_confirmacion_mensaje));
 
 	void* stream = buffer->stream;
@@ -478,10 +467,10 @@ t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre){
 	return getPokemon;
 }
 
-t_register_module* crearSuscribe(uint32_t ID_message_queue) {
+t_register_module* crearSuscribe(uint32_t ID_message_queue, uint32_t moduleId) {
 	t_register_module* suscribe = malloc(sizeof(t_register_module));
 	suscribe->messageQueue = ID_message_queue;
-
+	suscribe->moduleId = moduleId;
 	return suscribe;
 }
 

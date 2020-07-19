@@ -345,11 +345,26 @@ void insertPokeEnMapa(t_pokemon_posicion* poke) {
 	}
 }
 
+char* getMQName(uint32_t mq) {
+	char* message;
+	switch(mq) {
+		case 2:
+			message = "APPEARED_POKEMON";
+			break;
+		case 4:
+			message = "CAUGHT_POKEMON";
+			break;
+		case 6:
+			message = "LOCALIZED_POKEMON";
+			break;
+	}
+	return message;
+}
+
 t_suscribe* getSuscribe(uint32_t mq) {
+	printf("Intentando SUSCRIBE en %s...\n", getMQName(mq));
 	t_suscribe* suscribe = malloc(sizeof(t_suscribe));
-	char* ip = config_get_string_value(config, "IP_BROKER");
-    char* puerto = config_get_string_value(config, "PUERTO_BROKER");
-    uint32_t conexion = crear_conexion(ip, puerto);
+    uint32_t conexion = escuchaBroker();
 
 	suscribe->conexion = conexion;
 	suscribe->messageQueue = mq;

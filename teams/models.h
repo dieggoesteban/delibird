@@ -33,9 +33,9 @@ typedef struct {
 	uint32_t AKC;
 } t_akc;
 
-typedef struct 
-{
+typedef struct {
 	uint32_t messageQueue;
+	uint32_t moduleId;
 } t_register_module;
 
 typedef struct

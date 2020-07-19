@@ -16,9 +16,9 @@ int crear_conexion(char *ip, char* puerto) {
 	uint32_t socket_cliente = socket(server_info->ai_family,
 			server_info->ai_socktype, server_info->ai_protocol);
 
-	if (connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen)
-			== -1)
-		printf("error");
+	if (connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen) == -1) {
+		return ERROR;
+	}
 
 	freeaddrinfo(server_info);
 
@@ -27,6 +27,54 @@ int crear_conexion(char *ip, char* puerto) {
 
 void liberar_conexion(uint32_t socket_cliente) {
 	close(socket_cliente);
+}
+
+void establecerConexionBroker() {
+    suscribeCaught = getSuscribe(CAUGHT_POKEMON);
+    suscribeAppeared = getSuscribe(APPEARED_POKEMON);
+    suscribeLocalized = getSuscribe(LOCALIZED_POKEMON);
+
+    if (suscribeAppeared->conexion != -1) {
+        printf("Se establecio una conexion con el Broker :D\n");
+        mandarGET();
+        if(pthread_create(&threadSUSCRIBE_CAUGHT,NULL,(void*)suscribe,(void*)suscribeCaught) != 0)
+            printf("Error CAUGHT\n");
+
+        if(pthread_create(&threadSUSCRIBE_APPEARED,NULL,(void*)suscribe,(void*)suscribeAppeared) != 0)
+            printf("Error APPEARED\n");
+
+        if(pthread_create(&threadSUSCRIBE_LOCALIZED,NULL,(void*)suscribe,(void*)suscribeLocalized) != 0)
+            printf("Error LOCALIZED\n");
+
+        pthread_detach(threadSUSCRIBE_CAUGHT);
+        pthread_detach(threadSUSCRIBE_APPEARED);
+        pthread_detach(threadSUSCRIBE_LOCALIZED);
+    }
+    else {
+        printf("No se pudo establecer una conexion con el Broker :c\n");
+        printf("Intentando reconexion en %i segundos...\n", (uint32_t)config_get_int_value(config,"TIEMPO_RECONEXION"));
+        sem_post(&mutexReconnect);
+    }
+}
+
+void reconectarBroker() {
+	while(1) {
+		sem_wait(&mutexReconnect);
+		sleep((uint32_t)config_get_int_value(config,"TIEMPO_RECONEXION"));
+		printf("Intentando reconexion con Broker...\n");
+		establecerConexionBroker();
+	}
+}
+
+void detectarDesconexion() {
+	while(1) {
+		sem_wait(&detectorDesconexion);
+		sem_wait(&detectorDesconexion);
+		sem_wait(&detectorDesconexion);
+		printf("Se desconecto el Broker :c\n");
+
+		sem_post(&mutexReconnect);
+	}
 }
 
 void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente) {
@@ -60,14 +108,14 @@ void mandarGET() {
 void suscribe(void* structSuscribe) {
 	t_suscribe* s = (t_suscribe*) structSuscribe;
 
-	t_register_module* suscribe = crearSuscribe(s->messageQueue);
+	t_register_module* suscribe = crearSuscribe(s->messageQueue, idModule);
 	t_paquete* paquete = serializar_registerModule(suscribe);
 	printf("SUSCRIBE %i \n", s->messageQueue);
 	free(suscribe);
 	enviarMensaje(paquete, s->conexion);
 
 	while(1) {
-		serve_client(&s->conexion);
+		serve_suscribe(&s->conexion);
 	}
 }
 
@@ -123,15 +171,17 @@ void esperar_cliente(uint32_t socket_servidor)
 void serve_client(uint32_t* socket)
 {
 	
-	uint32_t cod_op;
+	int cod_op;
+	t_buffer* buffer;
 	if(recv(*socket, &cod_op, sizeof(int), MSG_WAITALL) == -1)
 		cod_op = -1;
-	//printf("codigo de op: %i", cod_op);
-	process_request(cod_op, *socket);
+	if(cod_op > 0 && cod_op < 8) {
+		buffer = recibir_buffer(*socket);
+	}
+	process_request(cod_op, buffer, *socket);
 }
 
-void process_request(uint32_t cod_op, uint32_t cliente_fd) {
-	t_buffer* buffer = recibir_buffer(cliente_fd);
+void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd) {
 	switch (cod_op) {
 		case APPEARED_POKEMON:
 			{
@@ -166,6 +216,61 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd) {
 			pthread_exit(NULL);
 		case -1:
 			pthread_exit(NULL);
+	}
+}
+
+void serve_suscribe(uint32_t* socket)
+{
+	int cod_op;
+	t_buffer* buffer;
+	if(recv(*socket, &cod_op, sizeof(int), MSG_WAITALL) == -1)
+		cod_op = -1;
+	if(cod_op > 0 && cod_op < 8) {
+		buffer = recibir_buffer(*socket);
+	}
+	process_suscribe_request(cod_op, buffer, *socket);
+}
+
+void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd) {
+	switch (cod_op) {
+		case APPEARED_POKEMON:
+			{
+				//log_info(logger, "SIZE BUFFER EN NEW: %i", buffer->size);
+				// deserializar_appearedPokemon(buffer);
+				t_appeared_pokemon* appearedPoke = deserializar_appearedPokemon(buffer);
+				t_pokemon_posicion* poke = crearPokemonPosicion(appearedPoke->nombre, appearedPoke->posicion);
+				printf("Llego un poke %s\n", poke->nombre);
+				insertPokeEnMapa(poke);
+
+				free(appearedPoke);
+				free(buffer->stream);
+				free(buffer);
+				break;
+			}
+		case CAUGHT_POKEMON:
+			{
+				t_caught_pokemon* caughtPoke = deserializar_caughtPokemon(buffer);
+				printf("\nEl pokemon del mensaje '%i'", caughtPoke->ID_mensaje_original);
+				if(caughtPoke->catchStatus == 1) {
+					printf(" ha sido capturado\n");
+				} else {
+					printf(" no se pudo capturar\n");
+				}
+
+				free(caughtPoke);
+				free(buffer->stream);
+				free(buffer);
+				break;
+			}
+		default:
+			{
+				printf("Se corto la conexion\n");
+				sem_post(&detectorDesconexion);
+				pthread_exit(&threadSUSCRIBE_CAUGHT);
+				pthread_exit(&threadSUSCRIBE_APPEARED);
+				pthread_exit(&threadSUSCRIBE_LOCALIZED);
+				break;
+			}
 	}
 }
 

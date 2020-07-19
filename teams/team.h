@@ -43,6 +43,9 @@ pthread_t threadSERVER;
 pthread_t threadSUSCRIBE_CAUGHT;
 pthread_t threadSUSCRIBE_APPEARED;
 pthread_t threadSUSCRIBE_LOCALIZED;
+pthread_t threadRECONNECT;
+pthread_t threadDETECT_DISCON;
+pthread_t finalizarPrograma;
 
 sem_t mutexNEW;
 sem_t mutexREADY;
@@ -51,6 +54,8 @@ sem_t mutexBLOCKED;
 sem_t mutexEXIT;
 sem_t mutexPokesEnMapa;
 sem_t counterPokesEnMapa;
+sem_t waitForFinish;
+sem_t mutexReconnect;
 
 uint32_t cicloCPU;
 uint32_t quantum;
