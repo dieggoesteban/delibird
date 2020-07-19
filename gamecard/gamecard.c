@@ -25,7 +25,9 @@ int main(int argc, char *argv[])
     inicializarGamecard();
     establecerConexionBroker();
   
-     
+    if (pthread_create(&finalizarPrograma,NULL,(void*)terminar_programa,NULL) != 0)
+        printf("Error FINALIZAR\n");
+
     if (pthread_create(&threadDETECT_DISCON,NULL,(void*)detectarDesconexion,NULL) != 0)
         printf("Error DETECTOR\n");
 
@@ -35,17 +37,19 @@ int main(int argc, char *argv[])
     if (pthread_create(&threadSERVER,NULL,(void*)iniciar_servidor,NULL) != 0)
         printf("Error");
     
-    
 
-    pthread_join(threadSUSCRIBE_CATCH, NULL);
-    pthread_join(threadSUSCRIBE_NEW, NULL);
-    pthread_join(threadSUSCRIBE_GET, NULL);
+    pthread_detach(finalizarPrograma);
+    pthread_join(threadRECONNECT, NULL);    
+    pthread_join(threadDETECT_DISCON, NULL);
     pthread_join(threadSERVER, NULL);
-    terminar_programa(logger,config);
+
+    terminar_programa();
+
     return 0;
 }
 
-void terminar_programa(t_log* logger, t_config* config){
+void terminar_programa(){
+    sem_wait(&waitForFinish);
     printf("\nCERRANDO EL PROGRAMA*********************************\n");
 
     

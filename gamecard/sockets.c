@@ -46,6 +46,7 @@ void establecerConexionBroker() {
     suscribeGet = getSuscribe(GET_POKEMON);
 
     if (suscribeNew->conexion != -1) {
+		printf("Conexion: %i\n", suscribeNew->conexion);
         printf("Se establecio una conexion con el Broker :D\n");
 
     	if(pthread_create(&threadSUSCRIBE_NEW,NULL,(void*)suscribe,(void*)suscribeNew) != 0)
@@ -185,7 +186,7 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd)
 			log_info(logger, "SIZE BUFFER EN NEW: %i\n", buffer->size);
 			t_new_pokemon *newPoke = deserializar_newPokemon(buffer);
 			printf("Nombre del poke new: %s\n", newPoke->nombre);
-			t_acknowledgement* ack = crearAcknowledgement(newPoke->ID_mensaje_recibido, NEW_POKEMON);
+			t_acknowledgement* ack = crearAcknowledgement(idModule, newPoke->ID_mensaje_recibido, NEW_POKEMON);
 			t_posicion* posicion = crearPosicion(newPoke->posicionCantidad->posicion_x, newPoke->posicionCantidad->posicion_y);
 			t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(0, newPoke->ID_mensaje_recibido, newPoke->nombre, posicion);
 				
@@ -226,7 +227,7 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd)
 
 			t_caught_pokemon* caughtPoke = crearCaughtPokemon(0,catchPoke->ID_mensaje_recibido,1);
 
-			t_acknowledgement* ack = crearAcknowledgement(catchPoke->ID_mensaje_recibido, CATCH_POKEMON);
+			t_acknowledgement* ack = crearAcknowledgement(idModule, catchPoke->ID_mensaje_recibido, CATCH_POKEMON);
 
 			pthread_t sendAck;
 			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
@@ -285,7 +286,7 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 			log_info(logger, "SIZE BUFFER EN NEW: %i\n", buffer->size);
 			t_new_pokemon *newPoke = deserializar_newPokemon(buffer);
 			printf("Nombre del poke new: %s\n", newPoke->nombre);
-			t_acknowledgement* ack = crearAcknowledgement(newPoke->ID_mensaje_recibido, NEW_POKEMON);
+			t_acknowledgement* ack = crearAcknowledgement(idModule,newPoke->ID_mensaje_recibido, NEW_POKEMON);
 			t_posicion* posicion = crearPosicion(newPoke->posicionCantidad->posicion_x, newPoke->posicionCantidad->posicion_y);
 			t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(0, newPoke->ID_mensaje_recibido, newPoke->nombre, posicion);
 				
@@ -295,7 +296,8 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 			pthread_t hiloAtenderNewPoke;
 			pthread_create(&hiloAtenderNewPoke, NULL, atenderNewPokemon,(void*)newPoke);
 			pthread_detach(hiloAtenderNewPoke);
-			// atenderNewPokemon((void*)newPoke);
+
+			
 			log_info(logger, newPoke->nombre);
 
 			free(buffer->stream);
@@ -309,7 +311,7 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 
 			t_caught_pokemon* caughtPoke = crearCaughtPokemon(0,catchPoke->ID_mensaje_recibido,1);
 
-			t_acknowledgement* ack = crearAcknowledgement(catchPoke->ID_mensaje_recibido, CATCH_POKEMON);
+			t_acknowledgement* ack = crearAcknowledgement(idModule ,catchPoke->ID_mensaje_recibido, CATCH_POKEMON);
 
 			pthread_t sendAck;
 			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);

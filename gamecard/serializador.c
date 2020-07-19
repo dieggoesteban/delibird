@@ -304,52 +304,41 @@ t_get_pokemon* deserializar_getPokemon(t_buffer* buffer){
     return pokemon;
 }
 
-//Register Module serialization
-t_paquete* serializar_registerModule(t_register_module* registerModule)
-{
-	printf("Entro a serializar_registerModule\n");
-
-
+t_paquete* serializar_registerModule(t_register_module* registerModule) {
 	t_buffer* registerModuleBuffer = malloc(sizeof(t_buffer));
-	registerModuleBuffer->size = sizeof(uint32_t)*2;
+	registerModuleBuffer->size = sizeof(uint32_t) * 2;
 	void* stream = malloc(registerModuleBuffer->size);
 	int offset = 0;
 
-	memcpy(stream + offset, &(registerModule->moduleId), sizeof(uint32_t));
-    offset += sizeof(uint32_t);
 	memcpy(stream + offset, &(registerModule->messageQueue), sizeof(uint32_t));
 	offset += sizeof(uint32_t);
+    memcpy(stream + offset, &(registerModule->moduleId), sizeof(uint32_t));
+    offset += sizeof(uint32_t);
 
 	registerModuleBuffer->stream = stream;
 	t_paquete* paquete = crear_paquete(SUBSCRIBE, registerModuleBuffer->size, registerModuleBuffer->stream);
 
-	printf("Codigo mensaje, serializar_registerModule: %i\n", paquete->codigo_mensaje);
 	return paquete;
 }
-
-//Register Module deserialization
-t_register_module* deserializar_registerModule(t_buffer* buffer)
-{
-	printf("Entro a deserializar_registerModule\n");
+t_register_module* deserializar_registerModule(t_buffer* buffer) {
 	t_register_module* registerModule = malloc(sizeof(t_register_module));
-
 	void* stream = buffer->stream;
-
 	memcpy(&(registerModule->messageQueue), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
-	memcpy(&(registerModule->moduleId), stream, sizeof(uint32_t));
-
-
+    memcpy(&(registerModule->moduleId), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
 	return registerModule;
 }
 
 t_paquete* serializar_acknowledgement(t_acknowledgement* akc)
 {
-	t_buffer* akcBuffer = malloc(sizeof(t_buffer));
-	akcBuffer->size = sizeof(uint32_t) * 2;
+		t_buffer* akcBuffer = malloc(sizeof(t_buffer));
+	akcBuffer->size = sizeof(uint32_t) * 3;
 	void* stream = malloc(akcBuffer->size);
 	int offset = 0;
 
+    memcpy(stream + offset, &(akc->idModule), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
 	memcpy(stream + offset, &(akc->idMessageReceived), sizeof(uint32_t));
 	offset += sizeof(uint32_t);
 	memcpy(stream + offset, &(akc->mq), sizeof(uint32_t));
@@ -367,6 +356,8 @@ t_acknowledgement* deserializar_acknowledgement(t_buffer* buffer)
 
 	void* stream = buffer->stream;
 
+    memcpy(&(akc->idModule), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
 	memcpy(&(akc->idMessageReceived), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
 	memcpy(&(akc->mq), stream, sizeof(uint32_t));
@@ -536,8 +527,9 @@ t_semaforo_pokemon* crearSemaforoPokemon(char* nombrePoke){
 	return semaforoPoke;
 }
 
-t_acknowledgement* crearAcknowledgement(uint32_t ID_mensaje_recibido, uint32_t mq_cod) {
+t_acknowledgement* crearAcknowledgement(uint32_t idModulo,uint32_t ID_mensaje_recibido, uint32_t mq_cod) {
 	t_acknowledgement* ack = malloc(sizeof(t_acknowledgement));
+	ack->idModule = idModulo;
 	ack->idMessageReceived = ID_mensaje_recibido;
 	ack->mq = mq_cod;
 

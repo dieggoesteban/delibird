@@ -47,6 +47,7 @@ pthread_t threadSUSCRIBE_NEW;
 pthread_t threadSUSCRIBE_GET;
 pthread_t threadRECONNECT;
 pthread_t threadDETECT_DISCON;
+pthread_t finalizarPrograma;
 pthread_mutex_t mutexBitmap;
 
 
@@ -57,7 +58,7 @@ sem_t mutexReconnect;
 
 //PROGRAMA
 void inicializarGamecard();
-void terminar_programa(t_log* logger, t_config* config);
+void terminar_programa();
 
 //CONEXION BROKER
 void* escuchaPermanenteBroker(void* idConexionPermanente);

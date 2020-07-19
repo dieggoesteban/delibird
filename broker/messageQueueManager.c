@@ -128,6 +128,10 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 			newPoke->ID_mensaje_recibido = message->id;
 			message->mensaje = newPoke;
 
+			log_info(logger,"NEW_POKEMON: nombre: %s, id: %i, MQ: %i\n", newPoke->nombre, newPoke->ID_mensaje_recibido, message->mq_cod);
+
+
+
 			log_info(logger, "Se ha recibido un mensaje del cliente %i en la cola %s", socket_cliente, messageQueue->name);
 			addMessageToQueue(message, messageQueue);
 

@@ -50,6 +50,7 @@ typedef struct{
 } t_message;
 
 typedef struct{
+	uint32_t idModule;
 	uint32_t idMessageReceived;
 	uint32_t mq;
 } t_acknowledgement;
