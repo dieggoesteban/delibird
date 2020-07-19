@@ -60,7 +60,7 @@ t_caught_pokemon* crearCaughtPokemon(uint32_t IDMensajeRecibido, uint32_t IDMens
 t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre);
 t_message* crearMessage(void* mensajeRecibido);
 t_confirmacion_mensaje* crearConfirmacionMensaje(uint32_t ID_mensaje, uint32_t colaMensajes, bool meLlego);
-t_register_module* crearSuscribe(uint32_t ID_message_queue);
+t_register_module* crearSuscribe(uint32_t ID_message_queue, uint32_t moduleID);
 t_semaforo_pokemon* crearSemaforoPokemon(char* nombrePoke);
 t_acknowledgement* crearAcknowledgement(uint32_t ID_mensaje_recibido, uint32_t mq_cod);
 

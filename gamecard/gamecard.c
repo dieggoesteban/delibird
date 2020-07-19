@@ -1,45 +1,55 @@
 #include "gamecard.h"
 
+void handler() {
+    sem_post(&waitForFinish);
+}
 
-int main(void)
+int main(int argc, char *argv[])
 {
     config = config_create("./assets/gamecard.config");
 
 	logger = log_create("./assets/gamecard.log","gamecard",true,LOG_LEVEL_INFO);
 
-    log_info(logger, "a ver");
+    if(argv[1]) {
+        idModule = atoi(argv[1]);
+    }
+    else {
+        idModule = (uint32_t)config_get_int_value(config,"ID_MODULE");
+    }
+
+    sem_init(&waitForFinish, 0, 0);
+    sem_init(&mutexReconnect, 0, 0);
+
+    signal(SIGINT, handler);
 
     inicializarGamecard();
+    establecerConexionBroker();
   
-      if(pthread_create(&threadSUSCRIBE_CATCH,NULL,(void*)suscribe,(void*)CATCH_POKEMON) != 0)
-        printf("Error");
+     
+    if (pthread_create(&threadDETECT_DISCON,NULL,(void*)detectarDesconexion,NULL) != 0)
+        printf("Error DETECTOR\n");
 
-    if(pthread_create(&threadSUSCRIBE_NEW,NULL,(void*)suscribe,(void*)NEW_POKEMON) != 0)
-        printf("Error");
-
-    if(pthread_create(&threadSUSCRIBE_GET,NULL,(void*)suscribe,(void*)GET_POKEMON) != 0)
-        printf("Error");
+    if (pthread_create(&threadRECONNECT,NULL,(void*)reconectarBroker,NULL) != 0)
+        printf("Error RECONEXION\n");
 
     if (pthread_create(&threadSERVER,NULL,(void*)iniciar_servidor,NULL) != 0)
         printf("Error");
     
+    
 
-
-    // sem_init(&semReconexion,0,1);
-
-    // pthread_create(&hiloEscuchaBroker, NULL, escuchaPermanenteBroker,&idConexionPermanente);
-    // pthread_join(hiloEscuchaBroker,NULL);
-
+    pthread_join(threadSUSCRIBE_CATCH, NULL);
+    pthread_join(threadSUSCRIBE_NEW, NULL);
+    pthread_join(threadSUSCRIBE_GET, NULL);
+    pthread_join(threadSERVER, NULL);
     terminar_programa(logger,config);
     return 0;
 }
 
 void terminar_programa(t_log* logger, t_config* config){
-    pthread_join(threadSUSCRIBE_CATCH, NULL);
-    pthread_join(threadSUSCRIBE_NEW, NULL);
-    pthread_join(threadSUSCRIBE_GET, NULL);
-    pthread_join(threadSERVER, NULL);
+    printf("\nCERRANDO EL PROGRAMA*********************************\n");
 
+    
+    log_info(logger,"Liberamos todo");
     log_destroy(logger);
     config_destroy(config);
 }

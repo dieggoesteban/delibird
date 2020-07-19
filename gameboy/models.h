@@ -22,7 +22,6 @@ typedef enum
     SUBSCRIBE = 7,
 	MENSAJE_RECIBIDO = 8,
 	ACKNOWLEDGEMENT = 9,
-	ID_ASIGNADO_SUSCRIPCION = 10
 } operation_cod;
 
 typedef struct {
@@ -104,9 +103,25 @@ typedef struct{
 typedef struct 
 {
 	uint32_t messageQueue;
-	uint32_t idModule;
+	uint32_t moduleId;
 } t_register_module;
 
+//Esta estructura representa al mensaje que envía el broker con el ID del mensaje recibido
+//Se lo envía al emisor del mensaje, como un "número de pedido", por si recibe respuesta.
+typedef struct{
+	uint32_t id_mensajeEnviado;
+} t_id_mensaje_recibido;
+
+typedef struct{
+	uint32_t idModule;
+	uint32_t idMessageReceived;
+	uint32_t mq;
+} t_acknowledgement;
+
+typedef struct{
+	uint32_t idModule;
+	uint32_t socket;
+} t_suscripcion;
 
 typedef struct
 {
@@ -152,20 +167,6 @@ typedef struct{
 	char* nombre;
 } t_get_pokemon;
 
-//Esta estructura representa al mensaje que envía el broker con el ID del mensaje recibido
-//Se lo envía al emisor del mensaje, como un "número de pedido", por si recibe respuesta.
-typedef struct{
-	uint32_t id_mensajeEnviado;
-} t_id_mensaje_recibido;
-
-typedef struct{
-	uint32_t idMessageReceived;
-	uint32_t mq;
-} t_acknowledgement;
-
-typedef struct{
-	uint32_t idAssigned;
-} t_id_subscriber_assigned;
 #pragma endregion
 
 #pragma region Mensajes_Estructura_Cache

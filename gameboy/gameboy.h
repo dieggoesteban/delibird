@@ -20,6 +20,8 @@ bool terminaConexion;
 char* ipBroker;
 char* puertoBroker;
 
+uint32_t ID_MODULE;
+
 pthread_t hiloSuscriptor;
 pthread_t hiloTemporizador; //Para la suscripcion
 

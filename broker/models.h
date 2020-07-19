@@ -20,8 +20,7 @@ typedef enum
 {
     SUBSCRIBE = 7,
 	MENSAJE_RECIBIDO = 8,
-	ACKNOWLEDGEMENT = 9,
-	ID_ASIGNADO_SUSCRIPCION = 10
+	ACKNOWLEDGEMENT = 9
 } operation_cod;
 
 typedef struct {
@@ -33,7 +32,6 @@ typedef struct {
 	//Semaphores
 	pthread_mutex_t s_mensajes;
 	pthread_mutex_t s_subscribers;
-	sem_t s_haySuscriptores;
 	sem_t s_hayMensajes;
 
 	//Threads
@@ -44,19 +42,21 @@ typedef struct{
 	uint32_t id;
 	uint32_t idCorrelativo;
 	uint32_t mq_cod; //Cada mensaje sabe que tipo es
-	uint32_t cantidadSuscriptoresAEnviar;
+	uint32_t countSuscriptoresObjetivo;
+	
+	t_list* suscriptoresEnviados;
 	t_list* suscriptoresConfirmados; 
 	void* mensaje; //Contenido del mensaje
-
-	//Flags
-
+	
 	//Semaphores
+	pthread_mutex_t s_suscriptoresEnviados;
 	pthread_mutex_t s_suscriptoresConfirmados;
 	sem_t s_puedeEliminarse;
 
 	//Threads
 	pthread_t caching;
 	pthread_t deleteFromQueue;
+	
 } t_message;
 #pragma endregion
 
@@ -101,25 +101,26 @@ typedef struct{
 #pragma endregion
 
 #pragma region Mensajes_Deserializados
-typedef struct 
-{
+
+typedef struct {
 	uint32_t messageQueue;
-	uint32_t idAssigned;
+	uint32_t moduleId;
 } t_register_module;
 
-//Esta estructura representa al mensaje que envía el broker con el ID del mensaje recibido
-//Se lo envía al emisor del mensaje, como un "número de pedido", por si recibe respuesta.
 typedef struct{
 	uint32_t id_mensajeEnviado;
 } t_id_mensaje_recibido;
 
 typedef struct{
+	uint32_t idModule;
 	uint32_t idMessageReceived;
 	uint32_t mq;
 } t_acknowledgement;
+
 typedef struct{
-	uint32_t idAssigned;
-} t_id_subscriber_assigned;
+	uint32_t idModule;
+	uint32_t socket;
+} t_suscripcion;
 
 //Colas de mensajes
 

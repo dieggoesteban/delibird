@@ -309,11 +309,14 @@ t_paquete* serializar_registerModule(t_register_module* registerModule)
 {
 	printf("Entro a serializar_registerModule\n");
 
+
 	t_buffer* registerModuleBuffer = malloc(sizeof(t_buffer));
-	registerModuleBuffer->size = sizeof(uint32_t);
+	registerModuleBuffer->size = sizeof(uint32_t)*2;
 	void* stream = malloc(registerModuleBuffer->size);
 	int offset = 0;
 
+	memcpy(stream + offset, &(registerModule->moduleId), sizeof(uint32_t));
+    offset += sizeof(uint32_t);
 	memcpy(stream + offset, &(registerModule->messageQueue), sizeof(uint32_t));
 	offset += sizeof(uint32_t);
 
@@ -331,11 +334,11 @@ t_register_module* deserializar_registerModule(t_buffer* buffer)
 	t_register_module* registerModule = malloc(sizeof(t_register_module));
 
 	void* stream = buffer->stream;
-	printf("Buffer size: %i\n", buffer->size);
 
 	memcpy(&(registerModule->messageQueue), stream, sizeof(uint32_t));
-	printf("messageQueue: %i\n", registerModule->messageQueue);
 	stream += sizeof(uint32_t);
+	memcpy(&(registerModule->moduleId), stream, sizeof(uint32_t));
+
 
 	return registerModule;
 }
@@ -515,9 +518,10 @@ t_confirmacion_mensaje* crearConfirmacionMensaje(uint32_t ID_mensaje, uint32_t c
 	return confirmacion;
 }
 
-t_register_module* crearSuscribe(uint32_t ID_message_queue) {
+t_register_module* crearSuscribe(uint32_t ID_message_queue, uint32_t moduleID) {
 	t_register_module* suscribe = malloc(sizeof(t_register_module));
 	suscribe->messageQueue = ID_message_queue;
+	suscribe->moduleId = moduleID;
 
 	return suscribe;
 }

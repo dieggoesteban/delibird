@@ -1,11 +1,14 @@
 #include "gameboy.h"
+#include <time.h>
 
 t_log *logger;
 t_log *gameboy_custom_logger;
 t_config *config;
 
 int main(int argc, char *argv[])
-{
+{   
+    srand(time(NULL));
+    ID_MODULE = rand() % 40;
     config = config_create("./assets/gameboy.config");
     logger = log_create("./assets/gameboy.log", "gameboy", true, LOG_LEVEL_INFO);
     gameboy_custom_logger = log_create("./assets/gameboy_custom.log", "gameboy", true, LOG_LEVEL_INFO);
@@ -16,9 +19,7 @@ int main(int argc, char *argv[])
     if (argc > 2)
     {
         char *proceso = argv[1];
-        log_info(gameboy_custom_logger, "Proceso: %s", argv[1]);
         char *tipo_mensaje = argv[2];
-        log_info(gameboy_custom_logger, "Tipo mensaje: %s", argv[2]);
         char *ip;
         char *puerto;
         char *arrayArgumentos[argc - 3];
@@ -35,7 +36,7 @@ int main(int argc, char *argv[])
                 sem_init(&tempo, 0, 1);
                 pthread_create(&hiloSuscriptor, NULL, (void*)modoSuscriptor, (void*)tipo_mensaje);
                 pthread_create(&hiloTemporizador, NULL, (void*)temporizador, (void*)atoi(argv[3]));
-                pthread_join(hiloSuscriptor, NULL);
+                pthread_detach(hiloSuscriptor);
                 pthread_join(hiloTemporizador, NULL);
             }
             else

@@ -16,6 +16,7 @@
 #include "models.h"
 #include "commons/collections/dictionary.h"
 #include "serializador.h"
+#include "sockets.h"
 
 t_log* logger;
 t_config* config;
@@ -36,5 +37,7 @@ void setValueDic(t_dictionary *dic, char *key, char *value);
 char* dictionaryToString(t_dictionary* dictionary);
 t_list* dictionaryToListPosiciones(t_dictionary* dictionary);
 uint32_t encontrarSemaforoDelPoke(char* nombrePoke, t_list* listaSem);
+char* getMQName(uint32_t mq);
+t_suscribe* getSuscribe(uint32_t mq);
 
 #endif /* UTILS_H_ */

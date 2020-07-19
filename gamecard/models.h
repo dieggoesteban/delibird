@@ -57,6 +57,7 @@ typedef struct{
 typedef struct 
 {
 	uint32_t messageQueue;
+	uint32_t moduleId;
 } t_register_module;
 
 typedef struct
@@ -151,5 +152,11 @@ typedef struct
 	bool enEspera;
     bool deadlock; 
 } t_entrenador;
+
+typedef struct
+{
+	uint32_t conexion;
+	uint32_t messageQueue;
+} t_suscribe;
 
 #endif /* MODELS_H_ */

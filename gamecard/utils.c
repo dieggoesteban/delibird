@@ -162,3 +162,31 @@ t_list* dictionaryToListPosiciones(t_dictionary* dictionary){
 	dictionary_iterator(dictionary,separarKeyEnPosicion);
 	return listaPosiciones;
 }
+
+char* getMQName(uint32_t mq) {
+	char* message;
+	switch(mq) {
+		case 1:
+			message = "NEW_POKEMON";
+			break;
+		case 3:
+			message = "CATCH_POKEMON";
+			break;
+		case 5:
+			message = "GET_POKEMON";
+			break;
+	}
+	return message;
+}
+
+t_suscribe* getSuscribe(uint32_t mq) {
+	printf("Intentando SUSCRIBE en %s...\n", getMQName(mq));
+	t_suscribe* suscribe = malloc(sizeof(t_suscribe));
+    uint32_t conexion = escuchaBroker();
+	printf("la Conexion es: %i y el MQ es %i\n", conexion,mq);
+
+	suscribe->conexion = conexion;
+	suscribe->messageQueue = mq;
+
+	return suscribe;
+}

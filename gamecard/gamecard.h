@@ -34,13 +34,26 @@ t_bitarray* bitmapArr;
 uint32_t cantBloques;
 uint32_t sizeBloque;
 char* magicNumber;
+uint32_t idModule;
+t_suscribe* suscribeNew;
+t_suscribe* suscribeCatch;
+t_suscribe* suscribeGet;
+
+
+//HILOS
 pthread_t threadSERVER;
 pthread_t threadSUSCRIBE_CATCH;
 pthread_t threadSUSCRIBE_NEW;
 pthread_t threadSUSCRIBE_GET;
+pthread_t threadRECONNECT;
+pthread_t threadDETECT_DISCON;
 pthread_mutex_t mutexBitmap;
+
+
 //SEMAFOROS
 sem_t semReconexion;
+sem_t waitForFinish;
+sem_t mutexReconnect;
 
 //PROGRAMA
 void inicializarGamecard();

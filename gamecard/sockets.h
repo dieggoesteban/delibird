@@ -23,6 +23,7 @@ t_config* config;
 pthread_t thread;
 char* IP;
 char* PUERTO;
+uint32_t idModule;
 
 // typedef struct {
 //     uint32_t mq_cod;
@@ -37,6 +38,19 @@ t_message_queue* getPokemonMessageQueue;
 t_message_queue* localizedPokemonMessageQueue;
 t_message_queue* caughtPokemonMessageQueue;
 
+t_suscribe* suscribeNew;
+t_suscribe* suscribeCatch;
+t_suscribe* suscribeGet;
+
+pthread_t threadSUSCRIBE_CATCH;
+pthread_t threadSUSCRIBE_NEW;
+pthread_t threadSUSCRIBE_GET;
+pthread_t threadRECONNECT;
+pthread_t threadDETECT_DISCON;
+
+sem_t mutexReconnect;
+sem_t detectorDesconexion;
+
 
 //CLIENTE
 int crear_conexion(char* ip, char* puerto);
@@ -49,7 +63,7 @@ uint32_t escuchaBroker();
 void iniciar_servidor(void);
 void esperar_cliente(uint32_t socket_servidor);
 void serve_client(uint32_t* socket);
-void process_request(uint32_t cod_op, uint32_t cliente_fd);
+void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd);
 t_buffer* recibir_buffer(uint32_t socket_cliente);
 void suscribe(void* message_queue);
 
@@ -57,6 +71,10 @@ void suscribe(void* message_queue);
 t_message_queue* getMessageQueueById(mq_cod id);
 
 
-sem_t semReconexion;
+void detectarDesconexion();
+void reconectarBroker();
+void establecerConexionBroker();
+void serve_suscribe(uint32_t* socket);
+void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd);
 
 #endif /* SOCKETS_H_ */

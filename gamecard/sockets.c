@@ -15,22 +15,11 @@ int crear_conexion(char *ip, char *puerto)
 	getaddrinfo(ip, puerto, &hints, &server_info);
 
 	uint32_t socket_cliente = socket(server_info->ai_family,
-									 server_info->ai_socktype, server_info->ai_protocol);
+			server_info->ai_socktype, server_info->ai_protocol);
 
-	// int resultadoConexion = connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen);
-
-	// // if (connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen) == -1)
-	// // 	printf("error");
-
-	// freeaddrinfo(server_info);
-	// if(resultadoConexion == ERROR){
-	// 	return -1;
-	// }
-	// 		server_info->ai_socktype, server_info->ai_protocol);
-
-	if (connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen)
-			== -1)
-		printf("error");
+	if (connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen) == -1) {
+		return ERROR;
+	}
 
 	freeaddrinfo(server_info);
 
@@ -51,20 +40,67 @@ void enviarMensaje(t_paquete *paquete, uint32_t socket_cliente)
 	free(stream);
 }
 
-void suscribe(void* message_queue) {
-	char* ip = config_get_string_value(config, "IP_BROKER");
-    char* puerto = config_get_string_value(config, "PUERTO_BROKER");
-    uint32_t conexion = crear_conexion(ip, puerto);
-	
-	uint32_t mq = (uint32_t) message_queue;
-	t_register_module* suscribe = crearSuscribe(mq);
-	t_paquete* paquete = serializar_registerModule(suscribe);
-	printf("SUSCRIBE %i \n", mq);
-	free(suscribe);
-	enviarMensaje(paquete, conexion);
+void establecerConexionBroker() {
+    suscribeNew = getSuscribe(NEW_POKEMON);
+    suscribeCatch = getSuscribe(CATCH_POKEMON);
+    suscribeGet = getSuscribe(GET_POKEMON);
 
+    if (suscribeNew->conexion != -1) {
+        printf("Se establecio una conexion con el Broker :D\n");
+
+    	if(pthread_create(&threadSUSCRIBE_NEW,NULL,(void*)suscribe,(void*)suscribeNew) != 0)
+        printf("Error");
+        
+		if(pthread_create(&threadSUSCRIBE_CATCH,NULL,(void*)suscribe,(void*)suscribeCatch) != 0)
+        printf("Error");
+
+   		if(pthread_create(&threadSUSCRIBE_GET,NULL,(void*)suscribe,(void*)suscribeGet) != 0)
+        printf("Error");
+
+        pthread_detach(threadSUSCRIBE_NEW);
+        pthread_detach(threadSUSCRIBE_CATCH);
+        pthread_detach(threadSUSCRIBE_GET);
+    }
+    else {
+        printf("No se pudo establecer una conexion con el Broker :c\n");
+        printf("Intentando reconexion en %i segundos...\n", (uint32_t)config_get_int_value(config,"TIEMPO_DE_REINTENTO_CONEXION"));
+        sem_post(&mutexReconnect);
+    }
+}
+
+void reconectarBroker() {
 	while(1) {
-		serve_client(&conexion);
+		sem_wait(&mutexReconnect);
+		sleep((uint32_t)config_get_int_value(config,"TIEMPO_DE_REINTENTO_CONEXION"));
+		printf("Intentando reconexion con Broker...\n");
+		establecerConexionBroker();
+	}
+}
+
+void detectarDesconexion() {
+	while(1) {
+		sem_wait(&detectorDesconexion);
+		sem_wait(&detectorDesconexion);
+		sem_wait(&detectorDesconexion);
+		printf("Se desconecto el Broker :c\n");
+
+		sem_post(&mutexReconnect);
+	}
+}
+
+
+
+void suscribe(void* structSuscribe) {
+	t_suscribe* s = (t_suscribe*) structSuscribe;
+
+	t_register_module* suscribe = crearSuscribe(s->messageQueue, idModule);
+	t_paquete* paquete = serializar_registerModule(suscribe);
+	printf("SUSCRIBE %i \n", s->messageQueue);
+	free(suscribe);
+	enviarMensaje(paquete, s->conexion);
+	
+	while(1) {
+		serve_suscribe(&s->conexion);
 	}
 }
 
@@ -130,16 +166,18 @@ void esperar_cliente(uint32_t socket_servidor)
 void serve_client(uint32_t *socket)
 {
 	uint32_t cod_op;
+	t_buffer* buffer;
 	if (recv(*socket, &cod_op, sizeof(int), MSG_WAITALL) == -1)
 		cod_op = -1;
-	printf("\nCodigo de op: %i\n", cod_op);
-	process_request(cod_op, *socket);
+	if(cod_op > 0 && cod_op < 11) {
+		buffer = recibir_buffer(*socket);
+	}
+	process_request(cod_op, buffer, *socket);
 }
 
-void process_request(uint32_t cod_op, uint32_t cliente_fd)
+void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd)
 {
-	log_info(logger,"atendiendo al cliente %i", cliente_fd);
-	t_buffer *buffer = recibir_buffer(cliente_fd);
+	log_info(logger,"atendiendo al cliente %i\n", cliente_fd);
 	switch (cod_op)
 	{
 		case NEW_POKEMON:
@@ -157,7 +195,6 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd)
 			pthread_t hiloAtenderNewPoke;
 			pthread_create(&hiloAtenderNewPoke, NULL, atenderNewPokemon,(void*)newPoke);
 			pthread_detach(hiloAtenderNewPoke);
-			// atenderNewPokemon((void*)newPoke);
 			log_info(logger, newPoke->nombre);
 			//podria generar la conexion con broker desde un principio, por donde se le va a enviar los appeared, caught y localized ,pero que sea el servidor que reciba las requests
 			//enviar a broker
@@ -206,13 +243,6 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd)
 		
 			break;
 		}
-		case CAUGHT_POKEMON:
-		{
-
-
-			
-			break;
-		}
 		case GET_POKEMON:
 		{
 			t_get_pokemon *getPoke = deserializar_getPokemon(buffer);
@@ -236,6 +266,92 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd)
 	free(buffer);
 }
 
+void serve_suscribe(uint32_t* socket)
+{
+	int cod_op;
+	t_buffer* buffer;
+	if(recv(*socket, &cod_op, sizeof(int), MSG_WAITALL) == -1)
+		cod_op = -1;
+	if(cod_op > 0 && cod_op < 11) {
+		buffer = recibir_buffer(*socket);
+	}
+	process_suscribe_request(cod_op, buffer, *socket);
+}
+
+void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd) {
+	switch (cod_op) {
+		case NEW_POKEMON:
+		{
+			log_info(logger, "SIZE BUFFER EN NEW: %i\n", buffer->size);
+			t_new_pokemon *newPoke = deserializar_newPokemon(buffer);
+			printf("Nombre del poke new: %s\n", newPoke->nombre);
+			t_acknowledgement* ack = crearAcknowledgement(newPoke->ID_mensaje_recibido, NEW_POKEMON);
+			t_posicion* posicion = crearPosicion(newPoke->posicionCantidad->posicion_x, newPoke->posicionCantidad->posicion_y);
+			t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(0, newPoke->ID_mensaje_recibido, newPoke->nombre, posicion);
+				
+			pthread_t sendAck;
+			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
+			pthread_detach(sendAck);
+			pthread_t hiloAtenderNewPoke;
+			pthread_create(&hiloAtenderNewPoke, NULL, atenderNewPokemon,(void*)newPoke);
+			pthread_detach(hiloAtenderNewPoke);
+			// atenderNewPokemon((void*)newPoke);
+			log_info(logger, newPoke->nombre);
+
+			free(buffer->stream);
+			free(buffer);
+			break;
+		}
+		case CATCH_POKEMON:
+		{
+			log_info(logger, "SIZE BUFFER EN NEW: %i\n", buffer->size);
+			t_catch_pokemon *catchPoke = deserializar_catchPokemon(buffer);
+
+			t_caught_pokemon* caughtPoke = crearCaughtPokemon(0,catchPoke->ID_mensaje_recibido,1);
+
+			t_acknowledgement* ack = crearAcknowledgement(catchPoke->ID_mensaje_recibido, CATCH_POKEMON);
+
+			pthread_t sendAck;
+			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
+			pthread_detach(sendAck);
+			pthread_t hiloAtenderCatchPoke;
+			pthread_create(&hiloAtenderCatchPoke, NULL, (void*)atenderCatchPokemon,(void*)catchPoke);
+			pthread_detach(hiloAtenderCatchPoke);
+
+			printf("Nombre del poke a atrapar: %s\n", catchPoke->nombre);
+			//enviar a broker
+
+			log_info(logger, catchPoke->nombre);
+			// free(catchPoke);
+		
+			break;
+		}
+		case GET_POKEMON:
+		{
+			t_get_pokemon *getPoke = deserializar_getPokemon(buffer);
+			log_info(logger, getPoke->nombre);
+			t_localized_pokemon* localizedPoke = atenderGetPokemon(getPoke);
+			
+			
+			//enviar a broker
+
+
+			free(getPoke);
+			
+			break;
+		}
+		default:
+		{
+			printf("Se corto la conexion\n");
+			sem_post(&detectorDesconexion);
+			pthread_exit(&threadSUSCRIBE_NEW);
+			pthread_exit(&threadSUSCRIBE_CATCH);
+			pthread_exit(&threadSUSCRIBE_GET);
+			break;
+		}
+	}
+}
+
 t_buffer *recibir_buffer(uint32_t socket_cliente)
 {
 	t_buffer *buffer = malloc(sizeof(t_buffer));
@@ -251,42 +367,14 @@ t_buffer *recibir_buffer(uint32_t socket_cliente)
 	return buffer;
 }
 
-//Devuelve la cola de mensajes dado un id
-
-
 uint32_t escuchaBroker(){
 	char* IP_BROKER = config_get_string_value(config,"IP_BROKER");
     char* PUERTO_BROKER = config_get_string_value(config,"PUERTO_BROKER");
+	uint32_t conexion = crear_conexion(IP_BROKER, PUERTO_BROKER);
+	printf("CONEXION: %i\n", conexion);
 
-	return crear_conexion(IP_BROKER, PUERTO_BROKER);
+	return conexion;
 }
 
-// void* escuchaPermanenteBroker(void* idConexionPermanente){
-//     uint32_t* idCon = (uint32_t*)idConexionPermanente;
-//     // log_info(logger,"idCOnecsdcPermanente: %i", (uint32_t)idConexionPermanente);
-//     uint32_t cod_op;
-//     while(1){
-//         int result = recv((uint32_t)idConexionPermanente, &cod_op, sizeof(uint32_t), MSG_WAITALL);
-//         if(result == ERROR){
-//             sem_wait(&semReconexion);
-//             pthread_t hiloReconexion;
-//             log_info(logger,"a punto de entrar a rec");
-//             pthread_create(&hiloReconexion,NULL,reconexionBroker,NULL);
-//             // uint32_t idNuevaConexion;
-//             pthread_join(hiloReconexion,(void**)&idCon); 
-//         }
-//     }
-// }
 
-// void* reconexionBroker(){
-//     log_info(logger,"entro a rec");
-//     uint32_t idCon = -1;
-//     while(idCon == ERROR){
-//         idCon = escuchaBroker();
-//         log_info(logger,"idConexion en reintento: %i", idCon);
-//         sleep(tiempoReintentoConexion);
-//     }
-//     pthread_exit((void*)idCon);
-//     sem_post(&semReconexion);
-// }
 
