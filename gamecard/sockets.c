@@ -148,17 +148,17 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd)
 			t_new_pokemon *newPoke = deserializar_newPokemon(buffer);
 			printf("Nombre del poke new: %s\n", newPoke->nombre);
 			t_acknowledgement* ack = crearAcknowledgement(newPoke->ID_mensaje_recibido, NEW_POKEMON);
+			t_posicion* posicion = crearPosicion(newPoke->posicionCantidad->posicion_x, newPoke->posicionCantidad->posicion_y);
+			t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(0, newPoke->ID_mensaje_recibido, newPoke->nombre, posicion);
 				
 			pthread_t sendAck;
 			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
 			pthread_detach(sendAck);
-			pthread_t hiloAtenderPoke;
-			pthread_create(&hiloAtenderPoke, NULL, atenderNewPokemon,(void*)newPoke);
-			pthread_detach(hiloAtenderPoke);
+			pthread_t hiloAtenderNewPoke;
+			pthread_create(&hiloAtenderNewPoke, NULL, atenderNewPokemon,(void*)newPoke);
+			pthread_detach(hiloAtenderNewPoke);
 			// atenderNewPokemon((void*)newPoke);
 			log_info(logger, newPoke->nombre);
-			t_posicion* posicion = crearPosicion(newPoke->posicionCantidad->posicion_x, newPoke->posicionCantidad->posicion_y);
-			t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(0, newPoke->ID_mensaje_recibido, newPoke->nombre, posicion);
 			//podria generar la conexion con broker desde un principio, por donde se le va a enviar los appeared, caught y localized ,pero que sea el servidor que reciba las requests
 			//enviar a broker
 			
@@ -171,6 +171,9 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd)
 			log_info(logger, "SIZE BUFFER EN NEW: %i", buffer->size);
 			// deserializar_appearedPokemon(buffer);
 			t_appeared_pokemon *appearedPoke = deserializar_appearedPokemon(buffer);
+			
+
+
 			printf("pos x de poke: %i", appearedPoke->posicion->posicion_x);
 			log_info(logger, appearedPoke->nombre);
 
@@ -183,13 +186,23 @@ void process_request(uint32_t cod_op, uint32_t cliente_fd)
 		{
 			log_info(logger, "SIZE BUFFER EN NEW: %i\n", buffer->size);
 			t_catch_pokemon *catchPoke = deserializar_catchPokemon(buffer);
-			printf("Nombre del poke a atrapar: %s\n", catchPoke->nombre);
-			atenderCatchPokemon(catchPoke);
+
 			t_caught_pokemon* caughtPoke = crearCaughtPokemon(0,catchPoke->ID_mensaje_recibido,1);
+
+			t_acknowledgement* ack = crearAcknowledgement(catchPoke->ID_mensaje_recibido, CATCH_POKEMON);
+
+			pthread_t sendAck;
+			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
+			pthread_detach(sendAck);
+			pthread_t hiloAtenderCatchPoke;
+			pthread_create(&hiloAtenderCatchPoke, NULL, (void*)atenderCatchPokemon,(void*)catchPoke);
+			pthread_detach(hiloAtenderCatchPoke);
+
+			printf("Nombre del poke a atrapar: %s\n", catchPoke->nombre);
 			//enviar a broker
 
 			log_info(logger, catchPoke->nombre);
-			free(catchPoke);
+			// free(catchPoke);
 		
 			break;
 		}

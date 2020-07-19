@@ -22,6 +22,7 @@ t_log* logger;
 char* IP;
 char* PUERTO;
 uint32_t tiempoReintentoConexion;
+uint32_t tiempoReintentoOperacion;
 uint32_t tiempoOperacion;
 char* punto_montaje;
 char* pathFiles;

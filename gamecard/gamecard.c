@@ -50,6 +50,7 @@ void inicializarGamecard(){
     PUERTO = config_get_string_value(config,"PUERTO_GAMECARD");
     tiempoReintentoConexion = (uint32_t)config_get_int_value(config,"TIEMPO_DE_REINTENTO_CONEXION");
     tiempoOperacion = (uint32_t)config_get_int_value(config,"TIEMPO_DE_REINTENTO_OPERACION");
+    tiempoReintentoOperacion = (uint32_t)config_get_int_value(config,"TIEMPO_RETARDO_OPERACION");
     punto_montaje = config_get_string_value(config,"PUNTO_MONTAJE_TALLGRASS");
 
     

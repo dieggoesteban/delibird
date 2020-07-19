@@ -44,6 +44,7 @@ uint32_t sizeBloque;
 char* magicNumber;
 t_list* semaforosPokemon;
 uint32_t tiempoReintentoConexion;
+uint32_t tiempoReintentoOperacion;
 uint32_t tiempoOperacion;
 
 pthread_mutex_t mutexBitmap;
@@ -105,6 +106,9 @@ bool existeBitmap(char* rutaArchivo);
 bool existeDirectorio(char* rutaDirectorio);
 bool estaOpen(t_config* metadataPoke);
 void* reintentarOperacion(void* metadataPoke);
+void reintentandoOperacion(char* metadataPoke);
+void waitSemYModificacionOpen(uint32_t indexSemaforo, char* pathMetadataPoke);
+void signalSemYModificacionOpen(uint32_t indexSemaforo, char* pathMetadataPoke);
 
 
 #endif /* TALLGRASS_H_ */
