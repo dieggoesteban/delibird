@@ -52,6 +52,7 @@ pthread_mutex_t mutexBitmap;
 //CREAR
 bool crearDirectorio(char* rutaDirectorio);
 t_bitarray* crear_bitmap_en_disco(char* archivo, size_t size);
+t_bitarray *copiar_bitmap_en_disco(char* archivo, size_t size);
 
 //AGREGAR EN PATH
 char* agregarAPuntoMontaje(char* restoRuta);
@@ -63,9 +64,9 @@ char* agregarADirectorioMetadataFS(char* restoRuta);
 char* agregarAPath(char* path, char* agregado);
 
 //ATENDER
-t_localized_pokemon* atenderGetPokemon(t_get_pokemon* getPokemon);
+t_localized_pokemon* atenderGetPokemon(t_getPokemon_indexSem* getPokemon);
 void* atenderNewPokemon(void* newPokemon);
-void atenderCatchPokemon(t_catch_pokemon* catchPokemon);
+void atenderCatchPokemon(void* catchPokemon);
 
 //ESCRIBIR
 void escribirBloque(char* texto, char* pathMetadataPoke, uint32_t bloqueAEscribir, char* modoEscritura);
@@ -104,6 +105,7 @@ uint32_t buscarBloqueEInsertarEnArchivo(t_config* metadataPoke);
 void sacarUltimoBloqueDeArchivo(t_config* metadataPoke, char** arrBloques);
 bool existeBitmap(char* rutaArchivo);
 bool existeDirectorio(char* rutaDirectorio);
+bool existeArchivo(char* rutaDirectorio);
 bool estaOpen(char* metadataPoke);
 void* reintentarOperacion(void* metadataPoke);
 void reintentandoOperacion(char* metadataPoke);

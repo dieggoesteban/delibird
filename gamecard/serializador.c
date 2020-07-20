@@ -534,6 +534,20 @@ t_newPokemon_indexSem* crearNewPokemonIndexSem(uint32_t indexSem, t_new_pokemon*
 	return newPokeSem;
 }
 
+t_catchPokemon_indexSem* crearCatchPokemonIndexSem(uint32_t indexSem, t_catch_pokemon* catchPoke){
+	t_catchPokemon_indexSem* catchPokeSem = malloc(sizeof(t_catchPokemon_indexSem));
+	catchPokeSem->indexSemaforo = indexSem;
+	catchPokeSem->catchPokemon = catchPoke;
+	return catchPokeSem;
+}
+
+t_getPokemon_indexSem* crearGetPokemonIndexSem(uint32_t indexSem, t_get_pokemon* getPoke){
+	t_getPokemon_indexSem* getPokeSem = malloc(sizeof(t_getPokemon_indexSem));
+	getPokeSem->indexSemaforo = indexSem;
+	getPokeSem->getPokemon = getPoke;
+	return getPokeSem;
+}
+
 t_acknowledgement* crearAcknowledgement(uint32_t idModulo,uint32_t ID_mensaje_recibido, uint32_t mq_cod) {
 	t_acknowledgement* ack = malloc(sizeof(t_acknowledgement));
 	ack->idModule = idModulo;

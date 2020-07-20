@@ -248,13 +248,20 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd)
 		{
 			t_get_pokemon *getPoke = deserializar_getPokemon(buffer);
 			log_info(logger, getPoke->nombre);
-			t_localized_pokemon* localizedPoke = atenderGetPokemon(getPoke);
-			
-			
-			//enviar a broker
 
 
-			free(getPoke);
+			uint32_t indexSem = getIndexSemaforo(getPoke->nombre, semaforosPokemon);
+			printf("INDEX QUE ME DA SOCKET: %i\n", indexSem);
+			if(indexSem == ERROR){
+			 	t_semaforo_pokemon* semPoke = crearSemaforoPokemon(getPoke->nombre);
+				indexSem = list_add(semaforosPokemon,semPoke);
+			}
+			
+			t_getPokemon_indexSem* getPokeSem = crearGetPokemonIndexSem(indexSem, getPoke);
+
+
+
+			t_localized_pokemon* localizedPoke = atenderGetPokemon(getPokeSem);
 			
 			break;
 		}
@@ -330,7 +337,7 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 				indexSem = list_add(semaforosPokemon,semPoke);
 			}
 			
-			t_catchPokemon_indexSem* catchPokeSem = crearNewPokemonIndexSem(indexSem, catchPoke);
+			t_catchPokemon_indexSem* catchPokeSem = crearCatchPokemonIndexSem(indexSem, catchPoke);
 
 			pthread_t sendAck;
 			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
@@ -344,6 +351,9 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 
 			log_info(logger, catchPoke->nombre);
 			// free(catchPoke);
+
+			free(buffer->stream);
+			free(buffer);
 		
 			break;
 		}
@@ -360,7 +370,7 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 				indexSem = list_add(semaforosPokemon,semPoke);
 			}
 			
-			t_getPokemon_indexSem* getPokeSem = crearNewPokemonIndexSem(indexSem, getPoke);
+			t_getPokemon_indexSem* getPokeSem = crearGetPokemonIndexSem(indexSem, getPoke);
 
 
 
@@ -369,8 +379,8 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 			
 			//enviar a broker
 
-
-			free(getPoke);
+			free(buffer->stream);
+			free(buffer);
 			
 			break;
 		}

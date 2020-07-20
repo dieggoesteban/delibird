@@ -80,3 +80,9 @@
 [INFO] 22:41:32:829 gameboy/(847:847): Se ha recibido el id del mensaje enviado: 7
 [INFO] 22:41:41:374 gameboy/(856:856): entro a get_pokemon
 [INFO] 22:41:41:375 gameboy/(856:856): Se ha recibido el id del mensaje enviado: 8
+[INFO] 02:11:04:674 gameboy/(7519:7519): Se ha recibido el id del mensaje enviado: 1
+[INFO] 02:12:48:150 gameboy/(7709:7709): Se ha recibido el id del mensaje enviado: 1
+[INFO] 02:12:56:894 gameboy/(7718:7718): Se ha recibido el id del mensaje enviado: 2
+[INFO] 02:13:03:482 gameboy/(7738:7738): Se ha recibido el id del mensaje enviado: 3
+[INFO] 02:13:52:442 gameboy/(7806:7806): Se ha recibido el id del mensaje enviado: 4
+[INFO] 02:14:24:935 gameboy/(7868:7868): Se ha recibido el id del mensaje enviado: 5

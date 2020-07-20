@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 void terminar_programa(){
     sem_wait(&waitForFinish);
     printf("\nCERRANDO EL PROGRAMA*********************************\n");
-
+    list_destroy_and_destroy_elements(semaforosPokemon, free);
     
     log_info(logger,"Liberamos todo");
     log_destroy(logger);
@@ -90,11 +90,11 @@ void inicializarGamecard(){
 
     pathBitmap = agregarADirectorioMetadataFS("Bitmap.txt");
     printf("path bitmap: %s\n", pathBitmap);
-    // if(existeBitmap(pathBitmap)){
-
-    // }else{
-    bitmapArr = crear_bitmap_en_disco(pathBitmap, cantBloques);
-    // }
+    if(existeArchivo(pathBitmap)){
+        bitmapArr = copiar_bitmap_en_disco(pathBitmap, cantBloques);
+    }else{
+        bitmapArr = crear_bitmap_en_disco(pathBitmap, cantBloques);
+    }
     semaforosPokemon = list_create();
     pthread_mutex_init(&mutexBitmap, NULL);
 

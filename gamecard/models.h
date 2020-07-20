@@ -145,7 +145,7 @@ typedef struct{
 typedef struct{
 	uint32_t indexSemaforo;
 	t_get_pokemon* getPokemon;
-}t_getPokemon_indexSem
+}t_getPokemon_indexSem;
 
 typedef struct
 {

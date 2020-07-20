@@ -38,6 +38,27 @@ bool existeDirectorio(char* rutaDirectorio){ //la ruta del direc tiene que termi
     }
 }
 
+bool existeArchivo(char* rutaDirectorio){ //la ruta del direc tiene que terminar con un /
+    struct stat s;
+    int err = stat(rutaDirectorio, &s);
+    if(-1 == err) {
+        if(ENOENT == errno) {
+            log_warning(logger,"NO EXISTE %s\n", rutaDirectorio);
+            return false;
+        } else {
+            perror("stat"); //borrar esta parte despues
+            exit(1);
+        }
+    } else {
+        if(S_ISDIR(s.st_mode)) {
+            // log_info(logger,"EXISTE%s\n", rutaDirectorio);
+            return false;
+        } else {
+            return true;
+        }
+    }
+}
+
 char *agregarAPuntoMontaje(char *restoRuta)
 {
     char *punto_montajeTemp = string_duplicate(punto_montaje);
@@ -419,6 +440,30 @@ bool existeBitmap(char* rutaArchivo){
     return (stat (rutaArchivo, &st) == 0);
 }
 
+t_bitarray *copiar_bitmap_en_disco(char* archivo, size_t size){
+    int fd = open(archivo, O_CREAT | O_RDWR, 0664);
+    if (fd == -1)
+    {
+        perror("open file");
+        exit(1);
+    }
+    ftruncate(fd, size);
+
+    bmap = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+
+    if (bmap == MAP_FAILED)
+    {
+        perror("mmap");
+        close(fd);
+        exit(1);
+    }
+    t_bitarray *bitmap = bitarray_create_with_mode((char *)bmap, size / 8, LSB_FIRST);
+     // msync(NULL, size, LSB_FIRST);
+    close(fd);
+    // munmap(bmap, size); para finalizar gamecard
+    return bitmap;
+}
+
 t_bitarray *crear_bitmap_en_disco(char *archivo, size_t size)
 {
     int fd = open(archivo, O_CREAT | O_RDWR, 0664);
@@ -524,7 +569,7 @@ t_localized_pokemon* atenderGetPokemon(t_getPokemon_indexSem* getPokemonSem){
 }
 
 void atenderCatchPokemon(void* catchPoke){
-    t_catchPokemon_indexSem* catchPokemonSem = (t_catch_pokemon*)catchPoke;
+    t_catchPokemon_indexSem* catchPokemonSem = (t_catchPokemon_indexSem*)catchPoke;
     char* pathFilesPokemon = string_duplicate(pathFiles);
     string_append(&pathFilesPokemon,catchPokemonSem->catchPokemon->nombre);
     char* pathMetadataPoke = agregarAPath(pathFilesPokemon,"/Metadata.txt");
