@@ -190,3 +190,13 @@ t_suscribe* getSuscribe(uint32_t mq) {
 
 	return suscribe;
 }
+
+uint32_t getIndexSemaforo(char* nombrePoke,t_list* lista) {
+	for(uint32_t i = 0; i < list_size(lista); i++) {
+		t_semaforo_pokemon* semPoke = (t_semaforo_pokemon*)list_get(lista, i);
+		if(string_equals_ignore_case(semPoke->nombrePoke, nombrePoke)) {
+			return i;
+		}
+	}
+	return ERROR;
+}

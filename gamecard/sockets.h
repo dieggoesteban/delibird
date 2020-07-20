@@ -17,6 +17,7 @@
 #include "serializador.h"
 #include "models.h"
 #include "tallgrass.h"
+#include "utils.h"
 
 t_log* logger;
 t_config* config;
@@ -51,6 +52,7 @@ pthread_t threadDETECT_DISCON;
 sem_t mutexReconnect;
 sem_t detectorDesconexion;
 
+t_list* semaforosPokemon;
 
 //CLIENTE
 int crear_conexion(char* ip, char* puerto);

@@ -104,7 +104,7 @@ uint32_t buscarBloqueEInsertarEnArchivo(t_config* metadataPoke);
 void sacarUltimoBloqueDeArchivo(t_config* metadataPoke, char** arrBloques);
 bool existeBitmap(char* rutaArchivo);
 bool existeDirectorio(char* rutaDirectorio);
-bool estaOpen(t_config* metadataPoke);
+bool estaOpen(char* metadataPoke);
 void* reintentarOperacion(void* metadataPoke);
 void reintentandoOperacion(char* metadataPoke);
 void waitSemYModificacionOpen(uint32_t indexSemaforo, char* pathMetadataPoke);

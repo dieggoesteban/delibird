@@ -26,6 +26,7 @@ typedef enum
 } operation_cod;
 
 
+
 typedef struct{
 	sem_t semPoke;
 	char* nombrePoke;
@@ -96,6 +97,11 @@ typedef struct
 } t_new_pokemon;
 
 typedef struct{
+	uint32_t indexSemaforo;
+	t_new_pokemon* newPokemon;
+}t_newPokemon_indexSem;
+
+typedef struct{
 	uint32_t ID_mensaje_recibido;
 	uint32_t ID_mensaje_original;
 	uint32_t sizeNombre;
@@ -120,6 +126,11 @@ typedef struct{
 }t_catch_pokemon;
 
 typedef struct{
+	uint32_t indexSemaforo;
+	t_catch_pokemon* catchPokemon;
+}t_catchPokemon_indexSem;
+
+typedef struct{
 	uint32_t ID_mensaje_recibido;
 	uint32_t ID_mensaje_original;
 	uint32_t catchStatus; 
@@ -130,6 +141,11 @@ typedef struct{
 	uint32_t sizeNombre;
 	char* nombre;
 } t_get_pokemon;
+
+typedef struct{
+	uint32_t indexSemaforo;
+	t_get_pokemon* getPokemon;
+}t_getPokemon_indexSem
 
 typedef struct
 {
