@@ -176,4 +176,8 @@ typedef struct
 	uint32_t messageQueue;
 } t_suscribe;
 
+typedef struct {
+	uint32_t id_mensajeEnviado;
+} t_id_mensaje_recibido;
+
 #endif /* MODELS_H_ */

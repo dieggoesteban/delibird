@@ -62,10 +62,13 @@ void terminar_programa(){
 void inicializarGamecard(){
     IP = config_get_string_value(config,"IP_GAMECARD");
     PUERTO = config_get_string_value(config,"PUERTO_GAMECARD");
+    IP_BROKER = config_get_string_value(config, "IP_BROKER");
+    PUERTO_BROKER = config_get_string_value(config,"PUERTO_BROKER");
     tiempoReintentoConexion = (uint32_t)config_get_int_value(config,"TIEMPO_DE_REINTENTO_CONEXION");
     tiempoOperacion = (uint32_t)config_get_int_value(config,"TIEMPO_DE_REINTENTO_OPERACION");
     tiempoReintentoOperacion = (uint32_t)config_get_int_value(config,"TIEMPO_RETARDO_OPERACION");
     punto_montaje = config_get_string_value(config,"PUNTO_MONTAJE_TALLGRASS");
+
 
     
     crearDirectorio(punto_montaje);

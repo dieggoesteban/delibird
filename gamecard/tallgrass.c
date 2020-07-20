@@ -501,7 +501,7 @@ uint32_t buscarBloqueLibre()
 {
     // t_bitarray *bitmap = bitarray_create_with_mode((char *)bmap, cantBloques / 8, LSB_FIRST);
     uint32_t i = 0;
-    while (bitarray_test_bit(bitmapArr, i) != 0)
+    while (bitarray_test_bit(bitmapArr, i) && bitarray_test_bit(bitmapArr, i)!= 0)
     {
         i++;
     }
@@ -542,7 +542,7 @@ char* catchPokemonATexto(t_catch_pokemon* catchPokemon){
 
 
 
-t_localized_pokemon* atenderGetPokemon(t_getPokemon_indexSem* getPokemonSem){
+void atenderGetPokemon(t_getPokemon_indexSem* getPokemonSem){
     t_localized_pokemon* localizedPokemon;
     char* pathFilesPokemon = string_duplicate(pathFiles);
     string_append(&pathFilesPokemon,getPokemonSem->getPokemon->nombre);
@@ -557,15 +557,16 @@ t_localized_pokemon* atenderGetPokemon(t_getPokemon_indexSem* getPokemonSem){
         localizedPokemon = escribirLocalizedPokemon(getPokemonSem->getPokemon, pathMetadataPoke);
         sleep(tiempoOperacion);
         signalSemYModificacionOpen(getPokemonSem->indexSemaforo, pathMetadataPoke);
+        mandarLOCALIZED(localizedPokemon);
 
         printf("termino la operacion de LOCALIZED_POKEMON de %s\n", getPokemonSem->getPokemon->nombre);
     }else{
         log_warning(logger,"No existe el pokemon %s en tallgrass", getPokemonSem->getPokemon->nombre);
         localizedPokemon = crearLocalizedPokemon(0, getPokemonSem->getPokemon->ID_mensaje_recibido, getPokemonSem->getPokemon->nombre, 0,list_create());
+        mandarLOCALIZED(localizedPokemon);
     }
     free(getPokemonSem->getPokemon);
     free(getPokemonSem);
-    return localizedPokemon;
 }
 
 void atenderCatchPokemon(void* catchPoke){
@@ -585,6 +586,9 @@ void atenderCatchPokemon(void* catchPoke){
         signalSemYModificacionOpen(indexSemaforo, pathMetadataPoke);
 
         printf("termino la operacion de CATCH_POKEMON de %s\n", catchPokemonATexto(catchPokemonSem->catchPokemon));
+        t_caught_pokemon* caughtPoke = crearCaughtPokemon(0,catchPokemonSem->catchPokemon->ID_mensaje_recibido,1);
+        mandarCAUGHT(caughtPoke);
+
     }else{
         log_warning(logger,"No existe el pokemon %s en tallgrass", catchPokemonSem->catchPokemon->nombre);
         printf("No existe el directorio %s\n", pathFilesPokemon);
@@ -618,33 +622,16 @@ void* atenderNewPokemon(void* newPokemonParam){
     sleep(tiempoOperacion);
     signalSemYModificacionOpen(newPokeSem->indexSemaforo, pathMetadataPoke);
 
+    t_posicion* posicion = crearPosicion(newPokeSem->newPokemon->posicionCantidad->posicion_x, newPokeSem->newPokemon->posicionCantidad->posicion_y);
+	t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(0, newPokeSem->newPokemon->ID_mensaje_recibido, newPokeSem->newPokemon->nombre, posicion);
+
+    mandarAPPEARED(appearedPokemon);
+
     printf("termino la operacion de NEW_POKEMON de %s\n", newPokemonATexto(newPokeSem->newPokemon));
     free(newPokeSem->newPokemon);
     free(newPokeSem);
     return NULL;
 }
-
-// bool estaOpen(t_config* metadataPoke){
-//     // char* valorOpen = config_get_string_value(metadataPoke,"OPEN");
-//     // if(string_equals_ignore_case(valorOpen, "Y")){
-//     //     log_info(logger,"ESTA OPEN con valor: %s",config_get_string_value(metadataPoke,"OPEN"));
-//     //     return true;
-//     // }else{
-//     //     log_info(logger,"NO ESTA OPEN con valor %s", config_get_string_value(metadataPoke,"OPEN"));
-//     //     return false;
-//     // }
-
-
-//     int valorSem;
-//     uint32_t indexSemaforo =  encontrarSemaforoDelPoke(nombrePokemon,semaforosPokemon);
-//     if (sem_getvalue(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, indexSemaforo))->semPoke), &valorSem) == 0){
-//         if(valorSem > 0){
-//             archivoCerrado = true;
-//         }else{
-//             archivoCerrado = false;
-//         }
-//     }
-// }
 
 bool estaOpen(char* nombrePokemon){
     bool archivoCerrado = false;

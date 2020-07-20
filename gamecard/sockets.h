@@ -25,6 +25,8 @@ pthread_t thread;
 char* IP;
 char* PUERTO;
 uint32_t idModule;
+char* IP_BROKER;
+char* PUERTO_BROKER;
 
 // typedef struct {
 //     uint32_t mq_cod;
@@ -78,5 +80,8 @@ void reconectarBroker();
 void establecerConexionBroker();
 void serve_suscribe(uint32_t* socket);
 void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd);
+void mandarAPPEARED(t_appeared_pokemon* appearedPoke);
+void mandarCAUGHT(t_caught_pokemon* caughtPoke);
+void mandarLOCALIZED(t_localized_pokemon* localizedPoke);
 
 #endif /* SOCKETS_H_ */

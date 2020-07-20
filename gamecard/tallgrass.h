@@ -27,6 +27,7 @@
 #include "utils.h"
 #include "models.h"
 #include "utilsGenerales.h"
+#include "sockets.h"
 
 
 //GLOBALES
@@ -64,7 +65,7 @@ char* agregarADirectorioMetadataFS(char* restoRuta);
 char* agregarAPath(char* path, char* agregado);
 
 //ATENDER
-t_localized_pokemon* atenderGetPokemon(t_getPokemon_indexSem* getPokemon);
+void atenderGetPokemon(t_getPokemon_indexSem* getPokemon);
 void* atenderNewPokemon(void* newPokemon);
 void atenderCatchPokemon(void* catchPokemon);
 

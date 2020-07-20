@@ -186,38 +186,26 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd)
 			log_info(logger, "SIZE BUFFER EN NEW: %i\n", buffer->size);
 			t_new_pokemon *newPoke = deserializar_newPokemon(buffer);
 			printf("Nombre del poke new: %s\n", newPoke->nombre);
-			t_acknowledgement* ack = crearAcknowledgement(idModule, newPoke->ID_mensaje_recibido, NEW_POKEMON);
-			t_posicion* posicion = crearPosicion(newPoke->posicionCantidad->posicion_x, newPoke->posicionCantidad->posicion_y);
-			t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(0, newPoke->ID_mensaje_recibido, newPoke->nombre, posicion);
-				
+			t_acknowledgement* ack = crearAcknowledgement(idModule,newPoke->ID_mensaje_recibido, NEW_POKEMON);
+			// t_posicion* posicion = crearPosicion(newPoke->posicionCantidad->posicion_x, newPoke->posicionCantidad->posicion_y);
+			// t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(0, newPoke->ID_mensaje_recibido, newPoke->nombre, posicion);
+
+			uint32_t indexSem = getIndexSemaforo(newPoke->nombre, semaforosPokemon);
+			printf("INDEX QUE ME DA SOCKET: %i\n", indexSem);
+			if(indexSem == ERROR){
+			 	t_semaforo_pokemon* semPoke = crearSemaforoPokemon(newPoke->nombre);
+				indexSem = list_add(semaforosPokemon,semPoke);
+			}
+			
+			t_newPokemon_indexSem* newPokeSem = crearNewPokemonIndexSem(indexSem, newPoke);
+
 			pthread_t sendAck;
 			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
 			pthread_detach(sendAck);
 			pthread_t hiloAtenderNewPoke;
-			pthread_create(&hiloAtenderNewPoke, NULL, atenderNewPokemon,(void*)newPoke);
+			pthread_create(&hiloAtenderNewPoke, NULL, atenderNewPokemon,(void*)newPokeSem);
 			pthread_detach(hiloAtenderNewPoke);
-			log_info(logger, newPoke->nombre);
-			//podria generar la conexion con broker desde un principio, por donde se le va a enviar los appeared, caught y localized ,pero que sea el servidor que reciba las requests
-			//enviar a broker
-			
-			// free(newPoke);
 
-			break;
-		}
-		case APPEARED_POKEMON:
-		{
-			log_info(logger, "SIZE BUFFER EN NEW: %i", buffer->size);
-			// deserializar_appearedPokemon(buffer);
-			t_appeared_pokemon *appearedPoke = deserializar_appearedPokemon(buffer);
-			
-
-
-			printf("pos x de poke: %i", appearedPoke->posicion->posicion_x);
-			log_info(logger, appearedPoke->nombre);
-
-			free(appearedPoke);
-			// free(buffer->stream);
-			// free(buffer);
 			break;
 		}
 		case CATCH_POKEMON:
@@ -225,22 +213,25 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd)
 			log_info(logger, "SIZE BUFFER EN NEW: %i\n", buffer->size);
 			t_catch_pokemon *catchPoke = deserializar_catchPokemon(buffer);
 
-			t_caught_pokemon* caughtPoke = crearCaughtPokemon(0,catchPoke->ID_mensaje_recibido,1);
+			// t_caught_pokemon* caughtPoke = crearCaughtPokemon(0,catchPoke->ID_mensaje_recibido,1);
 
-			t_acknowledgement* ack = crearAcknowledgement(idModule, catchPoke->ID_mensaje_recibido, CATCH_POKEMON);
+			t_acknowledgement* ack = crearAcknowledgement(idModule ,catchPoke->ID_mensaje_recibido, CATCH_POKEMON);
+
+			uint32_t indexSem = getIndexSemaforo(catchPoke->nombre, semaforosPokemon);
+			printf("INDEX QUE ME DA SOCKET: %i\n", indexSem);
+			if(indexSem == ERROR){
+			 	t_semaforo_pokemon* semPoke = crearSemaforoPokemon(catchPoke->nombre);
+				indexSem = list_add(semaforosPokemon,semPoke);
+			}
+			
+			t_catchPokemon_indexSem* catchPokeSem = crearCatchPokemonIndexSem(indexSem, catchPoke);
 
 			pthread_t sendAck;
 			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
 			pthread_detach(sendAck);
 			pthread_t hiloAtenderCatchPoke;
-			pthread_create(&hiloAtenderCatchPoke, NULL, (void*)atenderCatchPokemon,(void*)catchPoke);
+			pthread_create(&hiloAtenderCatchPoke, NULL, (void*)atenderCatchPokemon,(void*)catchPokeSem);
 			pthread_detach(hiloAtenderCatchPoke);
-
-			printf("Nombre del poke a atrapar: %s\n", catchPoke->nombre);
-			//enviar a broker
-
-			log_info(logger, catchPoke->nombre);
-			// free(catchPoke);
 		
 			break;
 		}
@@ -249,7 +240,7 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd)
 			t_get_pokemon *getPoke = deserializar_getPokemon(buffer);
 			log_info(logger, getPoke->nombre);
 
-
+			t_acknowledgement* ack = crearAcknowledgement(idModule ,getPoke->ID_mensaje_recibido, CATCH_POKEMON);
 			uint32_t indexSem = getIndexSemaforo(getPoke->nombre, semaforosPokemon);
 			printf("INDEX QUE ME DA SOCKET: %i\n", indexSem);
 			if(indexSem == ERROR){
@@ -259,9 +250,12 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd)
 			
 			t_getPokemon_indexSem* getPokeSem = crearGetPokemonIndexSem(indexSem, getPoke);
 
-
-
-			t_localized_pokemon* localizedPoke = atenderGetPokemon(getPokeSem);
+			pthread_t sendAck;
+			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
+			pthread_detach(sendAck);
+			pthread_t hiloAtenderGetPoke;
+			pthread_create(&hiloAtenderGetPoke, NULL, (void*)atenderGetPokemon,(void*)getPokeSem);
+			pthread_detach(hiloAtenderGetPoke);
 			
 			break;
 		}
@@ -294,8 +288,8 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 			t_new_pokemon *newPoke = deserializar_newPokemon(buffer);
 			printf("Nombre del poke new: %s\n", newPoke->nombre);
 			t_acknowledgement* ack = crearAcknowledgement(idModule,newPoke->ID_mensaje_recibido, NEW_POKEMON);
-			t_posicion* posicion = crearPosicion(newPoke->posicionCantidad->posicion_x, newPoke->posicionCantidad->posicion_y);
-			t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(0, newPoke->ID_mensaje_recibido, newPoke->nombre, posicion);
+			// t_posicion* posicion = crearPosicion(newPoke->posicionCantidad->posicion_x, newPoke->posicionCantidad->posicion_y);
+			// t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(0, newPoke->ID_mensaje_recibido, newPoke->nombre, posicion);
 
 			uint32_t indexSem = getIndexSemaforo(newPoke->nombre, semaforosPokemon);
 			printf("INDEX QUE ME DA SOCKET: %i\n", indexSem);
@@ -312,10 +306,7 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 			pthread_detach(sendAck);
 			pthread_t hiloAtenderNewPoke;
 			pthread_create(&hiloAtenderNewPoke, NULL, atenderNewPokemon,(void*)newPokeSem);
-			pthread_detach(hiloAtenderNewPoke);
-
-			
-			log_info(logger, newPoke->nombre);
+			pthread_detach(hiloAtenderNewPoke);			
 
 			free(buffer->stream);
 			free(buffer);
@@ -326,7 +317,7 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 			log_info(logger, "SIZE BUFFER EN NEW: %i\n", buffer->size);
 			t_catch_pokemon *catchPoke = deserializar_catchPokemon(buffer);
 
-			t_caught_pokemon* caughtPoke = crearCaughtPokemon(0,catchPoke->ID_mensaje_recibido,1);
+			// t_caught_pokemon* caughtPoke = crearCaughtPokemon(0,catchPoke->ID_mensaje_recibido,1);
 
 			t_acknowledgement* ack = crearAcknowledgement(idModule ,catchPoke->ID_mensaje_recibido, CATCH_POKEMON);
 
@@ -346,11 +337,6 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 			pthread_create(&hiloAtenderCatchPoke, NULL, (void*)atenderCatchPokemon,(void*)catchPokeSem);
 			pthread_detach(hiloAtenderCatchPoke);
 
-			printf("Nombre del poke a atrapar: %s\n", catchPoke->nombre);
-			//enviar a broker
-
-			log_info(logger, catchPoke->nombre);
-			// free(catchPoke);
 
 			free(buffer->stream);
 			free(buffer);
@@ -362,6 +348,7 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 			t_get_pokemon *getPoke = deserializar_getPokemon(buffer);
 			log_info(logger, getPoke->nombre);
 
+			t_acknowledgement* ack = crearAcknowledgement(idModule ,getPoke->ID_mensaje_recibido, CATCH_POKEMON);
 
 			uint32_t indexSem = getIndexSemaforo(getPoke->nombre, semaforosPokemon);
 			printf("INDEX QUE ME DA SOCKET: %i\n", indexSem);
@@ -372,12 +359,12 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 			
 			t_getPokemon_indexSem* getPokeSem = crearGetPokemonIndexSem(indexSem, getPoke);
 
-
-
-			t_localized_pokemon* localizedPoke = atenderGetPokemon(getPokeSem);
-			
-			
-			//enviar a broker
+			pthread_t sendAck;
+			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
+			pthread_detach(sendAck);
+			pthread_t hiloAtenderGetPoke;
+			pthread_create(&hiloAtenderGetPoke, NULL, (void*)atenderGetPokemon,(void*)getPokeSem);
+			pthread_detach(hiloAtenderGetPoke);
 
 			free(buffer->stream);
 			free(buffer);
@@ -420,5 +407,85 @@ uint32_t escuchaBroker(){
 	return conexion;
 }
 
+void mandarAPPEARED(t_appeared_pokemon* appearedPoke) {
+    
+    t_paquete* paquete = serializar_appearedPokemon(appearedPoke);
+
+    free(appearedPoke);
+
+
+    uint32_t conexion = crear_conexion(IP_BROKER, PUERTO_BROKER);
+
+	if(conexion == ERROR){
+		log_error(logger,"No se pudo mandar el Appeared de %s por Broker caido", appearedPoke->nombre);
+	}else{
+		enviarMensaje(paquete, conexion);
+
+		int cod_op;
+		t_buffer* buffer;
+		recv(conexion, &cod_op, sizeof(int), MSG_WAITALL);
+		buffer = recibir_buffer(conexion);
+
+		t_id_mensaje_recibido* confirmacion = deserializar_idMensajeRecibido(buffer);
+
+		printf("El id de mensaje APPEARED_POKEMON asignado es %i\n", (uint32_t)confirmacion->id_mensajeEnviado);
+	}
+
+    liberar_conexion(conexion);
+}
+
+void mandarCAUGHT(t_caught_pokemon* caughtPoke) {
+    
+    t_paquete* paquete = serializar_caughtPokemon(caughtPoke);
+
+    free(caughtPoke);
+
+    uint32_t conexion = crear_conexion(IP_BROKER, PUERTO_BROKER);
+
+	if(conexion == ERROR){
+		log_error(logger,"No se pudo mandar el Caught de %s por Broker caido");
+	}else{
+		enviarMensaje(paquete, conexion);
+
+		int cod_op;
+		t_buffer* buffer;
+		recv(conexion, &cod_op, sizeof(int), MSG_WAITALL);
+		buffer = recibir_buffer(conexion);
+
+		t_id_mensaje_recibido* confirmacion = deserializar_idMensajeRecibido(buffer);
+
+		printf("El id de mensaje CAUGHT_POKEMON asignado es %i\n", (uint32_t)confirmacion->id_mensajeEnviado);
+	}
+
+
+    liberar_conexion(conexion);
+}
+
+void mandarLOCALIZED(t_localized_pokemon* localizedPoke) {
+    
+    t_paquete* paquete = serializar_localizedPokemon(localizedPoke);
+
+    free(localizedPoke);
+
+    uint32_t conexion = crear_conexion(IP_BROKER, PUERTO_BROKER);
+
+	if(conexion == ERROR){
+		log_error(logger,"No se pudo mandar el Localized de %s por Broker caido", localizedPoke->nombre);
+	}else{
+		enviarMensaje(paquete, conexion);
+
+		int cod_op;
+		t_buffer* buffer;
+		recv(conexion, &cod_op, sizeof(int), MSG_WAITALL);
+		buffer = recibir_buffer(conexion);
+
+		t_id_mensaje_recibido* confirmacion = deserializar_idMensajeRecibido(buffer);
+
+		printf("El id de mensaje LOCALIZED_POKEMON asignado es %i\n", (uint32_t)confirmacion->id_mensajeEnviado);
+	}
+
+
+    liberar_conexion(conexion);
+}
 
 

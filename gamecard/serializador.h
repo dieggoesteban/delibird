@@ -46,8 +46,10 @@ t_register_module* deserializar_registerModule(t_buffer* buffer);
 t_paquete* serializar_acknowledgement(t_acknowledgement* akc);
 t_acknowledgement* deserializar_acknowledgement(t_buffer* buffer);
 
-t_paquete* serializar_confirmacionMensaje(t_confirmacion_mensaje* confirmacion);
-t_confirmacion_mensaje* deserializar_confirmacionMensaje(t_buffer* buffer);
+t_paquete* serializar_idMensajeRecibido(t_id_mensaje_recibido* idMensajeRecibido);
+t_id_mensaje_recibido* deserializar_idMensajeRecibido(t_buffer* buffer);
+
+
 
 //CREACION DE LOS STRUCTS
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant);

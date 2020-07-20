@@ -21,6 +21,8 @@ t_config* config;
 t_log* logger;
 char* IP;
 char* PUERTO;
+char* IP_BROKER;
+char* PUERTO_BROKER;
 uint32_t tiempoReintentoConexion;
 uint32_t tiempoReintentoOperacion;
 uint32_t tiempoOperacion;

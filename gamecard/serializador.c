@@ -366,43 +366,29 @@ t_acknowledgement* deserializar_acknowledgement(t_buffer* buffer)
 	return akc;
 }
 
-// t_paquete* serializar_confirmacionMensaje(t_confirmacion_mensaje* confirmacion){
-// 	printf("Entro a serializar_confirmacionMensaje\n");
-// 	t_buffer* confirmacionBuffer = malloc(sizeof(t_buffer));
-// 	confirmacionBuffer->size = sizeof(uint32_t)*2 + sizeof(bool);
-// 	void* stream = malloc(confirmacionBuffer->size);
-// 	int offset = 0;
+t_paquete* serializar_idMensajeRecibido(t_id_mensaje_recibido* idMensajeRecibido) {
+    t_buffer* buffer = malloc(sizeof(t_buffer));
+	buffer->size = sizeof(uint32_t);
+    void* stream = malloc(buffer->size);
 
-// 	memcpy(stream + offset, &(confirmacion->ID_mensaje), sizeof(uint32_t));
-// 	offset += sizeof(uint32_t);
-// 	memcpy(stream + offset, &(confirmacion->MessageQueue), sizeof(uint32_t));
-// 	offset += sizeof(uint32_t);
-// 	memcpy(stream + offset, &(confirmacion->meLlego), sizeof(bool));
-// 	offset += sizeof(bool);
+    memcpy(stream, &(idMensajeRecibido->id_mensajeEnviado), sizeof(uint32_t));
 
-// 	confirmacionBuffer->stream = stream;
-// 	t_paquete* paquete = crear_paquete(CONFIRMACION_MSJ, confirmacionBuffer->size, confirmacionBuffer->stream);
+    buffer->stream = stream;
+    t_paquete* paquete = crear_paquete(MENSAJE_RECIBIDO, buffer->size, buffer->stream);
 
-// 	printf("Confirmacion, serializar_confirmacionMensaje");
-// 	return paquete;
-// }
+    return paquete;
+}
 
-// t_confirmacion_mensaje* deserializar_confirmacionMensaje(t_buffer* buffer){
-// 	printf("ENtro a deserializar_confirmacion\n");
-// 	t_confirmacion_mensaje* confirmacion = malloc(sizeof(t_confirmacion_mensaje));
+t_id_mensaje_recibido* deserializar_idMensajeRecibido(t_buffer* buffer) {
+    t_id_mensaje_recibido* idMensajeEnviado = malloc(sizeof(t_id_mensaje_recibido)); //Enviado para el que lo deserializa
 
-// 	void* stream = buffer->stream;
-// 	printf("Buffer size: %i\n", buffer->size);
+    void* stream = buffer->stream;
 
-// 	memcpy(&(confirmacion->ID_mensaje), stream, sizeof(uint32_t));
-// 	stream += sizeof(uint32_t);
-// 	memcpy(&(confirmacion->MessageQueue), stream, sizeof(uint32_t));
-// 	stream += sizeof(uint32_t);
-// 	memcpy(&(confirmacion->meLlego), stream, sizeof(bool));
-// 	stream += sizeof(bool);
+    memcpy(&(idMensajeEnviado->id_mensajeEnviado), stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
 
-// 	return confirmacion;
-// }
+    return idMensajeEnviado;
+}
 
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant) {
 	t_posicion_cantidad* position = malloc(sizeof(t_posicion_cantidad));
