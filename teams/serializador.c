@@ -188,6 +188,7 @@ t_appeared_pokemon* deserializar_appearedPokemon(t_buffer* buffer)
 	memcpy(&(pokemon->sizeNombre), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
 	pokemon->nombre = malloc(pokemon->sizeNombre);
+	printf("Pos llegue aca\n");
 	memcpy(pokemon->nombre, stream, pokemon->sizeNombre);
 	stream += pokemon->sizeNombre;
 	memcpy(&(pokemon->posicion->posicion_x), stream, sizeof(uint32_t));

@@ -58,8 +58,6 @@ uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_men
 	return isValid;
 }
 
-
-
 uint32_t perteneceAlArray(char *val, char *arr[], uint32_t size)
 {
 	for (uint32_t i = 0; i < size; i++)
@@ -70,10 +68,135 @@ uint32_t perteneceAlArray(char *val, char *arr[], uint32_t size)
 	return 0;
 }
 
-uint32_t arraySize(void* arr[]) {
-	uint32_t size = 0;
-	while(arr[size] != NULL) {
-		size++;
+//robadisimo
+t_dictionary* crearDictionaryDeTexto(char* textoArchivo){
+	t_dictionary* dicArchivo = dictionary_create();
+	char** lines = string_split(textoArchivo, "\n");
+	
+	void add_cofiguration(char *line){
+		if (!string_starts_with(line, "#")) {
+			char** keyAndValue = string_n_split(line, 2, "=");
+			dictionary_put(dicArchivo, keyAndValue[0], keyAndValue[1]);
+			free(keyAndValue[0]);
+			free(keyAndValue);
+		}
 	}
-	return size;
+	string_iterate_lines(lines, add_cofiguration);
+	string_iterate_lines(lines, (void*) free);
+
+	free(lines);
+	return dicArchivo;
+}
+
+
+
+
+char *obtenerStringDic(t_dictionary* dic, char *key) {
+	return (char*)dictionary_get(dic, key);
+}
+
+int obtenerIntDic(t_dictionary *dic, char *key) {
+	char *value = obtenerStringDic(dic, key);
+	return atoi(value);
+}
+
+long obtenerLongDic(t_dictionary *dic, char *key) {
+	char *value = obtenerStringDic(dic, key);
+	return atol(value);
+}
+
+double obtenerDoubleDic(t_dictionary *dic, char *key) {
+	char *value = obtenerStringDic(dic, key);
+	return atof(value);
+}
+
+char** obtenerArrayCharDic(t_dictionary* dic, char* key) {
+	char* value_in_dictionary = obtenerStringDic(dic, key);
+	return string_get_string_as_array(value_in_dictionary);
+}
+
+void setValueDic(t_dictionary *dic, char *key, char *value) {
+	char* duplicate_value = string_duplicate(value);
+
+	dictionary_put(dic, key, (void*)duplicate_value);
+}
+
+void removerKeyDic(t_dictionary *dic, char *key) {
+
+	if(dictionary_has_key(dic, key)) {
+		dictionary_remove_and_destroy(dic, key, free);
+	}
+}
+
+
+uint32_t encontrarSemaforoDelPoke(char* nombrePoke, t_list* listaSem){
+	for(uint32_t i = 0; i < list_size(listaSem); i++){
+		if( string_equals_ignore_case(((t_semaforo_pokemon*)list_get(listaSem,i))->nombrePoke, nombrePoke)){
+			return i;
+		}
+	}
+	return 0;
+}
+
+char* dictionaryToString(t_dictionary* dictionary){
+	char* textoCompleto = string_new();
+	printf("llega a entrar a la funcion");
+
+	void keyAndValueToString(char* key, void* value){
+		string_append_with_format(&textoCompleto, "%s=", key);
+		string_append_with_format(&textoCompleto,"%s\n",(char*)value);
+		printf("esto transformo la funcion: %s\n", textoCompleto);
+	}
+	dictionary_iterator(dictionary,keyAndValueToString);
+	return textoCompleto;
+}
+
+t_list* dictionaryToListPosiciones(t_dictionary* dictionary){
+	t_list* listaPosiciones = list_create();
+
+	void separarKeyEnPosicion(char* key, void* value){
+		char** keySeparada = string_split(key,"-");
+		t_posicion* posicion = crearPosicion(atoi(keySeparada[0]), atoi(keySeparada[1]));
+		list_add(listaPosiciones, posicion);
+	}
+	dictionary_iterator(dictionary,separarKeyEnPosicion);
+	return listaPosiciones;
+}
+
+char* getMQName(uint32_t mq) {
+	char* message;
+	switch(mq) {
+		case 1:
+			message = "NEW_POKEMON";
+			break;
+		case 3:
+			message = "CATCH_POKEMON";
+			break;
+		case 5:
+			message = "GET_POKEMON";
+			break;
+	}
+	return message;
+}
+
+t_suscribe* getSuscribe(uint32_t mq) {
+	printf("Intentando SUSCRIBE en %s...\n", getMQName(mq));
+	t_suscribe* suscribe = malloc(sizeof(t_suscribe));
+    uint32_t conexion = escuchaBroker();
+	printf("la Conexion es: %i y el MQ es %i\n", conexion,mq);
+
+	suscribe->conexion = conexion;
+	suscribe->messageQueue = mq;
+
+	return suscribe;
+}
+
+uint32_t getIndexSemaforo(char* nombrePoke,t_list* lista) {
+	for(uint32_t i = 0; i < list_size(lista); i++) {
+		t_semaforo_pokemon* semPoke = (t_semaforo_pokemon*)list_get(lista, i);
+		if(string_equals_ignore_case(semPoke->nombrePoke, nombrePoke)) {
+			return i;
+		}
+	}
+	return ERROR;
 }

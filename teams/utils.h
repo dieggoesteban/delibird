@@ -74,6 +74,7 @@ uint32_t entrenadorPerteneceALista(t_entrenador* entrenador, t_list* lista);
 
 //OBTENER DE LISTA
 t_list* obtenerEntrenadoresSinDeadlock(); //obtiene de colaBlocked
+uint32_t getIndexSemaforo(char* nombrePoke,t_list* lista);
 
 //DE POKEMON
 bool pokemonEnObjetivoGlobal(t_pokemon_posicion* pokemon);

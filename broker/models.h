@@ -144,6 +144,7 @@ typedef struct{
 
 typedef struct{
 	uint32_t ID_mensaje_recibido;
+	uint32_t ID_mensaje_original;
 	uint32_t sizeNombre;
 	char* nombre;
 	t_posicion* posicion;

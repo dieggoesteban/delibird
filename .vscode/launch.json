@@ -5,6 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
+<<<<<<< HEAD
             "name": "Broker",
             "type": "cppdbg",
             "request": "launch",
@@ -14,6 +15,17 @@
             "cwd": "${workspaceFolder}/broker",
             "environment": [],
             "externalConsole": true,
+=======
+            "name": "Gamecard",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/gamecard/gamecard",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/gamecard",
+            "environment": [],
+            "externalConsole": false,
+>>>>>>> gamecard-hilos
             "MIMode": "gdb",
             "setupCommands": [
                 {
