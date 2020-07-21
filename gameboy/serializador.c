@@ -558,17 +558,25 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 		log_info(logger, "entro a appeared_pokemon");
 		t_appeared_pokemon* appearedPokemon;
 		t_posicion* posicion = crearPosicion((uint32_t)atoi(arrayArgumentos[1]),(uint32_t)atoi(arrayArgumentos[2]));
+<<<<<<< HEAD
 		if(arraySize((void*)arrayArgumentos) == 4){
 			appearedPokemon = crearAppearedPokemon(0,atoi(arrayArgumentos[3]), arrayArgumentos[0], posicion); //para cuando se les cante mandarlo con el id correlativo
 		}else{
 			appearedPokemon = crearAppearedPokemon(0,0, arrayArgumentos[0], posicion); //para cuando no lo manden con el id correlativo
 		}
+=======
+		printf("\nCANTIDAD DE ARGUMENTOS %i\n\n", arraySize((void*)arrayArgumentos));
+		//if(arraySize((void*)arrayArgumentos) == 4){
+		appearedPokemon = crearAppearedPokemon(0,0, arrayArgumentos[0], posicion); //para cuando no lo manden con el id correlativo
+		// }else{
+		// 	appearedPokemon = crearAppearedPokemon(0,atoi(arrayArgumentos[3]), arrayArgumentos[0], posicion); //para cuando se les cante mandarlo con el id correlativo
+		// }
+>>>>>>> gameboy
 
 		paquete = serializar_appearedPokemon(appearedPokemon);
 
 		free(posicion);
 		free(appearedPokemon);
-
 	}
 	else if (strcmp(tipo_mensaje, "CATCH_POKEMON") == 0)
 	{

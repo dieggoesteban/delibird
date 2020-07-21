@@ -125,6 +125,15 @@ typedef struct{
 
 typedef struct
 {
+<<<<<<< HEAD
+=======
+	uint32_t conexion;
+	uint32_t messageQueue;
+} t_suscribe_gameboy;
+
+typedef struct
+{
+>>>>>>> gameboy
 	uint32_t ID_mensaje_recibido;
 	uint32_t sizeNombre;
 	char* nombre;

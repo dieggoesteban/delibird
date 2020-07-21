@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
         char *puerto;
         char *arrayArgumentos[argc - 3];
         cortarArgumentos(argc, argv, arrayArgumentos);
+<<<<<<< HEAD
 
         uint32_t isValid = procesarComando(&ip, &puerto, proceso, tipo_mensaje);
         if (isValid == 1)
@@ -46,6 +47,35 @@ int main(int argc, char *argv[])
                 enviarMensaje(paquete, conexion);
                 serve_client(&conexion);
             }          
+=======
+        uint32_t isValid = procesarComando(&ip, &puerto, proceso, tipo_mensaje);
+
+        if (isValid == 1)
+        {
+            uint32_t conexion = crear_conexion(ip, puerto);
+            t_paquete *paquete;
+            if (strcmp(proceso, "SUSCRIPTOR") == 0)
+            {
+                uint32_t mq = getColaDeMensajes(tipo_mensaje);
+                temp = atoi(argv[3]);
+                t_suscribe_gameboy* suscribe = crearSuscribeGameboy(conexion,mq);
+
+                pthread_create(&hiloSuscriptor, NULL, (void*)modoSuscriptor, (void*)suscribe);
+                pthread_create(&hiloTemporizador, NULL, (void*)temporizador, (void*)temp);
+                pthread_detach(hiloSuscriptor);
+                pthread_join(hiloTemporizador, NULL);
+                log_info(logger, "Conexion con broker finalizada");
+            }
+            else
+            {
+                paquete = getPaquete(arrayArgumentos, tipo_mensaje);
+                enviarMensaje(paquete, conexion);
+                
+                //serve_client(&conexion);
+            }
+            printf("Liberamos conexion\n");
+            liberar_conexion(conexion);
+>>>>>>> gameboy
         }
         else
         {
