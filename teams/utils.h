@@ -17,7 +17,7 @@
 
 #include "models.h"
 #include "serializador.h"
-// #include "planificador.h"
+#include "sockets.h"
 
 //GLOBAL
 t_log* logger;
@@ -33,6 +33,12 @@ void inicializarPid();
 uint32_t getNuevoPid();
 void inicializarEntrenadores();
 void setObjetivoGlobal();
+
+//SEMAFOROS
+
+sem_t mutexEXEC;
+sem_t mutexPokesEnMapa;
+sem_t counterPokesEnMapa;
 
 //CREAR
 t_pokemon_posicion* crearPokemonPosicion(char* nombre, t_posicion* posicion);
@@ -54,6 +60,7 @@ bool perteneceALista(char *val, t_list* lista);
 uint32_t perteneceAListaContador(char *val, t_list* lista);
 bool list_equals(t_list* list1, t_list* list2);
 t_queue* listToQueue(t_list* lista);
+t_suscribe* getSuscribe(uint32_t mq);
 
 //STRUCTS PERTENECEN A LISTA
 uint32_t pokemonCantidadPerteneceALista(t_pokemon_cantidad* pokemon, t_list* lista);
@@ -64,12 +71,20 @@ uint32_t entrenadorPerteneceALista(t_entrenador* entrenador, t_list* lista);
 t_list* obtenerEntrenadoresSinDeadlock(); //obtiene de colaBlocked
 uint32_t getIndexSemaforo(char* nombrePoke,t_list* lista);
 
+//DE POKEMON
+bool pokemonEnObjetivoGlobal(t_pokemon_posicion* pokemon);
+void insertPokeEnMapa(t_pokemon_posicion* poke);
+
 //DE ENTRENADOR
 bool entrenadorEnDeadlock(t_entrenador* entrenador);
 bool entrenadorCumplioObjetivo(t_entrenador* entrenador);
+bool entrenadorDisponible(void* entrenador);
 bool entrenadorPuedeCapturar(void* entrenador);
+bool tardaMenos(void* trA, void* trB);
 bool ordenarEntrenador(void* a, void* b);
 bool ordenarPokemon(void* a, void* b);
 uint32_t turnosHastaPokemon(t_pokemon_posicion* pokemon, t_entrenador* entrenador);
 t_entrenador* cambiarPosicionEntrenador(t_entrenador* entrenador, uint32_t posX, uint32_t posY);
+void moverEntrenadorAPokemon(t_entrenador* entrenador);
+void actualizarPosicion(t_entrenador* entrenador);
 #endif /* UTILS_H_ */

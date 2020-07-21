@@ -273,6 +273,15 @@ t_get_pokemon* deserializar_getPokemon(t_buffer* buffer);
 t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon);
 t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer);
 
+t_paquete* serializar_registerModule(t_register_module* registerModule);
+t_register_module* deserializar_registerModule(t_buffer* buffer);
+
+t_paquete* serializar_akc(t_akc* akc);
+t_akc* deserializar_akc(t_buffer* buffer);
+
+t_paquete* serializar_confirmacionMensaje(t_confirmacion_mensaje* confirmacion);
+t_confirmacion_mensaje* deserializar_confirmacionMensaje(t_buffer* buffer);
+
 //CREACION DE LOS STRUCTS
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant);
 t_posicion* crearPosicion(uint32_t x, uint32_t y);

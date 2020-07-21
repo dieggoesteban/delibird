@@ -470,16 +470,17 @@ t_new_pokemon* crearNewPokemon(uint32_t IDMensajeRecibido, char* nombre, t_posic
 	return newPokemon;
 }
 
-t_localized_pokemon* crearLocalizedPokemon(uint32_t IDMensajeRecibido,uint32_t IDMensajeOriginal, char* nombre, uint32_t cantPosiciones, t_list* posicion){
+t_localized_pokemon* crearLocalizedPokemon(uint32_t IDMensajeRecibido,uint32_t IDMensajeOriginal, char* nombre, uint32_t sizePosicion, t_list* posicion)
+{
 	t_localized_pokemon* localizedPokemon = malloc(sizeof(t_localized_pokemon));
 
 	localizedPokemon->ID_mensaje_recibido = IDMensajeRecibido;
 	localizedPokemon->ID_mensaje_original = IDMensajeOriginal;
 	localizedPokemon->sizeNombre = strlen(nombre)+1;
 	localizedPokemon->nombre = nombre;
-	localizedPokemon->cantidadPosiciones = cantPosiciones;
+	localizedPokemon->cantidadPosiciones = sizePosicion;
 	localizedPokemon->posiciones = list_create();
-	list_add_all(localizedPokemon->posiciones,posicion);
+	list_add_all(localizedPokemon->posiciones, posicion);
 
 	return localizedPokemon;
 }
@@ -557,17 +558,17 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 		log_info(logger, "entro a appeared_pokemon");
 		t_appeared_pokemon* appearedPokemon;
 		t_posicion* posicion = crearPosicion((uint32_t)atoi(arrayArgumentos[1]),(uint32_t)atoi(arrayArgumentos[2]));
-		if(arraySize((void*)arrayArgumentos) == 4){
-			appearedPokemon = crearAppearedPokemon(0,atoi(arrayArgumentos[3]), arrayArgumentos[0], posicion); //para cuando se les cante mandarlo con el id correlativo
-		}else{
-			appearedPokemon = crearAppearedPokemon(0,0, arrayArgumentos[0], posicion); //para cuando no lo manden con el id correlativo
-		}
+		printf("\nCANTIDAD DE ARGUMENTOS %i\n\n", arraySize((void*)arrayArgumentos));
+		//if(arraySize((void*)arrayArgumentos) == 4){
+		appearedPokemon = crearAppearedPokemon(0,0, arrayArgumentos[0], posicion); //para cuando no lo manden con el id correlativo
+		// }else{
+		// 	appearedPokemon = crearAppearedPokemon(0,atoi(arrayArgumentos[3]), arrayArgumentos[0], posicion); //para cuando se les cante mandarlo con el id correlativo
+		// }
 
 		paquete = serializar_appearedPokemon(appearedPokemon);
 
 		free(posicion);
 		free(appearedPokemon);
-
 	}
 	else if (strcmp(tipo_mensaje, "CATCH_POKEMON") == 0)
 	{
@@ -612,7 +613,7 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 	}
 	else if (strcmp(tipo_mensaje, "LOCALIZED_POKEMON") == 0)
 	{ //ESTE AL FINAL NO LO HACE GAMEBOY, PARECE SER LA UNICA MQ QUE NO -> PERO LO DEJO IGUAL ASI PRUEBO LA SERIALIZACION Y LA DESERIALIZACION (DESPUES SACAR THO)
-		log_info(logger, "entro a localized_pokemon");
+			log_info(logger, "entro a localized_pokemon");
 
 		t_posicion *pos1 = crearPosicion(5, 10);
 		t_posicion *pos2 = crearPosicion(8, 11);

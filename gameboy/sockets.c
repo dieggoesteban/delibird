@@ -42,29 +42,22 @@ void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente) {
 	free(stream);
 }
 
-void modoSuscriptor(char* arg) {
-
-    uint32_t conexion = crear_conexion(ipBroker, puertoBroker);
-	uint32_t mq = getColaDeMensajes(arg);
-	t_register_module* registerModule = crearSuscribe(mq, ID_MODULE); //TODO: Tomar del config
+void modoSuscriptor(void* arg) {
+	t_suscribe_gameboy* suscribe = (t_suscribe_gameboy*) arg;
+	t_register_module* registerModule = crearSuscribe(suscribe->messageQueue, ID_MODULE); //TODO: Tomar del config
 	t_paquete *paquete = serializar_registerModule(registerModule);
 
 	free(registerModule);
-    enviarMensaje(paquete, conexion);
+    enviarMensaje(paquete, suscribe->conexion);
 	while(1) 
 	{
-		serve_client(&conexion);
+		serve_client(&suscribe->conexion);
 	}
-
-	liberar_conexion(conexion);
-	log_info(logger, "Conexion con broker finalizada");
 }
-
 
 void temporizador (void* tiempo) {
 	uint32_t temp = (uint32_t) tiempo;
 	sleep(temp);
-	//exit(0);
 	pthread_exit(&hiloSuscriptor);
 }
 

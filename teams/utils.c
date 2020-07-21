@@ -141,13 +141,31 @@ void inicializarEntrenadores() {
 
 		uint32_t sizeObjetivos = arraySize((void*)string_split(objetivosEntrenadores[i],"|"));
 
-		list_add(colaNEW, crearEntrenador(posicion, objetivos, pokemon, sizeObjetivos));
+		t_entrenador* entrenador = crearEntrenador(posicion, objetivos, pokemon, sizeObjetivos);
+
+		sem_init(&entrenador->mutex, 0, 0);
+
+		list_add(colaNEW, entrenador);
 
 		list_destroy(objetivos);
 		list_destroy(pokemon);
 		free(coordenadas);
 	}
+}
 
+uint32_t maxNum(uint32_t a, uint32_t b) {
+	if(a-b >= 0) {
+		return a-b;
+	} else return 0;
+}
+
+t_list* getCaughtPokemon() {
+	t_list* aux = list_create();
+	for(uint32_t i = 0; i < list_size(colaNEW); i++){
+		list_add_all(aux, ((t_entrenador*)list_get(colaNEW, i))->pokemonCapturados);
+	}
+
+	return aux;
 }
 
 void setObjetivoGlobal(){
@@ -155,6 +173,8 @@ void setObjetivoGlobal(){
 	t_list* globalAux = list_create();
 
 	objetivoGlobal = list_create();
+
+	t_list* caughtPokes = getCaughtPokemon();
 
 	for(uint32_t i = 0; i < list_size(colaNEW); i++){
 		list_add_all(pokemonesObjetivos, ((t_entrenador*)list_get(colaNEW, i))->pokemonObjetivo);
@@ -166,11 +186,19 @@ void setObjetivoGlobal(){
 		for(uint32_t j = 0; j < list_size(pokemon); j++){
 			if(perteneceALista(list_get(pokemon, j),globalAux) == 0) {
 				uint32_t cant = perteneceAListaContador(list_get(pokemon, j),pokemonesObjetivos);
-				list_add(objetivoGlobal, setPokemonCantidad(list_get(pokemon, j), cant));
+				uint32_t cantidad = perteneceAListaContador(list_get(pokemon,j),caughtPokes);
+				printf("Hay %i %s capturado/s \n", cantidad, (char*)list_get(pokemon, j));
+				list_add(objetivoGlobal, setPokemonCantidad(list_get(pokemon, j), maxNum(cant, cantidad)));
 				list_add(globalAux, list_get(pokemon, j));
 			}
 		}
 		free(pokemon);
+	}
+
+	printf("-OBJETIVO GLOBAL-\n");
+	for(uint32_t i = 0; i < list_size(objetivoGlobal); i++) {
+		t_pokemon_cantidad* poke = (t_pokemon_cantidad*)list_get(objetivoGlobal,i); 
+		printf("%s -- %i\n", (char*)poke->nombre, (uint32_t)poke->cantidad);
 	}
 
 	free(pokemonesObjetivos);
@@ -235,7 +263,7 @@ bool entrenadorCumplioObjetivo(t_entrenador* entrenador) {
 	return false;
 }
 
-bool entrenadorPuedeCapturar(void* entrenador) {
+bool entrenadorDisponible(void* entrenador) {
 	t_entrenador* trainer = (t_entrenador*) entrenador;
 
 	return (!entrenadorEnDeadlock(trainer) && !trainer->enEspera);
@@ -251,3 +279,80 @@ uint32_t turnosHastaPokemon(t_pokemon_posicion* pokemon, t_entrenador* entrenado
 	return abs(pokemon->posicion->posicion_x - entrenador->posicion->posicion_x) + abs(pokemon->posicion->posicion_y - entrenador->posicion->posicion_y);
 }
 
+bool entrenadorPuedeCapturar(void* entrenador) {
+	t_entrenador* trainer = (t_entrenador*) entrenador;
+
+	return (turnosHastaPokemon(trainer->pokemonPlanificado,trainer) == 0);
+}
+
+void moverEntrenadorAPokemon(t_entrenador* entrenador){ 
+    uint32_t entrenadorPosX = entrenador->posicion->posicion_x;
+    uint32_t entrenadorPosY = entrenador->posicion->posicion_y; 
+    uint32_t pokePosX = entrenador->pokemonPlanificado->posicion->posicion_x;
+    uint32_t pokePosY = entrenador->pokemonPlanificado->posicion->posicion_y;
+
+    if((pokePosX - entrenadorPosX) == 0){
+        if(pokePosY > entrenadorPosY)
+            entrenador = cambiarPosicionEntrenador(entrenador, entrenadorPosX, entrenadorPosY+1);
+        else
+            entrenador = cambiarPosicionEntrenador(entrenador, entrenadorPosX, entrenadorPosY-1);
+    }
+    else {
+        if(entrenador->pokemonPlanificado->posicion->posicion_x > entrenadorPosX)
+            entrenador = cambiarPosicionEntrenador(entrenador, entrenadorPosX+1, entrenadorPosY);
+        else
+            entrenador = cambiarPosicionEntrenador(entrenador, entrenadorPosX-1, entrenadorPosY);
+    }
+	printf("Entrenador %i se movio a %i:%i \n", (uint32_t)entrenador->id, (uint32_t)entrenador->posicion->posicion_x, (uint32_t)entrenador->posicion->posicion_y);
+	actualizarPosicion(entrenador);
+}
+
+void actualizarPosicion(t_entrenador* entrenador) {
+	sem_wait(&mutexEXEC);
+	list_remove(colaEXEC,0);
+	list_add(colaEXEC, entrenador);
+	sem_post(&mutexEXEC);
+}
+
+bool tardaMenos(void* trA, void* trB) {
+	t_entrenador* trainerA = (t_entrenador*) trA;
+	t_entrenador* trainerB = (t_entrenador*) trB;
+
+	uint32_t cantTurnosA = turnosHastaPokemon(trainerA->pokemonPlanificado,trainerA);
+	uint32_t cantTurnosB = turnosHastaPokemon(trainerB->pokemonPlanificado,trainerB);
+
+	return cantTurnosA < cantTurnosB;
+}
+
+bool pokemonEnObjetivoGlobal(t_pokemon_posicion* pokemon) {
+    uint32_t index = pokemonPosicionPerteneceALista(pokemon,objetivoGlobal);
+    if(index != ERROR) {
+        if(((t_pokemon_cantidad*)list_get(objetivoGlobal,index))->cantidad > 0)
+            return true;
+    }
+    return false;
+}
+
+void insertPokeEnMapa(t_pokemon_posicion* poke) {
+	if(pokemonEnObjetivoGlobal(poke)) {
+		sem_wait(&mutexPokesEnMapa);
+        list_add(pokemonesEnMapa, poke);
+		printf("Aparecio un %s salvaje!! \n", poke->nombre);
+        sem_post(&mutexPokesEnMapa);
+		sem_post(&counterPokesEnMapa);
+	} else {
+		free(poke);
+	}
+}
+
+t_suscribe* getSuscribe(uint32_t mq) {
+	t_suscribe* suscribe = malloc(sizeof(t_suscribe));
+	char* ip = config_get_string_value(config, "IP_BROKER");
+    char* puerto = config_get_string_value(config, "PUERTO_BROKER");
+    uint32_t conexion = crear_conexion(ip, puerto);
+
+	suscribe->conexion = conexion;
+	suscribe->messageQueue = mq;
+
+	return suscribe;
+}

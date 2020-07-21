@@ -10,6 +10,11 @@
 #include<string.h>
 #include "utils.h"
 #include "models.h"
+//METODOS DE CONEXION
+// int crear_conexion(char* ip, char* puerto);
+// void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente);
+// char* recibir_mensaje(int socket_cliente);
+// void liberar_conexion(int socket_cliente);
 
 //PAQUETES
 t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje);
@@ -46,8 +51,8 @@ t_id_mensaje_recibido* deserializar_idMensajeRecibido(t_buffer* buffer);
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant);
 t_posicion* crearPosicion(uint32_t x, uint32_t y);
 t_new_pokemon* crearNewPokemon(uint32_t IDMensajeRecibido, char* nombre, t_posicion_cantidad* posicionCantidad);
-t_localized_pokemon* crearLocalizedPokemon(uint32_t IDMensajeRecibido,uint32_t IDMensajeOriginal, char* nombre, uint32_t cantPosiciones, t_list* posicion);
-t_appeared_pokemon* crearAppearedPokemon(uint32_t IDMensajeRecibido, uint32_t IDMensajeOriginal,char* nombre, t_posicion* posicion);
+t_localized_pokemon* crearLocalizedPokemon(uint32_t IDMensajeRecibido,uint32_t IDMensajeOriginal, char* nombre, uint32_t sizePosicionCantidad, t_list* posicion);
+t_appeared_pokemon* crearAppearedPokemon(uint32_t IDMensajeRecibido, uint32_t IDMensajeOriginal, char* nombre, t_posicion* posicion);
 t_catch_pokemon* crearCatchPokemon(uint32_t ID_mensaje_recibido, char* nombre, t_posicion* posicion);
 t_caught_pokemon* crearCaughtPokemon(uint32_t IDMensajeRecibido, uint32_t IDMensajeOriginal, uint32_t catchStatus);
 t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre);

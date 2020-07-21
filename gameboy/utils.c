@@ -101,3 +101,12 @@ uint32_t arraySize(void* arr[]) {
 	}
 	return size;
 }
+
+t_suscribe_gameboy* crearSuscribeGameboy(uint32_t con, uint32_t mq) {
+	t_suscribe_gameboy* suscribe = malloc(sizeof(t_suscribe_gameboy));
+
+	suscribe->conexion = con;
+	suscribe->messageQueue = mq;
+
+	return suscribe;
+}

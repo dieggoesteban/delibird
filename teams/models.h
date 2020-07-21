@@ -1,6 +1,8 @@
 #ifndef MODELS_H_
 #define MODELS_H_
 
+#include<semaphore.h>
+
 #define ERROR -1
 
 typedef enum
@@ -10,14 +12,43 @@ typedef enum
 	CATCH_POKEMON = 3,
 	CAUGHT_POKEMON = 4,
 	GET_POKEMON = 5,
-	LOCALIZED_POKEMON = 6
+	LOCALIZED_POKEMON = 6,
+    SUSCRIBE = 7
 } mq_cod;
+
+typedef enum
+{
+	ACKNOWLEDGEMENT = 8,
+	CONFIRMACION_MSJ = 9
+} acciones;
+
+//struct que se manda como confirmacion de recibo de mensaje por parte de los modulos hacia el broker
+typedef struct{
+	uint32_t ID_mensaje;
+	uint32_t MessageQueue;
+	bool meLlego;
+} t_confirmacion_mensaje;
+
+typedef struct {
+	uint32_t AKC;
+} t_akc;
+
+typedef struct 
+{
+	uint32_t messageQueue;
+} t_register_module;
 
 typedef struct
 {
 	int size;
 	void* stream;
 } t_buffer;
+
+typedef struct
+{
+	uint32_t conexion;
+	uint32_t messageQueue;
+} t_suscribe;
 
 typedef struct
 {
@@ -52,17 +83,13 @@ typedef struct{
 	uint32_t ID_mensaje_original;
 	uint32_t sizeNombre;
 	char* nombre;
-<<<<<<< HEAD
-	uint32_t sizePosicion_cantidad; //LO AGREGO POR AHORA
-	t_list* posicion_cantidad; //una lista de t_posicion_cantidad
-=======
 	uint32_t cantidadPosiciones; 
 	t_list* posiciones; //una lista de t_posicion
->>>>>>> 574ee81798e3bd452a8cdf259582c2e9fd92c54e
 }t_localized_pokemon;
 
 typedef struct{
 	uint32_t ID_mensaje_recibido;
+	uint32_t ID_mensaje_original;
 	uint32_t sizeNombre;
 	char* nombre;
 	t_posicion* posicion;
@@ -73,13 +100,13 @@ typedef struct{
 	uint32_t sizeNombre;
 	char* nombre;
 	t_posicion* posicion;
-}t_catch_pokemon;
+} t_catch_pokemon;
 
 typedef struct{
 	uint32_t ID_mensaje_recibido;
 	uint32_t ID_mensaje_original;
 	uint32_t catchStatus; 
-}t_caught_pokemon;
+} t_caught_pokemon;
 
 typedef struct{
 	uint32_t ID_mensaje_recibido;
@@ -107,7 +134,8 @@ typedef struct
     uint32_t cantidadObjetivo;
     t_pokemon_posicion* pokemonPlanificado;
 	bool enEspera;
-    bool deadlock; 
+    bool deadlock;
+	sem_t mutex;
 } t_entrenador;
 
 #endif /* MODELS_H_ */
