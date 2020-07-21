@@ -4,13 +4,13 @@
 #include "global-includes.h"
 #include "models.h"
 #include <signal.h>
-#include <time.h>
+#include <sys/time.h>
 
 void* cache;
 
 t_list* partitions;
 t_list* holes;
-t_list* administrative;
+t_list* metadatas;
 
 pthread_mutex_t s_counterToCompactacion;
 pthread_mutex_t s_holes;
@@ -20,18 +20,22 @@ uint32_t counterToCompactacion;
 
 typedef struct
 {
+    uint32_t id;
     void* pStart;
     void* pLimit;
     uint32_t length;
     char free;
+    uint64_t lastUse;
 } t_partition;
 
 typedef struct
 {
+    uint32_t id;
     void* pStart;
     void* pLimit;
     uint32_t length; 
     char free;
+    uint64_t lastUse;
 } t_holes;
 
 uint32_t TAMANO_MEMORIA;
@@ -70,8 +74,7 @@ void showPartitions();
 uint32_t mem_address_menor_a_mayor(t_holes* hole1, t_holes* hole2);
 uint32_t existHolesBetweenPartitions();
 
+uint64_t getTimestamp();
 
-//Creacion y serializacion de mensajes con estructura de cache
-cache_message* createCacheMessage(t_message* message);
 
 #endif /* CACHE_H_ */

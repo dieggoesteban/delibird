@@ -32,6 +32,7 @@ void startCache()
     counterToCompactacion = 0;
     partitions = list_create();
     holes = list_create();
+    metadatas = list_create();
 
     if(pthread_mutex_init(&s_counterToCompactacion, NULL) != 0)
 		log_error(broker_custom_logger, "Error mutex init (s_counterToCompactacion) in cache initialization");
@@ -161,7 +162,6 @@ void memoria_particiones(t_message* message)
 
     //Etapa 1: Buscar partición libre
     t_holes* targetHole = algoritmo_particion_libre(sizeOfMessage); //Me asegura que de ese hole puedo sacar la particion minima por config
-
     while(targetHole == NULL)
     {
         pthread_mutex_lock(&s_counterToCompactacion);
@@ -194,6 +194,9 @@ void memoria_particiones(t_message* message)
     
     administrative->startAddress = targetHole->pStart;
 
+    //Guardamos la estructura administrativa
+    list_add(metadatas, (void*)administrative);
+    
     //Cuando el targetPartition ya esté ubicado se meten los datos donde corresponda
     writeData(administrative, targetHole, addressFromMessageToCopy);
 }
@@ -202,6 +205,8 @@ void writeData(cache_message* administrative, t_holes* targetHole, void* message
 {
     //Add mutex
     t_partition* partition = createPartition(targetHole->pStart, targetHole->length);
+    partition->id = administrative->idMessage;
+
     list_add(partitions, (void*)partition);
     list_sort(partitions, (void*)mem_address_menor_a_mayor);
     
@@ -228,11 +233,28 @@ void dump()
     printf("\nDump: %02d/%02d/%d %02d:%02d:%02d\n",
         tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);
     t_partition* currentBlock;
+    cache_message* currentMetadata;
     for (uint32_t i = 0; i < list_size(allMemory); i++)
     {
+        uint32_t _is_the_metadata(cache_message* message) {
+            return message->idMessage == currentBlock->id;
+        }
         currentBlock = (t_partition*)list_get(allMemory, i);
-        printf("Partition %i:  %p - %p    [%c]    Size: %ib    LRU:    COLA:    ID:\n", 
-            i+1, currentBlock->pStart, currentBlock->pLimit, currentBlock->free, currentBlock->length);
+
+        //Si es una particion ocupada
+        if(currentBlock->free == 'X')
+        {
+            currentMetadata = (cache_message*)list_find(metadatas, (void*)_is_the_metadata);
+            printf("Particion %i:  %p - %p    [%c]    Size: %ib    LRU: %llu    COLA: %i   ID: %i\n", 
+                i+1, currentBlock->pStart, currentBlock->pLimit, currentBlock->free, currentBlock->length, currentBlock->lastUse
+                , currentMetadata->mq_cod, currentMetadata->idMessage);
+        }
+        else
+        {
+            printf("Particion %i:  %p - %p    [%c]    Size: %ib    LRU: -    COLA: -   ID: -\n", 
+                i+1, currentBlock->pStart, currentBlock->pLimit, currentBlock->free, currentBlock->length);
+        }
+
     }
 }
 
@@ -401,6 +423,7 @@ t_holes* createHole(void* startAddress, uint32_t length)
     hole->pLimit = startAddress + length - 1; //Se resta uno porque hay que incluir el byte de pStart
     hole->length = length; 
     hole->free = 'L';
+    hole->lastUse =getTimestamp();
     return hole;
 }
 void showHoles()
@@ -424,6 +447,7 @@ t_partition* createPartition(void* startAddress, uint32_t length)
     partition->pLimit = startAddress + length - 1; //Se resta uno porque hay que incluir el byte de pStart
     partition->length = length; 
     partition->free = 'X';
+    partition->lastUse =getTimestamp();
     return partition;
 }
 void showPartitions()
@@ -455,4 +479,13 @@ uint32_t existHolesBetweenPartitions()
     pthread_mutex_unlock(&s_holes);
 
     return firstHole->pStart < lastPartition->pLimit;
+}
+
+uint64_t getTimestamp()
+{
+    struct timeval valor;
+    gettimeofday(&valor, NULL);
+    unsigned long long result = (((unsigned long long )valor.tv_sec) * 1000 + ((unsigned long) valor.tv_usec));
+    uint64_t tiempo = result;
+    return tiempo;
 }
