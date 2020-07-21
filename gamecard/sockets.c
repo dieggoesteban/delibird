@@ -240,7 +240,7 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd)
 			t_get_pokemon *getPoke = deserializar_getPokemon(buffer);
 			log_info(logger, getPoke->nombre);
 
-			t_acknowledgement* ack = crearAcknowledgement(idModule ,getPoke->ID_mensaje_recibido, CATCH_POKEMON);
+			t_acknowledgement* ack = crearAcknowledgement(idModule ,getPoke->ID_mensaje_recibido, GET_POKEMON);
 			uint32_t indexSem = getIndexSemaforo(getPoke->nombre, semaforosPokemon);
 			printf("INDEX QUE ME DA SOCKET: %i\n", indexSem);
 			if(indexSem == ERROR){
@@ -348,7 +348,7 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 			t_get_pokemon *getPoke = deserializar_getPokemon(buffer);
 			log_info(logger, getPoke->nombre);
 
-			t_acknowledgement* ack = crearAcknowledgement(idModule ,getPoke->ID_mensaje_recibido, CATCH_POKEMON);
+			t_acknowledgement* ack = crearAcknowledgement(idModule ,getPoke->ID_mensaje_recibido, GET_POKEMON);
 
 			uint32_t indexSem = getIndexSemaforo(getPoke->nombre, semaforosPokemon);
 			printf("INDEX QUE ME DA SOCKET: %i\n", indexSem);

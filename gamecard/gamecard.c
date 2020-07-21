@@ -17,6 +17,7 @@ int main(int argc, char *argv[])
         idModule = (uint32_t)config_get_int_value(config,"ID_MODULE");
     }
 
+
     sem_init(&waitForFinish, 0, 0);
     sem_init(&mutexReconnect, 0, 0);
 

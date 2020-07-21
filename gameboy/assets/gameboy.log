@@ -90,3 +90,34 @@
 [INFO] 20:50:40:644 gameboy/(7567:7567): Se ha recibido el id del mensaje enviado: 2
 [INFO] 20:51:42:398 gameboy/(7590:7590): entro a get_pokemon
 [INFO] 20:51:42:400 gameboy/(7590:7590): Se ha recibido el id del mensaje enviado: 5
+[INFO] 17:24:24:284 gameboy/(5945:5945): Se ha recibido el id del mensaje enviado: 1
+[INFO] 17:25:02:923 gameboy/(5968:5968): Se ha recibido el id del mensaje enviado: 3
+[INFO] 17:28:41:630 gameboy/(6049:6049): entro a get_pokemon
+[INFO] 17:28:41:631 gameboy/(6049:6049): Se ha recibido el id del mensaje enviado: 5
+[INFO] 17:36:05:221 gameboy/(6260:6260): entro a get_pokemon
+[INFO] 17:36:05:224 gameboy/(6260:6260): Se ha recibido el id del mensaje enviado: 1
+[INFO] 17:41:00:453 gameboy/(6581:6581): entro a get_pokemon
+[INFO] 17:41:00:455 gameboy/(6581:6581): Se ha recibido el id del mensaje enviado: 1
+[INFO] 17:45:01:172 gameboy/(6802:6802): Se ha recibido el id del mensaje enviado: 1
+[INFO] 17:45:36:148 gameboy/(6829:6829): Se ha recibido el id del mensaje enviado: 3
+[INFO] 17:50:11:146 gameboy/(7090:7090): Se ha recibido el id del mensaje enviado: 1
+[INFO] 17:51:36:184 gameboy/(7148:7148): entro a get_pokemon
+[INFO] 17:51:36:185 gameboy/(7148:7148): Se ha recibido el id del mensaje enviado: 3
+[INFO] 17:57:36:660 gameboy/(7290:7290): entro a get_pokemon
+[ERROR] 17:58:35:555 gameboy/(7290:7290): Codigo de operacion desconocido: 0
+[INFO] 18:13:14:111 gameboy/(7545:7545): entro a get_pokemon
+[INFO] 18:19:35:525 gameboy/(7701:7701): entro a get_pokemon
+[INFO] 18:19:35:527 gameboy/(7701:7701): Se ha recibido el id del mensaje enviado: 1
+[INFO] 18:21:10:411 gameboy/(7745:7745): entro a get_pokemon
+[INFO] 18:21:10:413 gameboy/(7745:7745): Se ha recibido el id del mensaje enviado: 1
+[INFO] 18:24:36:468 gameboy/(7996:7996): entro a get_pokemon
+[INFO] 18:24:36:470 gameboy/(7996:7996): Se ha recibido el id del mensaje enviado: 1
+[INFO] 18:25:12:347 gameboy/(8019:8019): entro a get_pokemon
+[ERROR] 18:25:58:991 gameboy/(8019:8019): Codigo de operacion desconocido: 0
+[INFO] 19:39:51:949 gameboy/(10410:10410): entro a get_pokemon
+[ERROR] 19:40:12:167 gameboy/(10410:10410): Codigo de operacion desconocido: 0
+[INFO] 19:41:33:466 gameboy/(10479:10479): entro a get_pokemon
+[ERROR] 19:41:39:581 gameboy/(10479:10479): Codigo de operacion desconocido: 0
+[INFO] 19:44:18:810 gameboy/(29783:29783): entro a get_pokemon
+[ERROR] 19:44:39:32 gameboy/(29783:29783): Codigo de operacion desconocido: 0
+[INFO] 19:46:28:274 gameboy/(29906:29906): entro a get_pokemon
