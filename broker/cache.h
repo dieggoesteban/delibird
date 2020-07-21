@@ -62,7 +62,7 @@ void cacheMessage(t_message* message);
 void dispatchCachedMessages(t_suscripcion* subscriber);
 void dump();
 //AUX Methods for dev purposes
-void writeData(cache_message* administrative, t_holes* targetHole);
+void writeData(cache_message* administrative, t_holes* targetHole, void* message);
 t_holes* createHole(void* startAddress, uint32_t length);
 void showHoles();
 t_partition* createPartition(void* startAddress, uint32_t length);

@@ -39,22 +39,10 @@ void startCache()
 		log_error(broker_custom_logger, "Error mutex init (s_holes) in cache initialization");
     if(pthread_mutex_init(&s_partitions, NULL) != 0)
 	    log_error(broker_custom_logger, "Error mutex init (s_partitions) in cache initialization");
-
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     //Memory allocation
     cache = malloc(TAMANO_MEMORIA);
-    t_holes* initial = (t_holes*)malloc(sizeof(t_holes));
-    initial = createHole(cache, TAMANO_MEMORIA);
+    t_holes* initial = createHole(cache, TAMANO_MEMORIA);
     list_add(holes, initial);
 
     //log_info(broker_custom_logger, "Cache inicializada correctamente");
@@ -105,7 +93,6 @@ void startCache()
         showHoles();*/
     #pragma endregion
     
-    //free(cache);
 }
 
 void memoria_buddySystem(t_message* message) 
@@ -120,6 +107,9 @@ void memoria_particiones(t_message* message)
     //log_info(broker_custom_logger, "Dynamic Partitions Algorithm\n");
 
     cache_message* administrative = (cache_message*)malloc(sizeof(cache_message));
+    void* addressFromMessageToCopy;
+    uint32_t sizeOfMessage;
+
     switch (message->mq_cod)
     {
         case NEW_POKEMON:
@@ -138,7 +128,9 @@ void memoria_particiones(t_message* message)
             administrative->length = (sizeof(uint32_t) * 4 + (cache_newPoke.nameLength - 1));
             administrative->suscriptoresEnviados = list_duplicate(message->suscriptoresEnviados);
             administrative->suscriptoresConfirmados = list_duplicate(message->suscriptoresConfirmados);
-            administrative->message = &newPoke;
+            
+            addressFromMessageToCopy = &newPoke;
+            sizeOfMessage = administrative->length;
             break;
         }
         case APPEARED_POKEMON:
@@ -168,9 +160,9 @@ void memoria_particiones(t_message* message)
     }
 
     //Etapa 1: Buscar partición libre
-    t_holes* targetHole = algoritmo_particion_libre(administrative->length);
+    t_holes* targetHole = algoritmo_particion_libre(sizeOfMessage); //Me asegura que de ese hole puedo sacar la particion minima por config
 
-    while(targetHole->pStart == NULL)
+    while(targetHole == NULL)
     {
         pthread_mutex_lock(&s_counterToCompactacion);
         if(counterToCompactacion < FRECUENCIA_COMPACTACION)
@@ -186,49 +178,34 @@ void memoria_particiones(t_message* message)
             pthread_mutex_unlock(&s_holes);
 
             counterToCompactacion = 0;
-            targetHole = algoritmo_particion_libre(administrative->length);
+            targetHole = algoritmo_particion_libre(sizeOfMessage);
             continue;
         }
         pthread_mutex_unlock(&s_counterToCompactacion);
+        
         //Etapa 3: Reemplazo y Consolidacion
         algoritmo_reemplazo();
-
         pthread_mutex_lock(&s_holes);
             consolidar();
         pthread_mutex_unlock(&s_holes);
-        targetHole = algoritmo_particion_libre(administrative->length);
+
+        targetHole = algoritmo_particion_libre(sizeOfMessage);
     }
     
     administrative->startAddress = targetHole->pStart;
 
     //Cuando el targetPartition ya esté ubicado se meten los datos donde corresponda
-    writeData(administrative, targetHole);
+    writeData(administrative, targetHole, addressFromMessageToCopy);
 }
 
-void writeData(cache_message* administrative, t_holes* targetHole)
+void writeData(cache_message* administrative, t_holes* targetHole, void* message)
 {
-    t_partition* partition = createPartition(administrative->startAddress, administrative->length);
-    
     //Add mutex
+    t_partition* partition = createPartition(targetHole->pStart, targetHole->length);
     list_add(partitions, (void*)partition);
-    if(targetHole->pLimit == (administrative->startAddress + administrative->length - 1)) //Ocupa justo todo el hueco
-    {
-        t_holes* currentHole;
-        for(uint32_t i = 0; i < list_size(holes); i++) {
-            currentHole = list_get(holes, i);
-            if (currentHole->pStart == targetHole->pStart) {
-                list_remove(holes, i);
-                break;
-            }
-        }
-    }
-    else
-    {
-        t_holes* splittedHole = createHole(administrative->startAddress, administrative->length);
-        list_add(holes, (void*)splittedHole);
-    }
-
-    memcpy(administrative->startAddress, administrative->message, administrative->length);
+    list_sort(partitions, (void*)mem_address_menor_a_mayor);
+    
+    memcpy(administrative->startAddress, message, administrative->length);
 }
 
 void reemplazo_fifo(){}
@@ -355,18 +332,33 @@ t_holes* particionLibre_ff(uint32_t bytes)
     else
         bytesToAlloc = TAMANO_MINIMO_PARTICION;
 
-    t_holes* currentHole;
+    t_holes* result = NULL;
+    t_holes* currentHole = NULL;
     pthread_mutex_lock(&s_holes);
         for(int i = 0; i < list_size(holes); i++)
         {
             currentHole = list_get(holes, i);
-            if (currentHole->length >= bytesToAlloc)
+            if (currentHole->length > bytesToAlloc)
             {
-                return currentHole;
+                //Hacer el split
+                t_holes* splittedHole = createHole(currentHole->pStart + bytesToAlloc, (currentHole->length - bytesToAlloc));
+                list_add(holes, (void*)splittedHole);
+                result = createHole(currentHole->pStart, bytesToAlloc);
+                list_remove(holes, i);
+                list_sort(holes, (void*)mem_address_menor_a_mayor);
+                break;
+            }
+            else if (currentHole->length == bytesToAlloc)
+            {
+                result = createHole(currentHole->pStart, bytesToAlloc);
+                list_remove(holes, i);
+                break;
             }
         }
+        list_sort(holes, (void*)mem_address_menor_a_mayor);
     pthread_mutex_unlock(&s_holes);
-    return NULL;
+    
+    return result;
 }
 
 t_holes* particionLibre_bf(uint32_t bytes)

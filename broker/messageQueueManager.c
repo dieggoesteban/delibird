@@ -411,7 +411,7 @@ void dispatchMessagesFromQueue(t_message_queue* messageQueue)
 void deleteFromQueue(t_message* message) 
 {
 	sem_wait(&message->s_puedeEliminarse); //Cache
-	sem_wait(&message->s_puedeEliminarse); //Ack
+	//sem_wait(&message->s_puedeEliminarse); //Ack
 	t_message_queue* messageQueue = getMessageQueueById(message->mq_cod);
 	t_message* current = (t_message*)malloc(sizeof(t_message));;
 	uint32_t targetIndex;
@@ -440,6 +440,7 @@ void notifySender(t_message* message, uint32_t socket_cliente)
 	t_id_mensaje_recibido* idAsignado = crearIdMensajeRecibido(message->id);		
 	t_paquete* paquete = serializar_idMensajeRecibido(idAsignado);
 	enviarMensaje(paquete, socket_cliente);
+	free(idAsignado);
 	//log_info(broker_custom_logger, "Respuesta de id (%i) enviada al cliente %i", message->id, socket_cliente);		
 }
 
