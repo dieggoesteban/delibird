@@ -50,6 +50,7 @@ int main(int argc, char *argv[])
     sem_init(&counterEntrenadoresCatch, 0, 0);
     sem_init(&mutexReconnect, 0, 0);
     sem_init(&mutexEntrenadoresCatch, 0, 1);
+    sem_init(&pokesObjetivoGlobal, 0, 1);
     
     inicializarTeam();
     establecerConexionBroker();
@@ -109,17 +110,15 @@ void terminar_programa() {
     sem_destroy(&mutexPokesEnMapa);
     sem_destroy(&counterPokesEnMapa);
 
-    list_destroy(colaNEW);
-    list_destroy(colaREADY);
-    list_destroy(colaBLOCKED);
-    list_destroy(colaEXEC);
-    list_destroy(colaEXIT);
-    list_destroy(pokemonesEnMapa);
+    list_destroy_and_destroy_elements(colaNEW, free);
+    list_destroy_and_destroy_elements(colaBLOCKED, free);
+    list_destroy_and_destroy_elements(colaEXEC, free);
+    list_destroy_and_destroy_elements(colaEXIT, free);
+    list_destroy_and_destroy_elements(pokemonesEnMapa, free);
 
     log_info(logger,"Liberamos todo");
     config_destroy(config);
     log_destroy(logger);
-
 
     exit(0);
 }

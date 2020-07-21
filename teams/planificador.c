@@ -99,6 +99,9 @@ void* planificadorREADY() {
         if (!sePudo) {
             moverEntrenadorDeCola(colaBLOCKED, colaREADY, entrenador);
         }
+        sem_wait(&pokesObjetivoGlobal);
+        actualizarObjetivoGlobal(poke, true);
+        sem_post(&pokesObjetivoGlobal);
         printf("Asignado %s al entrenador %i que esta en %i:%i \n", poke->nombre, (uint32_t)entrenador->id, (uint32_t)entrenador->posicion->posicion_x, (uint32_t)entrenador->posicion->posicion_y);
     }
 }

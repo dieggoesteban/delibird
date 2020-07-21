@@ -33,6 +33,7 @@ void inicializarPid();
 uint32_t getNuevoPid();
 void inicializarEntrenadores();
 void setObjetivoGlobal();
+void actualizarObjetivoGlobal(t_pokemon_posicion* poke, bool restar);
 
 //SEMAFOROS
 

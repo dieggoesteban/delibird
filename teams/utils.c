@@ -205,6 +205,17 @@ void setObjetivoGlobal(){
 	free(globalAux);
 }
 
+void actualizarObjetivoGlobal(t_pokemon_posicion* poke, bool restar) {
+	uint32_t index = pokemonPosicionPerteneceALista(poke,objetivoGlobal);
+	t_pokemon_cantidad* pokemon = list_remove(objetivoGlobal,index);
+	if(restar) {
+		pokemon->cantidad = pokemon->cantidad - 1;
+	} else {
+		pokemon->cantidad = pokemon->cantidad + 1;
+	}
+	list_add(objetivoGlobal, pokemon);
+}
+
 t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* pokemon, uint32_t cantObjetivos) {
     t_entrenador* entrenador = malloc(sizeof(t_entrenador));
 
@@ -422,6 +433,7 @@ void procesarMensajeCaught(t_caught_pokemon* caughtPoke) {
 			printf("El entrenador %i pudo capturar a %s\n", tr->id, poke);
 			list_add(tr->pokemonCapturados, poke);
 		} else {
+			
 			printf("El entrenador %i no pudo capturar a %s\n", tr->id, poke);
 		}
 		tr->pokemonPlanificado = NULL;

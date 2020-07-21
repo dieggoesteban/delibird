@@ -59,6 +59,7 @@ sem_t counterEntrenadoresCatch;
 sem_t waitForFinish;
 sem_t mutexReconnect;
 sem_t mutexEntrenadoresCatch;
+sem_t pokesObjetivoGlobal;
 
 uint32_t cicloCPU;
 uint32_t quantum;
