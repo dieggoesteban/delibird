@@ -19,7 +19,7 @@ void startCache()
     if(strcmp(ALGORITMO_REEMPLAZO, "FIFO") == 0)
         algoritmo_reemplazo = reemplazo_fifo;
     else if(strcmp(ALGORITMO_REEMPLAZO, "LRU") == 0)
-        algoritmo_reemplazo = reemplazo_bf;
+        algoritmo_reemplazo = reemplazo_lru;
 
     if(strcmp(ALGORITMO_PARTICION_LIBRE, "FF") == 0)
         algoritmo_particion_libre = particionLibre_ff;
@@ -33,20 +33,29 @@ void startCache()
     partitions = list_create();
     holes = list_create();
 
-    if(pthread_mutex_init(s_counterToCompactacion, NULL) != 0)
+    if(pthread_mutex_init(&s_counterToCompactacion, NULL) != 0)
 		log_error(broker_custom_logger, "Error mutex init (s_counterToCompactacion) in cache initialization");
-    if(pthread_mutex_init(s_holes, NULL) != 0)
+    if(pthread_mutex_init(&s_holes, NULL) != 0)
 		log_error(broker_custom_logger, "Error mutex init (s_holes) in cache initialization");
-    if(pthread_mutex_init(s_partitions, NULL) != 0)
-		log_error(broker_custom_logger, "Error mutex init (s_partitions) in cache initialization");
+    if(pthread_mutex_init(&s_partitions, NULL) != 0)
+	    log_error(broker_custom_logger, "Error mutex init (s_partitions) in cache initialization");
 
 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     //Memory allocation
     cache = malloc(TAMANO_MEMORIA);
-    // t_holes* initial = (t_holes*)malloc(sizeof(t_holes));
-    // initial->pStart = cache;
-    // initial->length = TAMANO_MEMORIA;
-    // list_add(holes, initial);
+    t_holes* initial = (t_holes*)malloc(sizeof(t_holes));
+    initial = createHole(cache, TAMANO_MEMORIA);
+    list_add(holes, initial);
 
     //log_info(broker_custom_logger, "Cache inicializada correctamente");
 
@@ -99,16 +108,18 @@ void startCache()
     //free(cache);
 }
 
-void memoria_buddySystem(t_message* message) {
+void memoria_buddySystem(t_message* message) 
+{
     log_info(broker_custom_logger, "I'm using Buddy System Algorithm\n");
 
     //not implemented
 }
 
-void memoria_particiones(t_message* message) {
-    log_info(broker_custom_logger, "Dynamic Partitions Algorithm\n");
+void memoria_particiones(t_message* message) 
+{
+    //log_info(broker_custom_logger, "Dynamic Partitions Algorithm\n");
 
-    cache_message administrative;
+    cache_message* administrative = (cache_message*)malloc(sizeof(cache_message));
     switch (message->mq_cod)
     {
         case NEW_POKEMON:
@@ -116,18 +127,36 @@ void memoria_particiones(t_message* message) {
             t_new_pokemon* newPoke = (t_new_pokemon*)message->mensaje;
             cache_new_pokemon cache_newPoke;
             cache_newPoke.nameLength = newPoke->sizeNombre;
-            cache_newPoke.pokeName = newPoke->nombre;
+            cache_newPoke.pokeName = malloc(newPoke->sizeNombre);
+            memcpy(&cache_newPoke.pokeName, newPoke->nombre, newPoke->sizeNombre);
             cache_newPoke.cantidad = newPoke->posicionCantidad->cantidad;
             cache_newPoke.posX = newPoke->posicionCantidad->posicion_x;
             cache_newPoke.posY = newPoke->posicionCantidad->posicion_y;
             
-            administrative.idMessage = newPoke->ID_mensaje_recibido;
-            administrative.mq_cod = NEW_POKEMON;
-            administrative.length = sizeof(cache_newPoke);
+            administrative->idMessage = newPoke->ID_mensaje_recibido;
+            administrative->mq_cod = NEW_POKEMON;
+            administrative->length = (sizeof(uint32_t) * 4 + (cache_newPoke.nameLength - 1));
+            administrative->suscriptoresEnviados = list_duplicate(message->suscriptoresEnviados);
+            administrative->suscriptoresConfirmados = list_duplicate(message->suscriptoresConfirmados);
+            administrative->message = &newPoke;
             break;
         }
         case APPEARED_POKEMON:
+        {
+            t_appeared_pokemon* appearedPoke = (t_appeared_pokemon*)message->mensaje;
+            cache_appeared_pokemon cache_appeared;
+            cache_appeared.nameLength = appearedPoke->sizeNombre;            
+            strcpy(cache_appeared.pokeName, appearedPoke->nombre);
+            cache_appeared.posX = appearedPoke->posicion->posicion_x;
+            cache_appeared.posY = appearedPoke->posicion->posicion_y;
+            
+            administrative->idMessage = appearedPoke->ID_mensaje_recibido;
+            administrative->mq_cod = APPEARED_POKEMON;
+            administrative->length = sizeof(cache_appeared);
+            administrative->suscriptoresEnviados = list_duplicate(message->suscriptoresEnviados);
+            administrative->suscriptoresConfirmados = list_duplicate(message->suscriptoresConfirmados);
             break;
+        }
         case CATCH_POKEMON:
             break;
         case CAUGHT_POKEMON:
@@ -139,47 +168,98 @@ void memoria_particiones(t_message* message) {
     }
 
     //Etapa 1: Buscar partición libre
-    t_partition* targetPartition = algoritmo_particion_libre(administrative.length);
+    t_holes* targetHole = algoritmo_particion_libre(administrative->length);
 
-    while(targetPartition == NULL)
+    while(targetHole->pStart == NULL)
     {
-        pthread_mutex_lock(s_counterToCompactacion);
+        pthread_mutex_lock(&s_counterToCompactacion);
         if(counterToCompactacion < FRECUENCIA_COMPACTACION)
         {
             counterToCompactacion++;
         }
         else
         {
-            pthread_mutex_lock(s_holes);
-            pthread_mutex_lock(s_partitions);
+            pthread_mutex_lock(&s_holes);
+            pthread_mutex_lock(&s_partitions);
                 compactar();
-            pthread_mutex_unlock(s_partitions);
-            pthread_mutex_unlock(s_holes);
+            pthread_mutex_unlock(&s_partitions);
+            pthread_mutex_unlock(&s_holes);
 
             counterToCompactacion = 0;
-            targetPartition = algoritmo_particion_libre(administrative.length);
+            targetHole = algoritmo_particion_libre(administrative->length);
             continue;
         }
-        pthread_mutex_unlock(s_counterToCompactacion);
+        pthread_mutex_unlock(&s_counterToCompactacion);
         //Etapa 3: Reemplazo y Consolidacion
         algoritmo_reemplazo();
 
-        pthread_mutex_lock(s_holes);
+        pthread_mutex_lock(&s_holes);
             consolidar();
-        pthread_mutex_unlock(s_holes);
-        targetPartition = algoritmo_particion_libre(administrative.length);
+        pthread_mutex_unlock(&s_holes);
+        targetHole = algoritmo_particion_libre(administrative->length);
     }
     
-    administrative.startAddress = targetPartition->pStart;
+    administrative->startAddress = targetHole->pStart;
+
     //Cuando el targetPartition ya esté ubicado se meten los datos donde corresponda
+    writeData(administrative, targetHole);
+}
+
+void writeData(cache_message* administrative, t_holes* targetHole)
+{
+    t_partition* partition = createPartition(administrative->startAddress, administrative->length);
     
-    //DO the memcpy
+    //Add mutex
+    list_add(partitions, (void*)partition);
+    if(targetHole->pLimit == (administrative->startAddress + administrative->length - 1)) //Ocupa justo todo el hueco
+    {
+        t_holes* currentHole;
+        for(uint32_t i = 0; i < list_size(holes); i++) {
+            currentHole = list_get(holes, i);
+            if (currentHole->pStart == targetHole->pStart) {
+                list_remove(holes, i);
+                break;
+            }
+        }
+    }
+    else
+    {
+        t_holes* splittedHole = createHole(administrative->startAddress, administrative->length);
+        list_add(holes, (void*)splittedHole);
+    }
+
+    memcpy(administrative->startAddress, administrative->message, administrative->length);
 }
 
 void reemplazo_fifo(){}
-void reemplazo_bf(){}
+void reemplazo_lru(){}
 
-void dispatchCachedMessages(uint32_t subscriber){}
+void dispatchCachedMessages(t_suscripcion* subscriber){}
+
+void dump()
+{
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+
+    //Añadir locks
+    t_list* allMemory = list_create();
+    list_add_all(allMemory, partitions);
+    list_add_all(allMemory, holes);
+
+    list_sort(allMemory, (void*)mem_address_menor_a_mayor);
+
+    printf("\nDump: %02d/%02d/%d %02d:%02d:%02d\n",
+        tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);
+    t_partition* currentBlock;
+    for (uint32_t i = 0; i < list_size(allMemory); i++)
+    {
+        currentBlock = (t_partition*)list_get(allMemory, i);
+        printf("Partition %i:  %p - %p    [%c]    Size: %ib    LRU:    COLA:    ID:\n", 
+            i+1, currentBlock->pStart, currentBlock->pLimit, currentBlock->free, currentBlock->length);
+    }
+}
+
+
 void consolidar()
 {
     if(list_size(holes) == 0 || list_size(holes) == 1)
@@ -267,7 +347,7 @@ void compactar()
     }
 }
 
-void* particionLibre_ff(uint32_t bytes) 
+t_holes* particionLibre_ff(uint32_t bytes) 
 { 
     uint32_t bytesToAlloc = 0;
     if(bytes > TAMANO_MINIMO_PARTICION)
@@ -275,24 +355,21 @@ void* particionLibre_ff(uint32_t bytes)
     else
         bytesToAlloc = TAMANO_MINIMO_PARTICION;
 
-    t_holes* currentPartition = (t_holes*)malloc(sizeof(t_holes));
-
-    pthread_mutex_lock(s_holes);
+    t_holes* currentHole;
+    pthread_mutex_lock(&s_holes);
         for(int i = 0; i < list_size(holes); i++)
         {
-            currentPartition = list_get(holes, i);
-            if (currentPartition->length >= bytesToAlloc)
+            currentHole = list_get(holes, i);
+            if (currentHole->length >= bytesToAlloc)
             {
-                return currentPartition->pStart;
+                return currentHole;
             }
         }
-    pthread_mutex_unlock(s_holes);
-
-    free(currentPartition);
+    pthread_mutex_unlock(&s_holes);
     return NULL;
 }
 
-void* particionLibre_bf(uint32_t bytes)
+t_holes* particionLibre_bf(uint32_t bytes)
 {
     uint32_t bytesToAlloc = 0;
     if(bytes > TAMANO_MINIMO_PARTICION)
@@ -301,28 +378,25 @@ void* particionLibre_bf(uint32_t bytes)
         bytesToAlloc = TAMANO_MINIMO_PARTICION;
 
     void* result = NULL;
-    t_holes* currentPartition = (t_holes*)malloc(sizeof(t_holes));
-    t_holes* bestFit = (t_holes*)malloc(sizeof(t_holes));
+    t_holes* currentHole;
+    t_holes* bestHole;
 
-    pthread_mutex_lock(s_holes);
+    pthread_mutex_lock(&s_holes);
         for(uint32_t i = 0; i < list_size(holes); i++)
         {
-            currentPartition = list_get(holes, i);
-            if(bestFit == NULL && currentPartition->length >= bytesToAlloc)
-                bestFit = currentPartition;
-            else if (currentPartition->length >= bytesToAlloc && currentPartition->length < bestFit->length)
+            currentHole = list_get(holes, i);
+            if(bestHole == NULL && currentHole->length >= bytesToAlloc)
+                bestHole = currentHole;
+            else if (currentHole->length >= bytesToAlloc && currentHole->length < bestHole->length)
             {
-                bestFit = currentPartition;
-                if(bestFit->length == bytesToAlloc)
+                bestHole = currentHole;
+                if(bestHole->length == bytesToAlloc)
                     break;
             }      
         }
-    pthread_mutex_unlock(s_holes);
+    pthread_mutex_unlock(&s_holes);
 
-    result = bestFit->pStart;
-
-    free(currentPartition);
-    free(bestFit);
+    result = bestHole;
     return result;
 }
 
@@ -334,21 +408,21 @@ t_holes* createHole(void* startAddress, uint32_t length)
     hole->pStart = startAddress;
     hole->pLimit = startAddress + length - 1; //Se resta uno porque hay que incluir el byte de pStart
     hole->length = length; 
+    hole->free = 'L';
     return hole;
 }
 void showHoles()
 {
-    t_holes* currentHole = (t_holes*)malloc(sizeof(t_holes));
+    t_holes* currentHole;
 
-    pthread_mutex_lock(s_holes);
+    pthread_mutex_lock(&s_holes);
     for(uint32_t i = 0; i < list_size(holes); i++)
     {
         currentHole = list_get(holes, i);
         printf("Hole %d - Range: %lu / %lu - Length: %d\n", i, 
             (unsigned long)currentHole->pStart%1000000, (unsigned long)currentHole->pLimit%1000000, currentHole->length);
     }
-    pthread_mutex_unlock(s_holes);
-    //free(currentHole);
+    pthread_mutex_unlock(&s_holes);
 }
 
 t_partition* createPartition(void* startAddress, uint32_t length)
@@ -357,60 +431,36 @@ t_partition* createPartition(void* startAddress, uint32_t length)
     partition->pStart = startAddress;
     partition->pLimit = startAddress + length - 1; //Se resta uno porque hay que incluir el byte de pStart
     partition->length = length; 
+    partition->free = 'X';
     return partition;
 }
 void showPartitions()
 {
-    t_partition* currentPartition = (t_partition*)malloc(sizeof(t_partition));
+    t_partition* currentPartition;
 
-    pthread_mutex_lock(s_partitions);
+    pthread_mutex_lock(&s_partitions);
     for(uint32_t i = 0; i < list_size(partitions); i++)
     {
         currentPartition = list_get(partitions, i);
         printf("Partition %d - Range: %lu / %lu - Length: %d\n", i, 
             (unsigned long)currentPartition->pStart%1000000, (unsigned long)currentPartition->pLimit%1000000, currentPartition->length);
     }
-    pthread_mutex_unlock(s_partitions);
-    //free(currentPartition);
+    pthread_mutex_unlock(&s_partitions);
 }
 
-uint32_t mem_address_menor_a_mayor(t_holes* hole1, t_holes* hole2)
+uint32_t mem_address_menor_a_mayor(t_holes* block, t_holes* block2)
 {
-    return hole1->pStart < hole2->pStart;
+    return block->pStart < block2->pStart;
 }
 
 uint32_t existHolesBetweenPartitions()
 {
-    pthread_mutex_lock(s_holes);
-    pthread_mutex_lock(s_partitions);
+    pthread_mutex_lock(&s_holes);
+    pthread_mutex_lock(&s_partitions);
         t_holes* firstHole = list_get(holes, 0); //El primer hueco
         t_partition* lastPartition = list_get(partitions, list_size(partitions) - 1); //La ultima particion
-    pthread_mutex_unlock(s_partitions);
-    pthread_mutex_unlock(s_holes);
+    pthread_mutex_unlock(&s_partitions);
+    pthread_mutex_unlock(&s_holes);
 
     return firstHole->pStart < lastPartition->pLimit;
-}
-
-cache_message* createCacheMessage(t_message* message)
-{
-    cache_message* cacheMessage = (cache_message*)malloc(sizeof(cache_message));
-    cacheMessage->message = message;
-    
-    switch(message->mq_cod)
-    {
-        case NEW_POKEMON:
-        {
-            t_new_pokemon* o_newPokemon = (t_new_pokemon*)malloc(sizeof(t_new_pokemon)); //o: original
-            cache_new_pokemon* c_newPokemon = (cache_new_pokemon*)malloc(sizeof(cache_new_pokemon)); //c: cached
-            o_newPokemon = (t_new_pokemon*)message->mensaje;
-
-            c_newPokemon->nameLength = o_newPokemon->sizeNombre;
-            c_newPokemon->pokeName = o_newPokemon->nombre;
-            c_newPokemon->cantidad = o_newPokemon->posicionCantidad->cantidad;
-            c_newPokemon->posX = o_newPokemon->posicionCantidad->posicion_x;
-            c_newPokemon->posY = o_newPokemon->posicionCantidad->posicion_y;
-        }
-    }
-
-    return cacheMessage;
 }

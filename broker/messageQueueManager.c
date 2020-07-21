@@ -304,13 +304,6 @@ void addMessageToQueue(t_message* message, t_message_queue* messageQueue)
 {
 	pthread_mutex_lock(&messageQueue->s_mensajes);
 		list_add(messageQueue->mensajes, message);
-
-		//Guardarlo en la cache
-		if(pthread_create(&message->caching, NULL, (void*)cacheMessage, message) < 0)
-			log_error(broker_custom_logger, "Error in pthread_create cacheMessage");
-		
-		if(pthread_join(message->caching, NULL) != 0)
-			log_error(broker_custom_logger, "Error in pthread_join cacheMessage");	
 	pthread_mutex_unlock(&messageQueue->s_mensajes);
 	sem_post(&messageQueue->s_hayMensajes);
 }
@@ -398,7 +391,14 @@ void dispatchMessagesFromQueue(t_message_queue* messageQueue)
 				currentSubscriber = (t_suscripcion*)list_get(messageQueue->subscribers, i);
 				sendMessageFromQueue(message, currentSubscriber);
 			}
-		pthread_mutex_unlock(&messageQueue->s_subscribers);		
+		pthread_mutex_unlock(&messageQueue->s_subscribers);	
+
+		//Guardarlo en la cache
+		if(pthread_create(&message->caching, NULL, (void*)cacheMessage, message) < 0)
+			log_error(broker_custom_logger, "Error in pthread_create cacheMessage");
+		
+		if(pthread_join(message->caching, NULL) != 0)
+			log_error(broker_custom_logger, "Error in pthread_join cacheMessage");		
 
 		if(pthread_create(&message->deleteFromQueue, NULL, (void*)deleteFromQueue, message) < 0)
 			log_error(broker_custom_logger, "Error in pthread_create deleteFromQueue");
@@ -445,7 +445,7 @@ void notifySender(t_message* message, uint32_t socket_cliente)
 
 void cacheMessage(t_message* message)
 {
-	//algoritmo_memoria(message);
+	algoritmo_memoria(message);
 	sem_post(&message->s_puedeEliminarse);
 	//log_info(logger, "Mensaje id %i agregado a la cache", message->id);
 }

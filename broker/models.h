@@ -168,6 +168,9 @@ typedef struct{
 } t_get_pokemon;
 #pragma endregion
 
+
+
+
 #pragma region Mensajes_Estructura_Cache
 
 typedef struct {
@@ -175,6 +178,7 @@ typedef struct {
 	uint32_t idCorrelational;
 	uint32_t mq_cod;
 	void* startAddress;
+	void* message;
 	uint32_t length;
 
 	t_list* suscriptoresConfirmados;
