@@ -24,30 +24,6 @@ int main(int argc, char *argv[])
         char *puerto;
         char *arrayArgumentos[argc - 3];
         cortarArgumentos(argc, argv, arrayArgumentos);
-<<<<<<< HEAD
-
-        uint32_t isValid = procesarComando(&ip, &puerto, proceso, tipo_mensaje);
-        if (isValid == 1)
-        {
-            t_paquete *paquete;
-            if (strcmp(proceso, "SUSCRIPTOR") == 0)
-            {
-                terminaConexion = false;
-                temp = atoi(argv[3]);
-                sem_init(&tempo, 0, 1);
-                pthread_create(&hiloSuscriptor, NULL, (void*)modoSuscriptor, (void*)tipo_mensaje);
-                pthread_create(&hiloTemporizador, NULL, (void*)temporizador, (void*)atoi(argv[3]));
-                pthread_detach(hiloSuscriptor);
-                pthread_join(hiloTemporizador, NULL);
-            }
-            else
-            {
-                uint32_t conexion = crear_conexion(ip, puerto);
-                paquete = getPaquete(arrayArgumentos, tipo_mensaje);
-                enviarMensaje(paquete, conexion);
-                serve_client(&conexion);
-            }          
-=======
         uint32_t isValid = procesarComando(&ip, &puerto, proceso, tipo_mensaje);
 
         if (isValid == 1)
@@ -75,7 +51,6 @@ int main(int argc, char *argv[])
             }
             printf("Liberamos conexion\n");
             liberar_conexion(conexion);
->>>>>>> gameboy
         }
         else
         {

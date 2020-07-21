@@ -30,12 +30,8 @@ void liberar_conexion(int socket_cliente);
 t_buffer *recibir_buffer(uint32_t socket_cliente);
 void serve_client(uint32_t* socket);
 void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cliente);
-<<<<<<< HEAD
-void modoSuscriptor(char* arg);
-=======
 void modoSuscriptor(void* arg);
 void suscribeBroker(void* conexion);
->>>>>>> gameboy
 void temporizador (void* tiempo);
 
 uint32_t temp;

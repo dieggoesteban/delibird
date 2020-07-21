@@ -100,8 +100,6 @@ uint32_t arraySize(void* arr[]) {
 		size++;
 	}
 	return size;
-<<<<<<< HEAD
-=======
 }
 
 t_suscribe_gameboy* crearSuscribeGameboy(uint32_t con, uint32_t mq) {
@@ -111,5 +109,4 @@ t_suscribe_gameboy* crearSuscribeGameboy(uint32_t con, uint32_t mq) {
 	suscribe->messageQueue = mq;
 
 	return suscribe;
->>>>>>> gameboy
 }
