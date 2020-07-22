@@ -15,12 +15,15 @@ t_list* metadatas;
 pthread_mutex_t s_counterToCompactacion;
 pthread_mutex_t s_holes;
 pthread_mutex_t s_partitions;
+pthread_mutex_t s_partitionCounter;
 
+uint32_t partitionCounter;
 uint32_t counterToCompactacion;
 
 typedef struct
 {
     uint32_t id;
+    uint32_t fifoPosition;
     void* pStart;
     void* pLimit;
     uint32_t length;
@@ -31,6 +34,7 @@ typedef struct
 typedef struct
 {
     uint32_t id;
+    uint32_t fifoPosition;
     void* pStart;
     void* pLimit;
     uint32_t length; 
@@ -46,15 +50,15 @@ char* ALGORITMO_PARTICION_LIBRE;
 uint32_t FRECUENCIA_COMPACTACION;
 
 void (*algoritmo_memoria) (t_message*);
-void (*algoritmo_reemplazo) ();
+t_holes* (*algoritmo_reemplazo) ();
 t_holes* (*algoritmo_particion_libre) (uint32_t bytes);
 
-void startCache();
+void startCache(); 
 void memoria_buddySystem();
 void memoria_particiones();
 
-void reemplazo_fifo();
-void reemplazo_lru();
+t_holes* reemplazo_fifo();
+t_holes* reemplazo_lru();
 
 t_holes* particionLibre_ff(uint32_t bytes);
 t_holes* particionLibre_bf(uint32_t bytes);
@@ -65,11 +69,12 @@ void consolidar();
 void cacheMessage(t_message* message);
 void dispatchCachedMessages(t_suscripcion* subscriber);
 void dump();
-//AUX Methods for dev purposes
 void writeData(cache_message* administrative, t_holes* targetHole, void* message);
+
 t_holes* createHole(void* startAddress, uint32_t length);
-void showHoles();
 t_partition* createPartition(void* startAddress, uint32_t length);
+
+void showHoles();
 void showPartitions();
 uint32_t mem_address_menor_a_mayor(t_holes* hole1, t_holes* hole2);
 uint32_t existHolesBetweenPartitions();

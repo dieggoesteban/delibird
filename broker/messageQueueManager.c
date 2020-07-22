@@ -141,7 +141,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 			t_message* message = crearMessage(appearedPoke, APPEARED_POKEMON);
 
 			message->id = asignarMessageId();
-			message->idCorrelativo = 0;
+			message->idCorrelativo = appearedPoke->ID_mensaje_original;
 			message->mq_cod = APPEARED_POKEMON;
 			appearedPoke->ID_mensaje_recibido = message->id;
 			message->mensaje = appearedPoke;
@@ -395,10 +395,10 @@ void dispatchMessagesFromQueue(t_message_queue* messageQueue)
 
 		//Guardarlo en la cache
 		if(pthread_create(&message->caching, NULL, (void*)cacheMessage, message) < 0)
-			log_error(broker_custom_logger, "Error in pthread_create cacheMessage");
+		 	log_error(broker_custom_logger, "Error in pthread_create cacheMessage");
 		
-		if(pthread_join(message->caching, NULL) != 0)
-			log_error(broker_custom_logger, "Error in pthread_join cacheMessage");		
+		 if(pthread_join(message->caching, NULL) != 0)
+		 	log_error(broker_custom_logger, "Error in pthread_join cacheMessage");		
 
 		if(pthread_create(&message->deleteFromQueue, NULL, (void*)deleteFromQueue, message) < 0)
 			log_error(broker_custom_logger, "Error in pthread_create deleteFromQueue");
