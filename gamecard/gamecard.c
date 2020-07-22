@@ -53,10 +53,22 @@ void terminar_programa(){
     sem_wait(&waitForFinish);
     printf("\nCERRANDO EL PROGRAMA*********************************\n");
     list_destroy_and_destroy_elements(semaforosPokemon, free);
+
+    liberar_conexion(suscribeNew->conexion);
+    liberar_conexion(suscribeCatch->conexion);
+    liberar_conexion(suscribeGet->conexion);
+
+    free(suscribeNew);
+    free(suscribeCatch);
+    free(suscribeGet);
+
+    sem_destroy(&mutexReconnect);
     
     log_info(logger,"Liberamos todo");
     log_destroy(logger);
     config_destroy(config);
+
+    exit(0);
 }
 
 
