@@ -185,6 +185,12 @@ typedef struct {
 	t_list* suscriptoresEnviados;
 } cache_message;
 
+typedef struct
+{
+    t_suscripcion* suscripcion;
+    uint32_t mq_cod;
+} t_cache_dispatch_info;
+
 typedef struct {
 	uint32_t nameLength;
 	char* pokeName;

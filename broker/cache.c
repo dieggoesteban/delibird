@@ -158,7 +158,24 @@ void memoria_particiones(t_message* message)
         case CAUGHT_POKEMON:
             break;
         case GET_POKEMON:
+        {
+            t_get_pokemon* getPoke = (t_get_pokemon*)message->mensaje;
+            cache_get_pokemon cache_getPoke;
+            cache_getPoke.nameLength = getPoke->sizeNombre;
+            cache_getPoke.pokeName = malloc(getPoke->sizeNombre);
+
+            memcpy(cache_getPoke.pokeName, getPoke->nombre, getPoke->sizeNombre);
+            
+            administrative->idMessage = getPoke->ID_mensaje_recibido;
+            administrative->mq_cod = GET_POKEMON;
+            administrative->length = (sizeof(uint32_t) + (cache_getPoke.nameLength - 1));
+            administrative->suscriptoresEnviados = list_duplicate(message->suscriptoresEnviados);
+            administrative->suscriptoresConfirmados = list_duplicate(message->suscriptoresConfirmados);
+            
+            addressFromMessageToCopy = &getPoke;
+            sizeOfMessage = administrative->length;
             break;
+        }
         case LOCALIZED_POKEMON: 
             break;
     }
@@ -173,21 +190,17 @@ void memoria_particiones(t_message* message)
             counterToCompactacion++;
         }
         else
-        {
-            pthread_mutex_lock(&s_holes);
-            pthread_mutex_lock(&s_partitions);
-                compactar();
-            pthread_mutex_unlock(&s_partitions);
-            pthread_mutex_unlock(&s_holes);
-
+        {           
+            compactar();
             counterToCompactacion = 0;
             targetHole = algoritmo_particion_libre(sizeOfMessage);
+            pthread_mutex_unlock(&s_counterToCompactacion);
             continue;
         }
         pthread_mutex_unlock(&s_counterToCompactacion);
         
         //Etapa 3: Reemplazo y Consolidacion
-        targetHole = algoritmo_reemplazo();
+        targetHole = algoritmo_reemplazo(sizeOfMessage);
         pthread_mutex_lock(&s_holes);
             consolidar();
         pthread_mutex_unlock(&s_holes);
@@ -200,8 +213,8 @@ void memoria_particiones(t_message* message)
     
     //Cuando el targetPartition ya esté ubicado se meten los datos donde corresponda
     writeData(administrative, targetHole, addressFromMessageToCopy);
-    log_debug(broker_custom_logger, "Partitions: %i - Holes: %i", list_size(partitions), list_size(holes));
-    dump();
+    //log_debug(broker_custom_logger, "Partitions: %i - Holes: %i", list_size(partitions), list_size(holes));
+    //dump();
 }
 
 void writeData(cache_message* administrative, t_holes* targetHole, void* message)
@@ -216,8 +229,10 @@ void writeData(cache_message* administrative, t_holes* targetHole, void* message
     memcpy(administrative->startAddress, message, administrative->length);
 }
 
-t_holes* reemplazo_fifo()
+t_holes* reemplazo_fifo(uint32_t bytes)
 {   
+    t_partition* targetFifoPartition = NULL;
+
     //Se crea una copia para ordenarla por fifo
     t_list* tempPartitionsList = list_duplicate(partitions);
     uint32_t _fifo_menor_a_mayor (t_partition* partition1, t_partition* partition2) {
@@ -225,40 +240,65 @@ t_holes* reemplazo_fifo()
     }
     list_sort(tempPartitionsList, (void*)_fifo_menor_a_mayor);
 
-    //Se toma el numero de fifo de la primera particion despues del orden
-    t_partition* targetFifoPosition = (t_partition*)list_get(tempPartitionsList, 0);
-    uint32_t fifoToDelete = targetFifoPosition->fifoPosition;
-    free(targetFifoPosition);
-
-    //Se ubica a la victima en la lista original y se crea el nuevo hueco con sus datos
-    uint32_t _is_the_one_with_fifo_number(t_partition* partition) {
-        return partition->fifoPosition == fifoToDelete;
-    }
-    t_partition* victim = (t_partition*)list_find(partitions, (void*)_is_the_one_with_fifo_number);
-    
-    if(victim == NULL) {
-        log_error(broker_custom_logger, "No se encontro particion victima");
-        exit(1);
-    }
-    t_holes* newFreeSpace = createHole(victim->pStart, victim->length);
-    
-    //Se elimina de la lista de particiones
-    t_partition* currentPartition;
-    for(uint32_t i = 0; i < list_size(partitions); i++)
+    while (targetFifoPartition == NULL || targetFifoPartition->length < bytes)
     {
-        currentPartition = list_get(partitions, i);
-        if(currentPartition->fifoPosition == victim->fifoPosition)
+        //Se toma el numero de fifo de la primera particion despues del orden
+        t_partition* targetFifoPartition = (t_partition*)list_get(tempPartitionsList, 0);
+        if(targetFifoPartition->length < bytes)
         {
-            list_remove(partitions, i);
-            break;
+            list_remove(tempPartitionsList, 0);
+            continue;
         }
+        uint32_t fifoToDelete = targetFifoPartition->fifoPosition;
+
+        free(targetFifoPartition);
+
+        //Se ubica a la victima en la lista original y se crea el nuevo hueco con sus datos
+        uint32_t _is_the_one_with_fifo_number(t_partition* partition) {
+            return partition->fifoPosition == fifoToDelete;
+        }
+        t_partition* victim = (t_partition*)list_find(partitions, (void*)_is_the_one_with_fifo_number);
+        
+        if(victim == NULL) {
+            log_error(broker_custom_logger, "No se encontro particion victima");
+            exit(1);
+        }
+        t_holes* newFreeSpace = createHole(victim->pStart, victim->length);
+        
+        //Se elimina de la lista de particiones
+        t_partition* currentPartition;
+        for(uint32_t i = 0; i < list_size(partitions); i++)
+        {
+            currentPartition = list_get(partitions, i);
+            if(currentPartition->fifoPosition == victim->fifoPosition)
+            {
+                list_remove(partitions, i);
+                break;
+            }
+        }
+        return newFreeSpace;
     }
-    return newFreeSpace;
+    return NULL;
 }
 
 t_holes* reemplazo_lru(uint32_t bytes){ return createHole(0, 0);}
 
-void dispatchCachedMessages(t_suscripcion* subscriber){}
+void dispatchCachedMessages(t_cache_dispatch_info* dispatchInfo)
+{
+    switch (dispatchInfo->mq_cod)
+    {
+        case NEW_POKEMON:
+        {
+
+            break;
+        }
+        case APPEARED_POKEMON:
+        {
+
+            break;
+        }
+    }
+}
 
 void dump()
 {
@@ -351,10 +391,10 @@ void compactar()
     uint32_t targetPartitionIndex;
     t_partition* targetPartition;
 
+    pthread_mutex_lock(&s_holes);
+    pthread_mutex_lock(&s_partitions);
     while (existHolesBetweenPartitions())
     {
-        showPartitions();
-        showHoles();
         t_holes* hole = (t_holes*)list_get(holes, 0);
 
         //Busco la particion contigua al hueco
@@ -386,6 +426,8 @@ void compactar()
 
         targetPartition = NULL;
     }
+    pthread_mutex_unlock(&s_holes);
+    pthread_mutex_unlock(&s_partitions);
 }
 
 t_holes* particionLibre_ff(uint32_t bytes) 
@@ -524,12 +566,8 @@ uint32_t mem_address_menor_a_mayor(t_holes* block, t_holes* block2)
 
 uint32_t existHolesBetweenPartitions()
 {
-    pthread_mutex_lock(&s_holes);
-    pthread_mutex_lock(&s_partitions);
-        t_holes* firstHole = list_get(holes, 0); //El primer hueco
-        t_partition* lastPartition = list_get(partitions, list_size(partitions) - 1); //La ultima particion
-    pthread_mutex_unlock(&s_partitions);
-    pthread_mutex_unlock(&s_holes);
+    t_holes* firstHole = list_get(holes, 0); //El primer hueco
+    t_partition* lastPartition = list_get(partitions, list_size(partitions) - 1); //La ultima particion
 
     return firstHole->pStart < lastPartition->pLimit;
 }

@@ -42,6 +42,7 @@ typedef struct
     uint64_t lastUse;
 } t_holes;
 
+
 uint32_t TAMANO_MEMORIA;
 uint32_t TAMANO_MINIMO_PARTICION;
 char* ALGORITMO_MEMORIA;
@@ -50,15 +51,15 @@ char* ALGORITMO_PARTICION_LIBRE;
 uint32_t FRECUENCIA_COMPACTACION;
 
 void (*algoritmo_memoria) (t_message*);
-t_holes* (*algoritmo_reemplazo) ();
+t_holes* (*algoritmo_reemplazo) (uint32_t bytes);
 t_holes* (*algoritmo_particion_libre) (uint32_t bytes);
 
 void startCache(); 
 void memoria_buddySystem();
 void memoria_particiones();
 
-t_holes* reemplazo_fifo();
-t_holes* reemplazo_lru();
+t_holes* reemplazo_fifo(uint32_t bytes);
+t_holes* reemplazo_lru(uint32_t bytes);
 
 t_holes* particionLibre_ff(uint32_t bytes);
 t_holes* particionLibre_bf(uint32_t bytes);
@@ -67,7 +68,7 @@ void compactar();
 void consolidar();
 
 void cacheMessage(t_message* message);
-void dispatchCachedMessages(t_suscripcion* subscriber);
+void dispatchCachedMessages(t_cache_dispatch_info* dispatchInfo);
 void dump();
 void writeData(cache_message* administrative, t_holes* targetHole, void* message);
 

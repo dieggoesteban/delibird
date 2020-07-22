@@ -298,6 +298,15 @@ void subscribeNewModule(uint32_t idNewModule, uint32_t socket_cliente, uint32_t 
 		log_info(logger, "Se ha registrado un nuevo suscriptor id %i a la cola %s", suscripcion->idModule, messageQueue->name);
 	}
 	pthread_mutex_unlock(&messageQueue->s_subscribers);
+
+	//Enviar los mensajes de la cache
+	t_cache_dispatch_info* cache_dispatch_info = (t_cache_dispatch_info*)malloc(sizeof(t_cache_dispatch_info));
+	cache_dispatch_info->suscripcion = suscripcion;
+	cache_dispatch_info->mq_cod = mq_cod;
+
+	// pthread_t dispatchCache;
+	// pthread_create(&dispatchCache, NULL, (void*)dispatchCachedMessages, suscripcion);
+	// pthread_detach(dispatchCache);
 }
 
 void addMessageToQueue(t_message* message, t_message_queue* messageQueue)
@@ -386,6 +395,10 @@ void dispatchMessagesFromQueue(t_message_queue* messageQueue)
 
 		pthread_mutex_lock(&messageQueue->s_subscribers);
 			subscribersCount = list_size(messageQueue->subscribers);
+			if(subscribersCount == 0)
+			{
+				sem_post(&message->s_puedeEliminarse);
+			}
 			message->countSuscriptoresObjetivo = subscribersCount;
 			for(uint32_t i = 0; i < subscribersCount; i++) {
 				currentSubscriber = (t_suscripcion*)list_get(messageQueue->subscribers, i);
@@ -411,7 +424,7 @@ void dispatchMessagesFromQueue(t_message_queue* messageQueue)
 void deleteFromQueue(t_message* message) 
 {
 	sem_wait(&message->s_puedeEliminarse); //Cache
-	//sem_wait(&message->s_puedeEliminarse); //Ack
+	sem_wait(&message->s_puedeEliminarse); //Ack
 	t_message_queue* messageQueue = getMessageQueueById(message->mq_cod);
 	t_message* current = (t_message*)malloc(sizeof(t_message));;
 	uint32_t targetIndex;
