@@ -272,6 +272,10 @@ t_paquete* serializar_getPokemon(t_get_pokemon* pokemon);
 t_get_pokemon* deserializar_getPokemon(t_buffer* buffer);
 t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon);
 t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer);
+t_paquete* serializar_idMensajeRecibido(t_id_mensaje_recibido* idMensajeRecibido);
+t_id_mensaje_recibido* deserializar_idMensajeRecibido(t_buffer* buffer);
+t_paquete* serializar_acknowledgement(t_acknowledgement* akc);
+t_acknowledgement* deserializar_acknowledgement(t_buffer* buffer);
 
 t_paquete* serializar_registerModule(t_register_module* registerModule);
 t_register_module* deserializar_registerModule(t_buffer* buffer);
@@ -286,10 +290,13 @@ t_confirmacion_mensaje* deserializar_confirmacionMensaje(t_buffer* buffer);
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant);
 t_posicion* crearPosicion(uint32_t x, uint32_t y);
 t_new_pokemon* crearNewPokemon(uint32_t IDMensajeRecibido, char* nombre, t_posicion_cantidad* posicionCantidad);
-t_localized_pokemon* crearLocalizedPokemon(uint32_t IDMensajeRecibido,uint32_t IDMensajeOriginal, char* nombre, uint32_t sizePosicionCantidad, t_list* posicion);
+t_localized_pokemon* crearLocalizedPokemon(uint32_t IDMensajeRecibido,uint32_t IDMensajeOriginal, char* nombre, uint32_t cantPosiciones, t_list* posicion);
 t_appeared_pokemon* crearAppearedPokemon(uint32_t IDMensajeRecibido, char* nombre, t_posicion* posicion);
 t_catch_pokemon* crearCatchPokemon(uint32_t ID_mensaje_recibido, char* nombre, t_posicion* posicion);
 t_caught_pokemon* crearCaughtPokemon(uint32_t IDMensajeRecibido, uint32_t IDMensajeOriginal, uint32_t catchStatus);
 t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre);
+t_confirmacion_mensaje* crearConfirmacionMensaje(uint32_t ID_mensaje, uint32_t colaMensajes, bool meLlego);
+t_register_module* crearSuscribe(uint32_t ID_message_queue, uint32_t moduleId);
+t_acknowledgement* crearAcknowledgement(uint32_t idModule, uint32_t idMR, uint32_t mq);
 
 #endif /* CONNECTION_H_ */

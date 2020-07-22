@@ -20,7 +20,8 @@ typedef enum
 {
     SUBSCRIBE = 7,
 	MENSAJE_RECIBIDO = 8,
-	ACKNOWLEDGEMENT = 9
+	ACKNOWLEDGEMENT = 9,
+	CONFIRMACION_MSJ = 10
 } operation_cod;
 
 typedef struct {
@@ -143,6 +144,7 @@ typedef struct{
 
 typedef struct{
 	uint32_t ID_mensaje_recibido;
+	uint32_t ID_mensaje_original;
 	uint32_t sizeNombre;
 	char* nombre;
 	t_posicion* posicion;

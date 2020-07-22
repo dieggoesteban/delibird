@@ -26,6 +26,7 @@ uint32_t idModule;
 
 t_list* objetivoGlobal;
 t_list* pokemonesEnMapa;
+t_list* entrenadoresCatch;
 
 t_list* colaNEW;
 t_list* colaREADY;
@@ -43,6 +44,9 @@ pthread_t threadSERVER;
 pthread_t threadSUSCRIBE_CAUGHT;
 pthread_t threadSUSCRIBE_APPEARED;
 pthread_t threadSUSCRIBE_LOCALIZED;
+pthread_t threadRECONNECT;
+pthread_t threadDETECT_DISCON;
+pthread_t finalizarPrograma;
 
 sem_t mutexNEW;
 sem_t mutexREADY;
@@ -51,6 +55,11 @@ sem_t mutexBLOCKED;
 sem_t mutexEXIT;
 sem_t mutexPokesEnMapa;
 sem_t counterPokesEnMapa;
+sem_t counterEntrenadoresCatch;
+sem_t waitForFinish;
+sem_t mutexReconnect;
+sem_t mutexEntrenadoresCatch;
+sem_t pokesObjetivoGlobal;
 
 uint32_t cicloCPU;
 uint32_t quantum;

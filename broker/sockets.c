@@ -34,7 +34,7 @@ void liberar_conexion(uint32_t socket_cliente) {
 	close(socket_cliente);
 }
 
-void liberarPaquete(t_paquete* paquete){
+void liberarPaquete(t_paquete* paquete) {
 	free(paquete->buffer->stream);
 	free(paquete->buffer);	
 	free(paquete);

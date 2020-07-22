@@ -162,9 +162,12 @@ t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer){
 	return localizedPokemon;
 }
 
-t_paquete* serializar_appearedPokemon(t_appeared_pokemon* pokemon){
+t_paquete* serializar_appearedPokemon(t_appeared_pokemon* pokemon)
+{
+	
+	t_paquete* paquete;
     t_buffer* pokemon_buffer = malloc(sizeof(t_buffer));
-    pokemon_buffer->size = sizeof(uint32_t)*2
+    pokemon_buffer->size = sizeof(uint32_t)*3
                             + strlen(pokemon->nombre) + 1
                             + sizeof(t_posicion);
 
@@ -173,6 +176,8 @@ t_paquete* serializar_appearedPokemon(t_appeared_pokemon* pokemon){
 
     memcpy(stream + offset, &pokemon->ID_mensaje_recibido, sizeof(uint32_t));
     offset += sizeof(uint32_t);
+	memcpy(stream + offset, &pokemon->ID_mensaje_original, sizeof(uint32_t));
+	offset += sizeof(uint32_t);
     memcpy(stream + offset, &pokemon->sizeNombre, sizeof(uint32_t));
     offset += sizeof(uint32_t);
     memcpy(stream + offset, pokemon->nombre, strlen(pokemon->nombre)+1);
@@ -183,13 +188,13 @@ t_paquete* serializar_appearedPokemon(t_appeared_pokemon* pokemon){
 
     pokemon_buffer->stream = stream;
 
-	t_paquete* paquete = crear_paquete(APPEARED_POKEMON, pokemon_buffer->size, pokemon_buffer->stream);
+	paquete = crear_paquete(APPEARED_POKEMON, pokemon_buffer->size, pokemon_buffer->stream);
 
-	printf("Codigo de mensaje en serialziar poke: %i\n", paquete->codigo_mensaje);
     return paquete;
 }
 
-t_appeared_pokemon* deserializar_appearedPokemon(t_buffer* buffer){
+t_appeared_pokemon* deserializar_appearedPokemon(t_buffer* buffer)
+{
 	t_appeared_pokemon* pokemon = malloc(sizeof(t_appeared_pokemon));
 	pokemon->posicion = malloc(sizeof(t_posicion));
 	
@@ -197,9 +202,12 @@ t_appeared_pokemon* deserializar_appearedPokemon(t_buffer* buffer){
 
 	memcpy(&(pokemon->ID_mensaje_recibido), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
+	memcpy(&(pokemon->ID_mensaje_original), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
 	memcpy(&(pokemon->sizeNombre), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
 	pokemon->nombre = malloc(pokemon->sizeNombre);
+	printf("Pos llegue aca\n");
 	memcpy(pokemon->nombre, stream, pokemon->sizeNombre);
 	stream += pokemon->sizeNombre;
 	memcpy(&(pokemon->posicion->posicion_x), stream, sizeof(uint32_t));

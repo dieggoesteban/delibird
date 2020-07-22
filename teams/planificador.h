@@ -30,11 +30,15 @@ sem_t mutexREADY;
 sem_t mutexEXEC;
 sem_t mutexBLOCKED;
 sem_t mutexEXIT;
-
 sem_t counterPokesEnMapa;
+sem_t counterEntrenadoresCatch;
+sem_t mutexEntrenadoresCatch;
+sem_t pokesObjetivoGlobal;
 
+t_list* objetivoGlobal;
 t_list* pokemonesEnMapa; // lucario pikachu pikachu pikachu squirtle
 t_list* objetivoGlobal; //3 lucario 1 pikachu 2 squirtle
+t_list* entrenadoresCatch;
 
 uint32_t cicloCPU;
 bool desalojo;

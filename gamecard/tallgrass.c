@@ -579,6 +579,7 @@ void atenderCatchPokemon(void* catchPoke){
     string_append(&pathFilesPokemon,catchPokemonSem->catchPokemon->nombre);
     char* pathMetadataPoke = agregarAPath(pathFilesPokemon,"/Metadata.txt");
     uint32_t indexSemaforo = 0;
+    t_caught_pokemon* caughtPoke = crearCaughtPokemon(0,catchPokemonSem->catchPokemon->ID_mensaje_recibido,1);
 
     if(existeDirectorio(pathFilesPokemon)){
         if(estaOpen(catchPokemonSem->catchPokemon->nombre)){
@@ -590,12 +591,13 @@ void atenderCatchPokemon(void* catchPoke){
         signalSemYModificacionOpen(indexSemaforo, pathMetadataPoke);
 
         printf("termino la operacion de CATCH_POKEMON de %s\n", catchPokemonATexto(catchPokemonSem->catchPokemon));
-        t_caught_pokemon* caughtPoke = crearCaughtPokemon(0,catchPokemonSem->catchPokemon->ID_mensaje_recibido,1);
         mandarCAUGHT(caughtPoke);
 
     }else{
+        caughtPoke->catchStatus = 0;
         log_warning(logger,"No existe el pokemon %s en tallgrass", catchPokemonSem->catchPokemon->nombre);
         printf("No existe el directorio %s\n", pathFilesPokemon);
+        mandarCAUGHT(caughtPoke);
     }
     free(catchPokemonSem->catchPokemon);
     free(catchPokemonSem); 

@@ -33,17 +33,23 @@ void inicializarPid();
 uint32_t getNuevoPid();
 void inicializarEntrenadores();
 void setObjetivoGlobal();
+void actualizarObjetivoGlobal(t_pokemon_posicion* poke, bool restar);
 
 //SEMAFOROS
 
 sem_t mutexEXEC;
+sem_t mutexBLOCKED;
 sem_t mutexPokesEnMapa;
 sem_t counterPokesEnMapa;
+sem_t mutexEntrenadoresCatch;
+sem_t counterEntrenadoresCatch;
 
 //CREAR
 t_pokemon_posicion* crearPokemonPosicion(char* nombre, t_posicion* posicion);
 t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* pokemon, uint32_t cantidadObjetivo);
 t_pokemon_cantidad* setPokemonCantidad(char* nombre, uint32_t cantidad);
+t_entrenador_catch* crearEntrenadorCatch(uint32_t mID, uint32_t trID);
+t_suscribe* getSuscribe(uint32_t mq);
 
 //COLAS
 t_list* colaNEW;
@@ -51,6 +57,7 @@ t_list* colaREADY;
 t_list* colaEXEC;
 t_list* colaBLOCKED;
 t_list* colaEXIT;
+t_list* entrenadoresCatch;
 
 //UTILIDADES ARRAYS/LISTS/QUEUE
 uint32_t arraySize(void* arr[]);
@@ -60,7 +67,6 @@ bool perteneceALista(char *val, t_list* lista);
 uint32_t perteneceAListaContador(char *val, t_list* lista);
 bool list_equals(t_list* list1, t_list* list2);
 t_queue* listToQueue(t_list* lista);
-t_suscribe* getSuscribe(uint32_t mq);
 
 //STRUCTS PERTENECEN A LISTA
 uint32_t pokemonCantidadPerteneceALista(t_pokemon_cantidad* pokemon, t_list* lista);
@@ -74,6 +80,8 @@ uint32_t getIndexSemaforo(char* nombrePoke,t_list* lista);
 //DE POKEMON
 bool pokemonEnObjetivoGlobal(t_pokemon_posicion* pokemon);
 void insertPokeEnMapa(t_pokemon_posicion* poke);
+
+void procesarMensajeCaught(t_caught_pokemon* caughtPoke);
 
 //DE ENTRENADOR
 bool entrenadorEnDeadlock(t_entrenador* entrenador);

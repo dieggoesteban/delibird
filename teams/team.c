@@ -3,16 +3,23 @@
 t_log *logger;
 t_config *config;
 
+void handler() {
+    sem_post(&waitForFinish);
+}
+
 int main(int argc, char *argv[])
 {
     config = config_create("./assets/team.config");
     
-    if(argc > 0) {
+    if(argv[1]) {
         idModule = atoi(argv[1]);
     }
     else {
         idModule = (uint32_t)config_get_int_value(config,"ID_MODULE");
     }
+
+    sem_init(&waitForFinish, 0, 0);
+    signal(SIGINT, handler);
 
     printf("Id modulo: %i \n", idModule);
     logger = log_create("./assets/team.log", "team", true, LOG_LEVEL_INFO);
@@ -30,10 +37,8 @@ int main(int argc, char *argv[])
     colaEXEC = list_create();
     colaEXIT = list_create();
     pokemonesEnMapa = list_create();
+    entrenadoresCatch = list_create();
 
-    suscribeCaught = getSuscribe(CAUGHT_POKEMON);
-    suscribeAppeared = getSuscribe(APPEARED_POKEMON);
-    suscribeLocalized = getSuscribe(LOCALIZED_POKEMON);
 
     sem_init(&mutexNEW, 0, 1);
     sem_init(&mutexREADY, 0, 1);
@@ -42,50 +47,52 @@ int main(int argc, char *argv[])
     sem_init(&mutexEXIT, 0, 1);
     sem_init(&mutexPokesEnMapa, 0, 1);
     sem_init(&counterPokesEnMapa, 0, 0);
+    sem_init(&counterEntrenadoresCatch, 0, 0);
+    sem_init(&mutexReconnect, 0, 0);
+    sem_init(&mutexEntrenadoresCatch, 0, 1);
+    sem_init(&pokesObjetivoGlobal, 0, 1);
     
     inicializarTeam();
+    establecerConexionBroker();
 
-    logger = log_create(LOG,"team",true,LOG_LEVEL_INFO);
+    if (pthread_create(&finalizarPrograma,NULL,(void*)terminar_programa,NULL) != 0)
+        printf("Error FINALIZAR\n");
 
     if (pthread_create(&threadREADY,NULL,(void*)planificadorREADY,NULL) != 0)
         printf("Error READY\n");
 
     if (pthread_create(&threadEXEC,NULL,(void*)planificadorEXEC,(void*)getAlgoritmo(ALGORITMO)) != 0)
         printf("Error EXEC\n");
-    
-    if(pthread_create(&threadSUSCRIBE_CAUGHT,NULL,(void*)suscribe,(void*)suscribeCaught) != 0)
-        printf("Error CAUGHT\n");
 
-    if(pthread_create(&threadSUSCRIBE_APPEARED,NULL,(void*)suscribe,(void*)suscribeAppeared) != 0)
-        printf("Error APPEARED\n");
+    if (pthread_create(&threadDETECT_DISCON,NULL,(void*)detectarDesconexion,NULL) != 0)
+        printf("Error DETECTOR\n");
 
-    if(pthread_create(&threadSUSCRIBE_LOCALIZED,NULL,(void*)suscribe,(void*)suscribeLocalized) != 0)
-        printf("Error LOCALIZED\n");
+    if (pthread_create(&threadRECONNECT,NULL,(void*)reconectarBroker,NULL) != 0)
+        printf("Error RECONEXION\n");
 
     if (pthread_create(&threadSERVER,NULL,(void*)iniciar_servidor,NULL) != 0)
         printf("Error SERVIDOR\n");
 
-    signal(SIGTERM,terminar_programa);
-
+    pthread_detach(finalizarPrograma);
     pthread_join(threadREADY, NULL);
     pthread_join(threadEXEC, NULL);
-    pthread_join(threadSUSCRIBE_CAUGHT, NULL);
-    pthread_join(threadSUSCRIBE_APPEARED, NULL);
-    pthread_join(threadSUSCRIBE_LOCALIZED, NULL);
+    pthread_join(threadRECONNECT, NULL);
     pthread_join(threadSERVER, NULL);
+    pthread_join(threadDETECT_DISCON, NULL);
 
-    exit(0);
+    terminar_programa();
     return 0;
 }
 
 void terminar_programa() {
-    printf("\nCERRANDO EL PROGRAMA*********************************");
-    pthread_exit(&threadREADY);
-    pthread_exit(&threadEXEC);
-    pthread_exit(&threadSUSCRIBE_CAUGHT);
-    pthread_exit(&threadSUSCRIBE_APPEARED);
-    pthread_exit(&threadSUSCRIBE_LOCALIZED);
-    pthread_exit(&threadSERVER);
+    sem_wait(&waitForFinish);
+    printf("\nCERRANDO EL PROGRAMA*********************************\n");
+    // pthread_exit(&threadREADY);
+    // pthread_exit(&threadEXEC);
+    // pthread_exit(&threadSUSCRIBE_CAUGHT);
+    // pthread_exit(&threadSUSCRIBE_APPEARED);
+    // pthread_exit(&threadSUSCRIBE_LOCALIZED);
+    // pthread_exit(&threadSERVER);
 
     liberar_conexion(suscribeCaught->conexion);
     liberar_conexion(suscribeAppeared->conexion);
@@ -95,14 +102,23 @@ void terminar_programa() {
     free(suscribeAppeared);
     free(suscribeLocalized);
 
-    list_destroy(colaNEW);
-    list_destroy(colaREADY);
-    list_destroy(colaBLOCKED);
-    list_destroy(colaEXEC);
-    list_destroy(colaEXIT);
-    list_destroy(pokemonesEnMapa);
+    sem_destroy(&mutexNEW);
+    sem_destroy(&mutexREADY);
+    sem_destroy(&mutexBLOCKED);
+    sem_destroy(&mutexEXEC);
+    sem_destroy(&mutexEXIT);
+    sem_destroy(&mutexPokesEnMapa);
+    sem_destroy(&counterPokesEnMapa);
+
+    list_destroy_and_destroy_elements(colaNEW, free);
+    list_destroy_and_destroy_elements(colaBLOCKED, free);
+    list_destroy_and_destroy_elements(colaEXEC, free);
+    list_destroy_and_destroy_elements(colaEXIT, free);
+    list_destroy_and_destroy_elements(pokemonesEnMapa, free);
 
     log_info(logger,"Liberamos todo");
+    config_destroy(config);
+    log_destroy(logger);
 
     exit(0);
 }
@@ -114,32 +130,17 @@ void inicializarTeam()
     inicializarEntrenadores();
     setObjetivoGlobal();
     
-    mandarGET();
 
-    /*t_pokemon_posicion* pokemon = crearPokemonPosicion("Pitochu", crearPosicion(1,1));
-
-    t_posicion* pos1 = crearPosicion(4,7);
-    t_pokemon_posicion* poke1 = crearPokemonPosicion("Pikachu", pos1);
-    t_posicion* pos2 = crearPosicion(5,9);
-    t_pokemon_posicion* poke2 = crearPokemonPosicion("Squirtle", pos2);
-    t_posicion* pos3 = crearPosicion(8,10);
-    t_pokemon_posicion* poke3 = crearPokemonPosicion("Charmander", pos3);
-
-    insertPokeEnMapa(poke1);
-    insertPokeEnMapa(poke2);
-    insertPokeEnMapa(poke3);
-    insertPokeEnMapa(pokemon);*/
 
     //asignar pokes por posicion cercana LISTO
 
-    //hacer los algoritmos de planificacion (FIFO) EN ESO
-    //iniciar thread planificador
-
-    //sendGET();
+    //hacer los algoritmos de planificacion EN ESO
+    //iniciar thread planificador LISTO
+    //sendGET(); LISTO
     //iniciar thread que compruebe que se conecto con broker o realizar la reconexion
-    //iniciar threads conexiones con broker
+    //iniciar threads conexiones con broker LISTO
     //comprobar si el mensaje es para el modulo
     //comprobar deadlock
     //hacer intercambio
-    //finalizar
+    //finalizar LISTO
 }

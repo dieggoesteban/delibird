@@ -63,8 +63,8 @@ void temporizador (void* tiempo) {
 
 void serve_client(uint32_t* socket)
 {
-	uint32_t cod_op;
-	if(recv(*socket, &cod_op, sizeof(int), 0) == -1){
+	int cod_op;
+	if(recv(*socket, &cod_op, sizeof(int), 0) < 0){
 		cod_op = -1;
 	}
 	t_buffer *buffer = recibir_buffer(*socket);
@@ -158,7 +158,9 @@ void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_c
 		}
 		default:
 		{
-			log_error(logger, "Codigo de operacion desconocido: %i", operation_cod);
+			printf("Se corto la conexion\n");
+			pthread_exit(&hiloSuscriptor);
+			break;
 		}
 	}
 }

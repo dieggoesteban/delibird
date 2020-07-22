@@ -37,7 +37,7 @@ uint32_t getColaDeMensajes(char* queue) {
 uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_mensaje) {
 	uint32_t isValid = 0;
 	char *brokerCommands[] = {"NEW_POKEMON", "APPEARED_POKEMON", "CATCH_POKEMON", "CAUGHT_POKEMON", "GET_POKEMON"};
-	char *teamCommands[] = {"APPEARED_POKEMON"};
+	char *teamCommands[] = {"APPEARED_POKEMON", "CAUGHT_POKEMON"};
 	char *gamecardCommands[] = {"NEW_POKEMON", "CATCH_POKEMON", "GET_POKEMON"};
 	char *ipAux, *puertoAux;
 
