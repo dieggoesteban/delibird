@@ -36,21 +36,23 @@ void startCache()
     holes = list_create();
     metadatas = list_create();
 
+    if(pthread_mutex_init(&s_cache, NULL) != 0)
+        log_error(broker_custom_logger, "Error mutex init (s_cache) in cache initialization");
     if(pthread_mutex_init(&s_partitionCounter, NULL) != 0)
 		log_error(broker_custom_logger, "Error mutex init (s_partitionCounter) in cache initialization");
     if(pthread_mutex_init(&s_counterToCompactacion, NULL) != 0)
 		log_error(broker_custom_logger, "Error mutex init (s_counterToCompactacion) in cache initialization");
-    if(pthread_mutex_init(&s_holes, NULL) != 0)
-		log_error(broker_custom_logger, "Error mutex init (s_holes) in cache initialization");
     if(pthread_mutex_init(&s_partitions, NULL) != 0)
 	    log_error(broker_custom_logger, "Error mutex init (s_partitions) in cache initialization");
+    if(pthread_mutex_init(&s_holes, NULL) != 0)
+		log_error(broker_custom_logger, "Error mutex init (s_holes) in cache initialization");
+    if(pthread_mutex_init(&s_metadatas, NULL) != 0)
+	    log_error(broker_custom_logger, "Error mutex init (s_metadatas) in cache initialization");
        
     //Memory allocation
     cache = malloc(TAMANO_MEMORIA);
     t_holes* initial = createHole(cache, TAMANO_MEMORIA);
     list_add(holes, initial);
-
-    //log_info(broker_custom_logger, "Cache inicializada correctamente");
 
     #pragma region Prueba de consolidacion
 
@@ -120,12 +122,13 @@ void memoria_particiones(t_message* message)
         {
             t_new_pokemon* newPoke = (t_new_pokemon*)message->mensaje;
             cache_new_pokemon cache_newPoke;
+
             cache_newPoke.nameLength = newPoke->sizeNombre;
             cache_newPoke.pokeName = malloc(newPoke->sizeNombre);
-            memcpy(cache_newPoke.pokeName, newPoke->nombre, newPoke->sizeNombre);
             cache_newPoke.cantidad = newPoke->posicionCantidad->cantidad;
             cache_newPoke.posX = newPoke->posicionCantidad->posicion_x;
             cache_newPoke.posY = newPoke->posicionCantidad->posicion_y;
+            memcpy(cache_newPoke.pokeName, newPoke->nombre, newPoke->sizeNombre);
             
             administrative->idMessage = newPoke->ID_mensaje_recibido;
             administrative->mq_cod = NEW_POKEMON;
@@ -133,7 +136,7 @@ void memoria_particiones(t_message* message)
             administrative->suscriptoresEnviados = list_duplicate(message->suscriptoresEnviados);
             administrative->suscriptoresConfirmados = list_duplicate(message->suscriptoresConfirmados);
             
-            addressFromMessageToCopy = &newPoke;
+            addressFromMessageToCopy = &cache_newPoke;
             sizeOfMessage = administrative->length;
             break;
         }
@@ -141,29 +144,70 @@ void memoria_particiones(t_message* message)
         {
             t_appeared_pokemon* appearedPoke = (t_appeared_pokemon*)message->mensaje;
             cache_appeared_pokemon cache_appeared;
+
             cache_appeared.nameLength = appearedPoke->sizeNombre;            
-            strcpy(cache_appeared.pokeName, appearedPoke->nombre);
+            cache_appeared.pokeName = malloc(appearedPoke->sizeNombre);
             cache_appeared.posX = appearedPoke->posicion->posicion_x;
             cache_appeared.posY = appearedPoke->posicion->posicion_y;
+            strcpy(cache_appeared.pokeName, appearedPoke->nombre);
             
             administrative->idMessage = appearedPoke->ID_mensaje_recibido;
+            administrative->idCorrelational = appearedPoke->ID_mensaje_original;
             administrative->mq_cod = APPEARED_POKEMON;
-            administrative->length = sizeof(cache_appeared);
+            administrative->length = sizeof(u_int32_t) * 3 + (cache_appeared.nameLength - 1);
             administrative->suscriptoresEnviados = list_duplicate(message->suscriptoresEnviados);
             administrative->suscriptoresConfirmados = list_duplicate(message->suscriptoresConfirmados);
+
+            addressFromMessageToCopy = &appearedPoke;
+            sizeOfMessage = administrative->length;
             break;
         }
         case CATCH_POKEMON:
+        {
+            t_catch_pokemon* catchPoke = (t_catch_pokemon*)message->mensaje;
+            cache_catch_pokemon cache_catch;
+
+            cache_catch.nameLength = catchPoke->sizeNombre;            
+            cache_catch.pokeName = malloc(catchPoke->sizeNombre);
+            cache_catch.posX = catchPoke->posicion->posicion_x;
+            cache_catch.posY = catchPoke->posicion->posicion_y;
+            strcpy(cache_catch.pokeName, catchPoke->nombre);
+            
+            administrative->idMessage = catchPoke->ID_mensaje_recibido;
+            administrative->mq_cod = CATCH_POKEMON;
+            administrative->length = sizeof(u_int32_t) * 3 + (cache_catch.nameLength - 1);
+            administrative->suscriptoresEnviados = list_duplicate(message->suscriptoresEnviados);
+            administrative->suscriptoresConfirmados = list_duplicate(message->suscriptoresConfirmados);
+
+            addressFromMessageToCopy = &cache_catch;
+            sizeOfMessage = administrative->length;
             break;
+        }
         case CAUGHT_POKEMON:
+        {
+            t_caught_pokemon* caughtPoke = (t_caught_pokemon*)message->mensaje;
+            cache_caught_pokemon cache_caught;
+
+            cache_caught.seAtrapo = caughtPoke->catchStatus;
+            
+            administrative->idMessage = caughtPoke->ID_mensaje_recibido;
+            administrative->idCorrelational = caughtPoke->ID_mensaje_original;
+            administrative->mq_cod = CAUGHT_POKEMON;
+            administrative->length = sizeof(uint32_t);
+            administrative->suscriptoresEnviados = list_duplicate(message->suscriptoresEnviados);
+            administrative->suscriptoresConfirmados = list_duplicate(message->suscriptoresConfirmados);
+
+            addressFromMessageToCopy = &cache_caught;
+            sizeOfMessage = administrative->length;
             break;
+        }
         case GET_POKEMON:
         {
             t_get_pokemon* getPoke = (t_get_pokemon*)message->mensaje;
             cache_get_pokemon cache_getPoke;
+
             cache_getPoke.nameLength = getPoke->sizeNombre;
             cache_getPoke.pokeName = malloc(getPoke->sizeNombre);
-
             memcpy(cache_getPoke.pokeName, getPoke->nombre, getPoke->sizeNombre);
             
             administrative->idMessage = getPoke->ID_mensaje_recibido;
@@ -172,12 +216,33 @@ void memoria_particiones(t_message* message)
             administrative->suscriptoresEnviados = list_duplicate(message->suscriptoresEnviados);
             administrative->suscriptoresConfirmados = list_duplicate(message->suscriptoresConfirmados);
             
-            addressFromMessageToCopy = &getPoke;
+            addressFromMessageToCopy = &cache_getPoke;
             sizeOfMessage = administrative->length;
             break;
         }
         case LOCALIZED_POKEMON: 
+        {
+            // t_localized_pokemon* localizedPoke = (t_localized_pokemon*)message->mensaje;
+            // cache_localized_pokemon cache_localizedPoke;
+
+            // cache_localizedPoke.nameLength = localizedPoke->sizeNombre;
+            // cache_localizedPoke.pokeName = malloc(localizedPoke->sizeNombre);
+            // cache_localizedPoke.posiciones = localizedPoke->cantidadPosiciones;
+
+            // memcpy(cache_localizedPoke.pokeName, localizedPoke->nombre, localizedPoke->sizeNombre);
+            
+            // administrative->idMessage = localizedPoke->ID_mensaje_recibido;
+            // administrative->mq_cod = LOCALIZED_POKEMON;
+            // administrative->length = (sizeof(uint32_t) * 3 + (cache_localizedPoke.nameLength - 1));
+            // administrative->suscriptoresEnviados = list_duplicate(message->suscriptoresEnviados);
+            // administrative->suscriptoresConfirmados = list_duplicate(message->suscriptoresConfirmados);
+            
+            // addressFromMessageToCopy = &localizedPoke;
+            // sizeOfMessage = administrative->length;
             break;
+        }
+        default:
+            log_error(broker_custom_logger, "Codigo de operación desconocido. No se puede cachear el mensaje");
     }
 
     //Etapa 1: Buscar partición libre
@@ -209,24 +274,27 @@ void memoria_particiones(t_message* message)
     administrative->startAddress = targetHole->pStart;
 
     //Guardamos la estructura administrativa
-    list_add(metadatas, (void*)administrative);
-    
+    pthread_mutex_lock(&s_metadatas);
+        list_add(metadatas, (void*)administrative);
+    pthread_mutex_unlock(&s_metadatas);
+
     //Cuando el targetPartition ya esté ubicado se meten los datos donde corresponda
     writeData(administrative, targetHole, addressFromMessageToCopy);
-    //log_debug(broker_custom_logger, "Partitions: %i - Holes: %i", list_size(partitions), list_size(holes));
-    //dump();
 }
 
 void writeData(cache_message* administrative, t_holes* targetHole, void* message)
 {
-    //Add mutex
     t_partition* partition = createPartition(targetHole->pStart, targetHole->length);
     partition->id = administrative->idMessage;
 
-    list_add(partitions, (void*)partition);
-    list_sort(partitions, (void*)mem_address_menor_a_mayor);
+    pthread_mutex_lock(&s_partitions);
+        list_add(partitions, (void*)partition);
+        list_sort(partitions, (void*)mem_address_menor_a_mayor);
+    pthread_mutex_unlock(&s_partitions);
     
-    memcpy(administrative->startAddress, message, administrative->length);
+    pthread_mutex_lock(&s_cache);
+        memcpy(administrative->startAddress, message, administrative->length);
+    pthread_mutex_unlock(&s_cache);
 }
 
 t_holes* reemplazo_fifo(uint32_t bytes)
@@ -257,8 +325,11 @@ t_holes* reemplazo_fifo(uint32_t bytes)
         uint32_t _is_the_one_with_fifo_number(t_partition* partition) {
             return partition->fifoPosition == fifoToDelete;
         }
-        t_partition* victim = (t_partition*)list_find(partitions, (void*)_is_the_one_with_fifo_number);
-        
+
+        pthread_mutex_lock(&s_partitions);
+            t_partition* victim = (t_partition*)list_find(partitions, (void*)_is_the_one_with_fifo_number);
+        pthread_mutex_unlock(&s_partitions);
+
         if(victim == NULL) {
             log_error(broker_custom_logger, "No se encontro particion victima");
             exit(1);
@@ -267,21 +338,24 @@ t_holes* reemplazo_fifo(uint32_t bytes)
         
         //Se elimina de la lista de particiones
         t_partition* currentPartition;
+        pthread_mutex_lock(&s_partitions);
         for(uint32_t i = 0; i < list_size(partitions); i++)
-        {
-            currentPartition = list_get(partitions, i);
-            if(currentPartition->fifoPosition == victim->fifoPosition)
             {
-                list_remove(partitions, i);
-                break;
+                currentPartition = list_get(partitions, i);
+                if(currentPartition->fifoPosition == victim->fifoPosition)
+                {
+                    list_remove(partitions, i);
+                    break;
+                }
             }
-        }
+        pthread_mutex_unlock(&s_partitions);
+
         return newFreeSpace;
     }
     return NULL;
 }
 
-t_holes* reemplazo_lru(uint32_t bytes){ return createHole(0, 0);}
+t_holes* reemplazo_lru(uint32_t bytes){ return createHole(0, 0); }
 
 void dispatchCachedMessages(t_cache_dispatch_info* dispatchInfo)
 {
@@ -308,8 +382,12 @@ void dump()
     //Añadir locks
     t_list* allMemory = list_create();
 
-    list_add_all(allMemory, partitions);
-    list_add_all(allMemory, holes);
+    pthread_mutex_lock(&s_partitions);
+        list_add_all(allMemory, partitions);
+    pthread_mutex_unlock(&s_partitions);
+    pthread_mutex_lock(&s_holes);
+        list_add_all(allMemory, holes);
+    pthread_mutex_unlock(&s_holes);
 
     list_sort(allMemory, (void*)mem_address_menor_a_mayor);
 
@@ -345,7 +423,9 @@ void dump()
 void consolidar()
 {
     if(list_size(holes) == 0 || list_size(holes) == 1)
-        return;
+    {
+        log_info(broker_custom_logger, "Hay un solo uno o ningun hueco, no es necesario consolidar");
+    }
 
     t_holes* lowerHole;
     t_holes* upperHole;
@@ -362,12 +442,13 @@ void consolidar()
             t_holes* consolidado = createHole(lowerHole->pStart, lowerHole->length + upperHole->length);
 
             //Se elimina la posición i dos veces porque el espacio contiguo se desplaza un lugar
-            list_remove(holes, i);
-            list_remove(holes, i);
-
-            list_add(holes, consolidado);
-            //Ordenamos para siempre comparar los primeros 2 holes
-            list_sort(holes, (void*) mem_address_menor_a_mayor);
+            pthread_mutex_lock(&s_holes);
+                list_remove(holes, i);
+                list_remove(holes, i);
+                list_add(holes, consolidado);
+                //Ordenamos para siempre comparar los primeros 2 holes
+                list_sort(holes, (void*) mem_address_menor_a_mayor);
+            pthread_mutex_unlock(&s_holes);
             i = 0;
             continue;
         }

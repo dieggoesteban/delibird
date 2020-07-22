@@ -12,10 +12,12 @@ t_list* partitions;
 t_list* holes;
 t_list* metadatas;
 
+pthread_mutex_t s_cache;
 pthread_mutex_t s_counterToCompactacion;
-pthread_mutex_t s_holes;
-pthread_mutex_t s_partitions;
 pthread_mutex_t s_partitionCounter;
+pthread_mutex_t s_partitions;
+pthread_mutex_t s_holes;
+pthread_mutex_t s_metadatas;
 
 uint32_t partitionCounter;
 uint32_t counterToCompactacion;

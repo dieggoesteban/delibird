@@ -410,14 +410,14 @@ void dispatchMessagesFromQueue(t_message_queue* messageQueue)
 		if(pthread_create(&message->caching, NULL, (void*)cacheMessage, message) < 0)
 		 	log_error(broker_custom_logger, "Error in pthread_create cacheMessage");
 		
-		 if(pthread_join(message->caching, NULL) != 0)
+		 if(pthread_detach(message->caching) != 0)
 		 	log_error(broker_custom_logger, "Error in pthread_join cacheMessage");		
 
 		if(pthread_create(&message->deleteFromQueue, NULL, (void*)deleteFromQueue, message) < 0)
 			log_error(broker_custom_logger, "Error in pthread_create deleteFromQueue");
 		
 		if(pthread_detach(message->deleteFromQueue) != 0)
-			log_error(broker_custom_logger, "Error in pthread_join deleteFromQueue");
+			log_error(broker_custom_logger, "Error in pthread_detach deleteFromQueue");
 	}
 }
 
@@ -442,8 +442,8 @@ void deleteFromQueue(t_message* message)
 		{
 			list_remove(messageQueue->mensajes, targetIndex);			
 			log_warning(broker_custom_logger, "Mensaje eliminado de la cola");
+			free(current);
 		}
-		free(current);
 	pthread_mutex_unlock(&messageQueue->s_mensajes);
 }
 
