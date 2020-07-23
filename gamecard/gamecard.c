@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 {
     config = config_create("./assets/gamecard.config");
 
-	logger = log_create("./assets/gamecard.log","gamecard",true,LOG_LEVEL_INFO);
+	logger = log_create("./assets/gamecard.log","gamecard",true,LOG_LEVEL_DEBUG);
 
     if(argv[1]) {
         idModule = atoi(argv[1]);
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
         printf("Error RECONEXION\n");
 
     if (pthread_create(&threadSERVER,NULL,(void*)iniciar_servidor,NULL) != 0)
-        printf("Error");
+        printf("Error SERVIDOR");
     
 
     pthread_detach(finalizarPrograma);
@@ -54,9 +54,11 @@ void terminar_programa(){
     printf("\nCERRANDO EL PROGRAMA*********************************\n");
     list_destroy_and_destroy_elements(semaforosPokemon, free);
 
-    liberar_conexion(suscribeNew->conexion);
-    liberar_conexion(suscribeCatch->conexion);
-    liberar_conexion(suscribeGet->conexion);
+    if(suscribeNew->conexion != ERROR){
+        liberar_conexion(suscribeNew->conexion);
+        liberar_conexion(suscribeCatch->conexion);
+        liberar_conexion(suscribeGet->conexion);
+    }
 
     free(suscribeNew);
     free(suscribeCatch);
@@ -78,8 +80,8 @@ void inicializarGamecard(){
     IP_BROKER = config_get_string_value(config, "IP_BROKER");
     PUERTO_BROKER = config_get_string_value(config,"PUERTO_BROKER");
     tiempoReintentoConexion = (uint32_t)config_get_int_value(config,"TIEMPO_DE_REINTENTO_CONEXION");
-    tiempoOperacion = (uint32_t)config_get_int_value(config,"TIEMPO_DE_REINTENTO_OPERACION");
-    tiempoReintentoOperacion = (uint32_t)config_get_int_value(config,"TIEMPO_RETARDO_OPERACION");
+    tiempoOperacion = (uint32_t)config_get_int_value(config,"TIEMPO_RETARDO_OPERACION");
+    tiempoReintentoOperacion = (uint32_t)config_get_int_value(config,"TIEMPO_DE_REINTENTO_OPERACION");
     punto_montaje = config_get_string_value(config,"PUNTO_MONTAJE_TALLGRASS");
 
 
@@ -111,7 +113,15 @@ void inicializarGamecard(){
     }else{
         bitmapArr = crear_bitmap_en_disco(pathBitmap, cantBloques);
     }
+    
     semaforosPokemon = list_create();
+    
     pthread_mutex_init(&mutexBitmap, NULL);
+    pthread_mutex_init(&yaExistiaDirec, NULL);
+    pthread_mutex_init(&mutexEstaOpen, NULL);
+    pthread_mutex_init(&mutexListaSemsNew, NULL);
+    pthread_mutex_init(&mutexListaSemsCatch, NULL);
+    pthread_mutex_init(&mutexListaSemsGet, NULL);
+
 
 }

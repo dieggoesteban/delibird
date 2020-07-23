@@ -113,7 +113,6 @@ t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon){
 		memcpy(stream + offset, &(((t_posicion*)list_get(localizedPokemon->posiciones,i))->posicion_y),sizeof(uint32_t));
 		offset += sizeof(uint32_t);
 	}
-	// memcpy(stream + offset, localizedPokemon->posiciones, sizeListaPos);
 
 	buffer->stream = stream;
 
@@ -127,7 +126,6 @@ t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer){
 	t_localized_pokemon* localizedPokemon = malloc(sizeof(t_localized_pokemon));
 	
 	void* stream = buffer->stream;
-	uint32_t sizeListaPos;
 
 	memcpy(&(localizedPokemon->ID_mensaje_recibido), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
@@ -144,7 +142,6 @@ t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer){
 	log_info(logger, localizedPokemon->nombre);
 	memcpy(&(localizedPokemon->cantidadPosiciones), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
-	// sizeListaPos = sizeof(t_posicion)* localizedPokemon->cantidadPosiciones;
 	localizedPokemon->posiciones = list_create();
 	for(uint32_t i = 0; i < localizedPokemon->cantidadPosiciones; i++){
 		uint32_t x;

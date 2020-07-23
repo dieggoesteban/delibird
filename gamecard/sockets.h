@@ -51,6 +51,11 @@ pthread_t threadSUSCRIBE_GET;
 pthread_t threadRECONNECT;
 pthread_t threadDETECT_DISCON;
 
+pthread_mutex_t mutexListaSemsNew;
+pthread_mutex_t mutexListaSemsCatch;
+pthread_mutex_t mutexListaSemsGet;
+
+
 sem_t mutexReconnect;
 sem_t detectorDesconexion;
 

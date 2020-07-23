@@ -562,12 +562,13 @@ void atenderGetPokemon(t_getPokemon_indexSem* getPokemonSem){
         printf("LOCALIZED DEL POKEMON: NOMBRE: %s, CANTIDAD DE POSICIONES: %i, POSX1: %i, POSX2: %i\n", localizedPokemon->nombre, localizedPokemon->cantidadPosiciones, ((t_posicion*)list_get(localizedPokemon->posiciones, 0))->posicion_x, ((t_posicion*)list_get(localizedPokemon->posiciones, 0))->posicion_y);
 
         mandarLOCALIZED(localizedPokemon);
-
+        free(localizedPokemon);
         printf("termino la operacion de LOCALIZED_POKEMON de %s\n", getPokemonSem->getPokemon->nombre);
     }else{
         log_warning(logger,"No existe el pokemon %s en tallgrass", getPokemonSem->getPokemon->nombre);
         localizedPokemon = crearLocalizedPokemon(0, getPokemonSem->getPokemon->ID_mensaje_recibido, getPokemonSem->getPokemon->nombre, 0,list_create());
         mandarLOCALIZED(localizedPokemon);
+        free(localizedPokemon);
     }
     free(getPokemonSem->getPokemon);
     free(getPokemonSem);
@@ -598,6 +599,7 @@ void atenderCatchPokemon(void* catchPoke){
         log_warning(logger,"No existe el pokemon %s en tallgrass", catchPokemonSem->catchPokemon->nombre);
         printf("No existe el directorio %s\n", pathFilesPokemon);
         mandarCAUGHT(caughtPoke);
+        free(caughtPoke);
     }
     free(catchPokemonSem->catchPokemon);
     free(catchPokemonSem); 
@@ -610,14 +612,21 @@ void* atenderNewPokemon(void* newPokemonParam){
     string_append(&pathFilesPokemon,newPokeSem->newPokemon->nombre);
     char* pathMetadataPoke = agregarAPath(pathFilesPokemon,"/Metadata.txt");
 
+    pthread_mutex_lock(&yaExistiaDirec);
     bool yaExistia = crearDirectorio(pathFilesPokemon);
+    pthread_mutex_unlock(&yaExistiaDirec);
+
 
     if(!yaExistia){
         insertarMetadataEnPath(pathFilesPokemon,"./assets/MetadataArchivoGeneral.txt");
         waitSemYModificacionOpen(newPokeSem->indexSemaforo, pathMetadataPoke);
         log_info(logger,"el index de la lista de semaforos en el if: %i",newPokeSem->indexSemaforo);
     }else{
-        if(estaOpen(newPokeSem->newPokemon->nombre)){
+        // pthread_mutex_lock(&mutexEstaOpen);
+        bool estaOpenBool = estaOpen(newPokeSem->newPokemon->nombre);
+        // pthread_mutex_unlock(&mutexEstaOpen);
+
+        if(estaOpenBool){
             reintentandoOperacion(pathFilesPokemon);
         }
         log_info(logger,"el index de la lista de semaforos en el else: %i",newPokeSem->indexSemaforo);
@@ -632,6 +641,7 @@ void* atenderNewPokemon(void* newPokemonParam){
 	t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(0, newPokeSem->newPokemon->ID_mensaje_recibido, newPokeSem->newPokemon->nombre, posicion);
 
     mandarAPPEARED(appearedPokemon);
+    free(appearedPokemon);
 
     printf("termino la operacion de NEW_POKEMON de %s\n", newPokemonATexto(newPokeSem->newPokemon));
     free(newPokeSem->newPokemon);
@@ -640,19 +650,19 @@ void* atenderNewPokemon(void* newPokemonParam){
 }
 
 bool estaOpen(char* nombrePokemon){
-    bool archivoCerrado = false;
+    bool archivoOpen = false;
     int valorSem;
     uint32_t indexSemaforo =  encontrarSemaforoDelPoke(nombrePokemon,semaforosPokemon);
     if (sem_getvalue(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, indexSemaforo))->semPoke), &valorSem) == 0){
         if(valorSem > 0){
-            log_info(logger,"ESTA CERRADO EL ARCHIVO");
+            log_info(logger,"ESTA CERRADO EL ARCHIVO con un valor del SEM: %i", valorSem);
         }else{
-            archivoCerrado = true;
-            log_info(logger,"ESTA ABIERTO EL ARCHIVO");
+            archivoOpen = true;
+            log_info(logger,"ESTA ABIERTO EL ARCHIVO con un valor del SEMN: %i", valorSem);
         }
 
     }
-    return archivoCerrado;
+    return archivoOpen;
 }
 
 
@@ -664,8 +674,8 @@ void waitSemYModificacionOpen(uint32_t indexSemaforo, char* pathMetadataPoke){
 }
 
 void signalSemYModificacionOpen(uint32_t indexSemaforo, char* pathMetadataPoke){
-    sem_post(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, indexSemaforo))->semPoke)); 
     modificarOpenArchivo(pathMetadataPoke,"N");
+    sem_post(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, indexSemaforo))->semPoke)); 
 }
 
 
@@ -679,19 +689,11 @@ void reintentandoOperacion(char* nombrePoke){
 void* reintentarOperacion(void* nombrePoke){
     char* nombrePokemon = (char*)nombrePoke;
     log_info(logger,"Pokemon haciendo el reintento: %s", nombrePokemon);
-    bool archivoCerrado = false;
+    bool archivoOpen = true;
     uint32_t i = 0;
-    while(!archivoCerrado){
+    while(archivoOpen){
         sleep(tiempoReintentoOperacion);
-        uint32_t indexSemaforo =  encontrarSemaforoDelPoke(nombrePokemon,semaforosPokemon);
-        int valorSem;
-        if (sem_getvalue(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, indexSemaforo))->semPoke), &valorSem) == 0){
-            if(valorSem > 0){
-                archivoCerrado = true;
-            }else{
-                archivoCerrado = false;
-            }
-        } 
+        archivoOpen = estaOpen(nombrePoke);
         i++;
         printf("reintento numero %i\n", i);
         log_info(logger, "reintento numeo %i", i);

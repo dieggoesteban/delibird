@@ -51,6 +51,11 @@ pthread_t threadRECONNECT;
 pthread_t threadDETECT_DISCON;
 pthread_t finalizarPrograma;
 pthread_mutex_t mutexBitmap;
+pthread_mutex_t yaExistiaDirec;
+pthread_mutex_t mutexEstaOpen;
+pthread_mutex_t mutexListaSemsNew;
+pthread_mutex_t mutexListaSemsCatch;
+pthread_mutex_t mutexListaSemsGet;
 
 
 //SEMAFOROS

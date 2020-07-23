@@ -49,6 +49,8 @@ uint32_t tiempoReintentoOperacion;
 uint32_t tiempoOperacion;
 
 pthread_mutex_t mutexBitmap;
+pthread_mutex_t yaExistiaDirec;
+pthread_mutex_t mutexEstaOpen;
 
 //CREAR
 bool crearDirectorio(char* rutaDirectorio);
