@@ -1,5 +1,6 @@
 #include "global-includes.h"
 #include "models.h"
+#include "serializador.h"
 
 typedef struct
 {
@@ -24,3 +25,5 @@ cache_get_pokemon* deserializar_cacheGetPokemon(t_cache_buffer* buffer);
 
 t_cache_buffer* serializar_cacheLocalizedPokemon(cache_localized_pokemon* localizedPokemon);
 cache_localized_pokemon* deserializar_cacheLocalizedPokemon(t_cache_buffer* buffer);
+
+t_new_pokemon* newPokemon_cacheToMessage(cache_new_pokemon* cacheNewPokemon, cache_message* metadata);

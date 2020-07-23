@@ -218,3 +218,10 @@ cache_localized_pokemon* deserializar_cacheLocalizedPokemon(t_cache_buffer* buff
 
 	return localizedPokemon;
 }
+
+t_new_pokemon* newPokemon_cacheToMessage(cache_new_pokemon* cacheNewPokemon, cache_message* metadata)
+{
+    t_posicion_cantidad* posCant = crearPosicionCantidad(cacheNewPokemon->posX, cacheNewPokemon->posY, cacheNewPokemon->cantidad);
+    t_new_pokemon* newPokemon = crearNewPokemon(metadata->idMessage, cacheNewPokemon->pokeName, posCant);
+    return newPokemon;
+}

@@ -296,6 +296,7 @@ void writeData(cache_message* administrative, t_holes* targetHole, t_cache_buffe
     
     pthread_mutex_lock(&s_cache);
         memcpy(administrative->startAddress, bufferMessage->stream, bufferMessage->size);
+        free(bufferMessage);
     pthread_mutex_unlock(&s_cache);
 }
 
@@ -379,14 +380,36 @@ void dispatchCachedMessages(t_cache_dispatch_info* dispatchInfo)
             cache_message* currentMetadata;
             tempMetadatas = list_filter(metadatas, (void*)_belongs_to_queue);
 
-            currentMetadata = list_get(tempMetadatas, 0);
-            pthread_mutex_lock(&s_cache);
-                t_cache_buffer* buffer = malloc(sizeof(t_cache_buffer));
-                buffer->stream = malloc(currentMetadata->length);
-                memcpy(buffer->stream, currentMetadata->startAddress, currentMetadata->length);
-                cache_new_pokemon* newPoke = deserializar_cacheNewPokemon(buffer);
-            pthread_mutex_unlock(&s_cache);
-            log_debug(broker_custom_logger, "Descached New Poke: %s", newPoke->pokeName);
+            for(uint32_t i = 0; i < list_size(metadatas); i++)
+            {
+                currentMetadata = list_get(tempMetadatas, i);
+                
+                //Chequeo que no se le haya enviado antes el mensaje
+                uint32_t _he_gots_the_message(t_suscripcion* suscription) {
+                    return suscription->idModule == dispatchInfo->suscripcion->idModule;
+                }
+                if(list_any_satisfy(currentMetadata->suscriptoresEnviados, (void*)_he_gots_the_message))
+                    continue;
+
+                pthread_mutex_lock(&s_cache);
+                    t_cache_buffer* buffer = malloc(sizeof(t_cache_buffer));
+                    buffer->stream = malloc(currentMetadata->length);
+                    memcpy(buffer->stream, currentMetadata->startAddress, currentMetadata->length);
+                    cache_new_pokemon* cache_newPoke = deserializar_cacheNewPokemon(buffer);
+
+                    t_new_pokemon* newPoke = newPokemon_cacheToMessage(cache_newPoke, currentMetadata);
+                    t_message* message = crearMessage();
+
+                    message->mensaje = newPoke;
+                    message->id = currentMetadata->idMessage;
+                    message->idCorrelativo = currentMetadata->idCorrelational;
+                    message->mq_cod = currentMetadata->mq_cod;
+                    list_add_all(message->suscriptoresConfirmados, currentMetadata->suscriptoresConfirmados);
+                    list_add_all(message->suscriptoresEnviados, currentMetadata->suscriptoresEnviados);
+                    log_debug(broker_custom_logger, "%s", cache_newPoke->pokeName);
+                pthread_mutex_unlock(&s_cache);
+                sendMessageFromQueue(message, dispatchInfo->suscripcion);
+            }
             break;
         }
         case APPEARED_POKEMON:

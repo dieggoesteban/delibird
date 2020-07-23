@@ -4,6 +4,7 @@
 #include "global-includes.h"
 #include "models.h"
 #include "cacheSerializador.h"
+#include "messageQueueManager.h"
 #include <signal.h>
 #include <sys/time.h>
 
