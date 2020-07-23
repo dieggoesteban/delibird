@@ -117,7 +117,7 @@ void* detectorDeIntercambio() {
                 t_entrenador* tr1 = list_get(enDeadlock, i);
                 for(uint32_t j=0; i < list_size(enDeadlock); j++) {
                     if(i != j) {
-                        t_entrenador* tr2 = list_get(enDeadlock, j);
+                        t_entrenador* tr2 = list_get(enDeadlock, j-1);
                         t_entrenador_posicion* trAsignado = getIntercambio(tr1, tr2);
                         if(trAsignado != NULL) {
                             printf("Asignando al entrenador %i el entrenador %i\n", tr1->id, tr2->id);

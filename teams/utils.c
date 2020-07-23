@@ -482,6 +482,7 @@ void procesarMensajeCaught(t_caught_pokemon* caughtPoke) {
 
 t_list* pokesQueNoQuiere(t_entrenador* tr) {
 	t_list* mangaDeKokemones = list_create();
+	printf("SIZE DE POKES CAPTURADOS POR ENTRENADOR: %i\n", list_size(tr->pokemonCapturados));
 	for(uint32_t i = 0; i < list_size(tr->pokemonCapturados); i++) {
 		if (!perteneceALista(list_get(tr->pokemonCapturados, i), tr->pokemonObjetivo)) {
 			list_add(mangaDeKokemones, list_get(tr->pokemonCapturados, i));
