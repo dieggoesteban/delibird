@@ -9,3 +9,11 @@ void cicloVidaEntrenador(t_entrenador* entrenador) {
     }
     
 }
+
+//exec 
+
+//actualizo la pos del entrenador
+
+//se guarda en la colaEXEC
+
+//se desaloja, se guarda en READY O BLOCKED --LA POSICION ES DIFERENTE

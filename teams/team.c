@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     pokemonesEnMapa = list_create();
     entrenadoresCatch = list_create();
 
-
+    sem_init(&mutexDetector, 0, 0);
     sem_init(&mutexNEW, 0, 1);
     sem_init(&mutexREADY, 0, 1);
     sem_init(&mutexBLOCKED, 0, 1);
@@ -61,21 +61,22 @@ int main(int argc, char *argv[])
     if (pthread_create(&threadREADY,NULL,(void*)planificadorREADY,NULL) != 0)
         printf("Error READY\n");
 
+    if (pthread_create(&threadDETECT_DEADLOCK,NULL,(void*)detectorDeIntercambio,NULL) != 0)
+        printf("Error DETECTOR DEADLOCK\n");
+
     if (pthread_create(&threadEXEC,NULL,(void*)planificadorEXEC,(void*)getAlgoritmo(ALGORITMO)) != 0)
         printf("Error EXEC\n");
 
     if (pthread_create(&threadDETECT_DISCON,NULL,(void*)detectarDesconexion,NULL) != 0)
-        printf("Error DETECTOR\n");
+        printf("Error DETECTOR DESCONEXION\n");
 
     if (pthread_create(&threadRECONNECT,NULL,(void*)reconectarBroker,NULL) != 0)
         printf("Error RECONEXION\n");
 
-    if (pthread_create(&threadSERVER,NULL,(void*)iniciar_servidor,NULL) != 0)
-        printf("Error SERVIDOR\n");
-
     pthread_detach(finalizarPrograma);
     pthread_join(threadREADY, NULL);
     pthread_join(threadEXEC, NULL);
+    pthread_join(threadDETECT_DEADLOCK, NULL);
     pthread_join(threadRECONNECT, NULL);
     pthread_join(threadSERVER, NULL);
     pthread_join(threadDETECT_DISCON, NULL);

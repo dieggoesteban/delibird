@@ -34,6 +34,7 @@ sem_t counterPokesEnMapa;
 sem_t counterEntrenadoresCatch;
 sem_t mutexEntrenadoresCatch;
 sem_t pokesObjetivoGlobal;
+sem_t mutexDetector;
 
 t_list* objetivoGlobal;
 t_list* pokemonesEnMapa; // lucario pikachu pikachu pikachu squirtle
@@ -53,9 +54,10 @@ bool pokemonEnObjetivoGlobal(t_pokemon_posicion* pokemon);
 void planificarFIFO();
 void ejecutarEntrenador(t_entrenador* entrenador);
 void mandarCATCH(t_entrenador* entrenador);
-
+t_entrenador_posicion* getIntercambio(t_entrenador* tr1, t_entrenador* tr2);
 
 void* planificadorREADY();
 void* planificadorEXEC(void*);
+void* detectorDeIntercambio();
 
 #endif /* PLANIFICADOR_H_ */

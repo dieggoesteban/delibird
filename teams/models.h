@@ -137,6 +137,11 @@ typedef struct{
     uint32_t cantidad;
 }t_pokemon_cantidad;
 
+typedef struct {
+	uint32_t id;
+	t_posicion* posicion;
+}t_entrenador_posicion;
+
 typedef struct
 {
 	uint32_t id;
@@ -145,6 +150,7 @@ typedef struct
     t_list* pokemonObjetivo;
     uint32_t cantidadObjetivo;
     t_pokemon_posicion* pokemonPlanificado;
+	t_entrenador_posicion* entrenadorPlanificado;
 	bool enEspera;
     bool deadlock;
 	sem_t mutex;

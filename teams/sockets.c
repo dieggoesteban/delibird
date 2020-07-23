@@ -220,6 +220,11 @@ void serve_suscribe(uint32_t* socket)
 		cod_op = -1;
 	if(cod_op > 0 && cod_op < 11) {
 		buffer = recibir_buffer(*socket);
+		if(buffer->size > 1000) {
+			cod_op = -1;
+			free(buffer->stream);
+			free(buffer);
+		}
 	}
 	process_suscribe_request(cod_op, buffer, *socket);
 }
@@ -269,7 +274,6 @@ t_buffer* recibir_buffer(uint32_t socket_cliente)
 	int size;
     
     recv(socket_cliente, &size, sizeof(int), MSG_WAITALL);
-	printf("size buffer: %d\n", size);
     buffer->size = size;
 	buffer->stream = malloc(buffer->size);
 	recv(socket_cliente, buffer->stream, buffer->size, MSG_WAITALL);
@@ -277,7 +281,7 @@ t_buffer* recibir_buffer(uint32_t socket_cliente)
 	return buffer;
 }
 
-uint32_t escuchaBroker(){
+uint32_t escuchaBroker() {
 	char* IP_BROKER = config_get_string_value(config,"IP_BROKER");
     char* PUERTO_BROKER = config_get_string_value(config,"PUERTO_BROKER");
 

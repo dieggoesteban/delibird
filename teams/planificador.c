@@ -100,11 +100,84 @@ void* planificadorREADY() {
             moverEntrenadorDeCola(colaBLOCKED, colaREADY, entrenador);
         }
         sem_wait(&pokesObjetivoGlobal);
-        actualizarObjetivoGlobal(poke, true);
+        actualizarObjetivoGlobal(poke->nombre, true);
         sem_post(&pokesObjetivoGlobal);
         printf("Asignado %s al entrenador %i que esta en %i:%i \n", poke->nombre, (uint32_t)entrenador->id, (uint32_t)entrenador->posicion->posicion_x, (uint32_t)entrenador->posicion->posicion_y);
     }
 }
+
+void* detectorDeIntercambio() {
+    while(1) {
+        sem_wait(&mutexDetector);
+        sem_wait(&mutexBLOCKED);
+        t_list* enDeadlock = list_filter(colaBLOCKED, (void*)entrenadorEnDeadlock);
+        sem_post(&mutexBLOCKED);
+        if(list_size(enDeadlock) > 1) {
+            for(uint32_t i=0; i < list_size(enDeadlock); i++) {
+                t_entrenador* tr1 = list_get(enDeadlock, i);
+                for(uint32_t j=0; i < list_size(enDeadlock); j++) {
+                    if(i != j) {
+                        t_entrenador* tr2 = list_get(enDeadlock, j);
+                        t_entrenador_posicion* trAsignado = getIntercambio(tr1, tr2);
+                        if(trAsignado != NULL) {
+                            printf("Asignando al entrenador %i el entrenador %i\n", tr1->id, tr2->id);
+                            tr1->entrenadorPlanificado = trAsignado;
+                            uint32_t index = getEntrenadorByID(tr2->id, colaBLOCKED);
+                            list_remove(colaBLOCKED, index);
+                            tr2->enEspera = true;
+                            sem_wait(&mutexBLOCKED);
+                            list_add(colaBLOCKED,tr2);
+                            sem_post(&mutexBLOCKED);
+                            break;
+                        }
+                    }
+                }
+                if(tr1->entrenadorPlanificado != NULL) {
+                    moverEntrenadorDeCola(colaBLOCKED, colaREADY, tr1);
+                    break;
+                }
+            }
+        }
+        list_destroy(enDeadlock);   //---///        ////----///
+    }
+}
+
+t_entrenador_posicion* getIntercambio(t_entrenador* tr1, t_entrenador* tr2) {
+    t_list* bastardosDe1 = pokesQueNoQuiere(tr1);
+    t_list* bastardosDe2 = pokesQueNoQuiere(tr2);
+
+    t_list* pokesQueQuiere1 = pokesQueSiQuiere(tr1, bastardosDe2);
+    t_list* pokesQueQuiere2 = pokesQueSiQuiere(tr2, bastardosDe1);
+
+    bool ambosEstanDisponibles = !tr1->enEspera && !tr2->enEspera;
+
+    if((list_size(pokesQueQuiere1) > 0 || list_size(pokesQueQuiere2) > 0) && ambosEstanDisponibles) {
+        printf("Entrenador 1 - %i quiere: ", tr1->id);
+        if(list_size(pokesQueQuiere1) > 0) {
+            for(uint32_t i = 0; i < list_size(pokesQueQuiere1); i++) {
+                printf("%s, ",(char*)list_get(pokesQueQuiere1,i));
+            }
+        }
+        printf("\n");
+        printf("Entrenador 2 - %i quiere: ", tr2->id);
+        if(list_size(pokesQueQuiere2) > 0) {
+            for(uint32_t i = 0; i < list_size(pokesQueQuiere2); i++) {
+                printf("%s, ",(char*)list_get(pokesQueQuiere2,i));
+            }
+        }
+        printf("\n");
+        return crearEntrenadorPosicion(tr2->id, tr2->posicion);
+    }
+    else return NULL;
+}
+
+//             quiere      -      no quiere
+
+//entrenador 1 pikachu     -      charmander
+
+//entrenador 2 charmander  -      bulbasaur
+
+//entrenador 3 bulbasaur   -      pikachu      -   
 
 void* planificadorBLOCKED() {
     printf("Hilo BLOCKED ejecutando\n");
@@ -125,7 +198,7 @@ void* planificadorEXEC(void* arg) {
                 entrenador = alg(NULL);
                 moverEntrenadorDeCola(colaREADY, colaEXEC, entrenador);
                 sem_post(&entrenador->mutex);
-                if(!entrenadorPuedeCapturar(entrenador)) {
+                if(!entrenadorLlegoASuDestino(entrenador)) {
                     moverEntrenadorAPokemon(entrenador);
                 } else {
                     printf("Entrenador %i puede capturar y va a BLOCKED\n", entrenador->id);
@@ -145,16 +218,21 @@ void* planificadorEXEC(void* arg) {
                 sem_wait(&mutexEXEC);
                 entrenador = (t_entrenador*)list_get(colaEXEC,0);
                 sem_post(&mutexEXEC);
-                if(entrenadorPuedeCapturar(entrenador)) {
-                    printf("Entrenador %i puede capturar y va a BLOCKED\n", entrenador->id);
-                    entrenador->enEspera = true;
-                    mandarCATCH(entrenador);
-                    moverEntrenadorDeCola(colaEXEC, colaBLOCKED, entrenador);
-                    if(list_size(colaREADY) > 0) {
-                        t_entrenador* nuevoEntrenador = alg(NULL);
-                        printf("Entrenador %i pasa a EXEC\n", nuevoEntrenador->id);
-                        moverEntrenadorDeCola(colaREADY, colaEXEC, nuevoEntrenador);
-                        moverEntrenadorAPokemon(nuevoEntrenador);
+                if(entrenadorLlegoASuDestino(entrenador)) {
+                    if(entrenador->pokemonPlanificado != NULL) {
+                        printf("Entrenador %i puede capturar y va a BLOCKED\n", entrenador->id);
+                        entrenador->enEspera = true;
+                        mandarCATCH(entrenador);
+                        moverEntrenadorDeCola(colaEXEC, colaBLOCKED, entrenador);
+                        if(list_size(colaREADY) > 0) {
+                            t_entrenador* nuevoEntrenador = alg(NULL);
+                            printf("Entrenador %i pasa a EXEC\n", nuevoEntrenador->id);
+                            moverEntrenadorDeCola(colaREADY, colaEXEC, nuevoEntrenador);
+                            moverEntrenadorAPokemon(nuevoEntrenador);
+                        }
+                    }
+                    else if(entrenador->entrenadorPlanificado != NULL) {
+                        printf("El entrenador %i puede realizar el intercambio con %i\n", entrenador->id, entrenador->entrenadorPlanificado->id);
                     }
                 }
                 else if(desalojo && list_size(colaREADY) > 0) {

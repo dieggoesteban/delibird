@@ -46,6 +46,7 @@ pthread_t threadSUSCRIBE_APPEARED;
 pthread_t threadSUSCRIBE_LOCALIZED;
 pthread_t threadRECONNECT;
 pthread_t threadDETECT_DISCON;
+pthread_t threadDETECT_DEADLOCK;
 pthread_t finalizarPrograma;
 
 sem_t mutexNEW;
@@ -60,6 +61,7 @@ sem_t waitForFinish;
 sem_t mutexReconnect;
 sem_t mutexEntrenadoresCatch;
 sem_t pokesObjetivoGlobal;
+sem_t mutexDetector;
 
 uint32_t cicloCPU;
 uint32_t quantum;

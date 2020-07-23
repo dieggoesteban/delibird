@@ -33,13 +33,14 @@ void inicializarPid();
 uint32_t getNuevoPid();
 void inicializarEntrenadores();
 void setObjetivoGlobal();
-void actualizarObjetivoGlobal(t_pokemon_posicion* poke, bool restar);
+void actualizarObjetivoGlobal(char* poke, bool restar);
 
 //SEMAFOROS
 
 sem_t mutexEXEC;
 sem_t mutexBLOCKED;
 sem_t mutexPokesEnMapa;
+sem_t mutexDetector;
 sem_t counterPokesEnMapa;
 sem_t mutexEntrenadoresCatch;
 sem_t counterEntrenadoresCatch;
@@ -50,6 +51,7 @@ t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* p
 t_pokemon_cantidad* setPokemonCantidad(char* nombre, uint32_t cantidad);
 t_entrenador_catch* crearEntrenadorCatch(uint32_t mID, uint32_t trID);
 t_suscribe* getSuscribe(uint32_t mq);
+t_entrenador_posicion* crearEntrenadorPosicion(uint32_t id, t_posicion* posicion);
 
 //COLAS
 t_list* colaNEW;
@@ -70,12 +72,15 @@ t_queue* listToQueue(t_list* lista);
 
 //STRUCTS PERTENECEN A LISTA
 uint32_t pokemonCantidadPerteneceALista(t_pokemon_cantidad* pokemon, t_list* lista);
-uint32_t pokemonPosicionPerteneceALista(t_pokemon_posicion* pokemon, t_list* lista);
+uint32_t pokemonPosicionPerteneceALista(char* pokemon, t_list* lista);
 uint32_t entrenadorPerteneceALista(t_entrenador* entrenador, t_list* lista);
 
 //OBTENER DE LISTA
 t_list* obtenerEntrenadoresSinDeadlock(); //obtiene de colaBlocked
 uint32_t getIndexSemaforo(char* nombrePoke,t_list* lista);
+t_list* pokesQueNoQuiere(t_entrenador* tr);
+t_list* pokesQueSiQuiere(t_entrenador* tr, t_list* pokes);
+uint32_t getEntrenadorByID(uint32_t id, t_list* lista);
 
 //DE POKEMON
 bool pokemonEnObjetivoGlobal(t_pokemon_posicion* pokemon);
@@ -87,7 +92,7 @@ void procesarMensajeCaught(t_caught_pokemon* caughtPoke);
 bool entrenadorEnDeadlock(t_entrenador* entrenador);
 bool entrenadorCumplioObjetivo(t_entrenador* entrenador);
 bool entrenadorDisponible(void* entrenador);
-bool entrenadorPuedeCapturar(void* entrenador);
+bool entrenadorLlegoASuDestino(void* entrenador);
 bool tardaMenos(void* trA, void* trB);
 bool ordenarEntrenador(void* a, void* b);
 bool ordenarPokemon(void* a, void* b);

@@ -51,9 +51,9 @@ uint32_t pokemonCantidadPerteneceALista(t_pokemon_cantidad* pokemon, t_list* lis
 	return ERROR;
 }
 
-uint32_t pokemonPosicionPerteneceALista(t_pokemon_posicion* pokemon, t_list* lista){
+uint32_t pokemonPosicionPerteneceALista(char* pokemon, t_list* lista){
 	for(uint32_t i = 0; i < list_size(lista); i++){
-		if(strcmp(((t_pokemon_posicion*)list_get(lista, i))->nombre,pokemon->nombre) == 0){
+		if(strcmp(((t_pokemon_posicion*)list_get(lista, i))->nombre,pokemon) == 0){
 			return i;
 		}
 	}
@@ -134,8 +134,10 @@ void inicializarEntrenadores() {
 	for(uint32_t i = 0; i < arraySize((void*)objetivosEntrenadores); i++) {
 
 		t_list* objetivos = arrayToList((void*)string_split(objetivosEntrenadores[i],"|"));
-		t_list* pokemon = arrayToList((void*)string_split(pokemonEntrenadores[i],"|"));
-		
+		t_list* pokemon = list_create();
+		if(pokemonEntrenadores[i]) {
+			pokemon = arrayToList((void*)string_split(pokemonEntrenadores[i],"|"));
+		}
 		char** coordenadas = string_split(posicionesEntrenadores[i],"|");
 		t_posicion* posicion = crearPosicion((uint32_t)atoi(coordenadas[0]),(uint32_t)atoi(coordenadas[1]));
 
@@ -205,7 +207,7 @@ void setObjetivoGlobal(){
 	free(globalAux);
 }
 
-void actualizarObjetivoGlobal(t_pokemon_posicion* poke, bool restar) {
+void actualizarObjetivoGlobal(char* poke, bool restar) {
 	uint32_t index = pokemonPosicionPerteneceALista(poke,objetivoGlobal);
 	t_pokemon_cantidad* pokemon = list_remove(objetivoGlobal,index);
 	if(restar) {
@@ -214,6 +216,12 @@ void actualizarObjetivoGlobal(t_pokemon_posicion* poke, bool restar) {
 		pokemon->cantidad = pokemon->cantidad + 1;
 	}
 	list_add(objetivoGlobal, pokemon);
+
+	printf("-OBJETIVO GLOBAL ACTUALIZADO-\n");
+	for(uint32_t i = 0; i < list_size(objetivoGlobal); i++) {
+		t_pokemon_cantidad* poke = (t_pokemon_cantidad*)list_get(objetivoGlobal,i); 
+		printf("%s -- %i\n", (char*)poke->nombre, (uint32_t)poke->cantidad);
+	}
 }
 
 t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* pokemon, uint32_t cantObjetivos) {
@@ -224,6 +232,7 @@ t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* p
     entrenador->pokemonCapturados = list_duplicate(pokemon);
     entrenador->pokemonObjetivo = list_duplicate(objetivos);
     entrenador->pokemonPlanificado = NULL;
+	entrenador->entrenadorPlanificado = NULL;
 	entrenador->cantidadObjetivo = cantObjetivos;
 	entrenador->enEspera = false;
 	entrenador->deadlock = entrenadorEnDeadlock(entrenador);
@@ -240,6 +249,15 @@ t_pokemon_posicion* crearPokemonPosicion(char* nombre, t_posicion* posicion){
 	return pokemon;
 }
 
+t_entrenador_posicion* crearEntrenadorPosicion(uint32_t id, t_posicion* posicion) {
+	t_entrenador_posicion* tr = malloc(sizeof(t_entrenador_posicion));
+
+	tr->id = id;
+	tr->posicion = posicion;
+
+	return tr;
+}
+
 t_pokemon_cantidad* setPokemonCantidad(char* nombre, uint32_t cantidad) {
 	t_pokemon_cantidad* pokemon = malloc(sizeof(t_pokemon_cantidad));
 
@@ -252,7 +270,7 @@ t_pokemon_cantidad* setPokemonCantidad(char* nombre, uint32_t cantidad) {
 bool list_equals(t_list* list1, t_list* list2) {
 	if(list_size(list1) == list_size(list2)) {
 		for(uint32_t i = 0; i < list_size(list1); i++) {
-			if(strcmp(list_get(list1,i),list_get(list1,2)) != 0) {
+			if(strcmp(list_get(list1,i),list_get(list2,i)) != 0) {
 				return false;
 			}
 		}
@@ -280,20 +298,32 @@ bool entrenadorDisponible(void* entrenador) {
 	return (!entrenadorEnDeadlock(trainer) && !trainer->enEspera);
 }
 
-t_entrenador* cambiarPosicionEntrenador(t_entrenador* entrenador, uint32_t posX, uint32_t posY){
+t_entrenador* cambiarPosicionEntrenador(t_entrenador* entrenador, uint32_t posX, uint32_t posY) {
 	entrenador->posicion->posicion_x = posX;
 	entrenador->posicion->posicion_y = posY;
 	return entrenador;
 }
 
-uint32_t turnosHastaPokemon(t_pokemon_posicion* pokemon, t_entrenador* entrenador){
+uint32_t turnosHastaPokemon(t_pokemon_posicion* pokemon, t_entrenador* entrenador) {
 	return abs(pokemon->posicion->posicion_x - entrenador->posicion->posicion_x) + abs(pokemon->posicion->posicion_y - entrenador->posicion->posicion_y);
 }
 
-bool entrenadorPuedeCapturar(void* entrenador) {
-	t_entrenador* trainer = (t_entrenador*) entrenador;
+uint32_t turnosHastaEntrenador(t_entrenador_posicion* tr, t_entrenador* entrenador) {
+	return abs(tr->posicion->posicion_x - entrenador->posicion->posicion_x) + abs(tr->posicion->posicion_y - entrenador->posicion->posicion_y);
+}
 
-	return (turnosHastaPokemon(trainer->pokemonPlanificado,trainer) == 0);
+bool entrenadorLlegoASuDestino(void* entrenador) {
+	t_entrenador* trainer = (t_entrenador*) entrenador;
+	bool llegoAPoke = false;
+	bool llegoAEntrenador = false;
+
+	if(trainer->pokemonPlanificado != NULL) {
+		llegoAPoke = turnosHastaPokemon(trainer->pokemonPlanificado,trainer) == 0;
+	} else {
+		llegoAEntrenador = turnosHastaEntrenador(trainer->entrenadorPlanificado,trainer) == 0;
+	}
+
+	return llegoAPoke || llegoAEntrenador;
 }
 
 void moverEntrenadorAPokemon(t_entrenador* entrenador){ 
@@ -336,7 +366,7 @@ bool tardaMenos(void* trA, void* trB) {
 }
 
 bool pokemonEnObjetivoGlobal(t_pokemon_posicion* pokemon) {
-    uint32_t index = pokemonPosicionPerteneceALista(pokemon,objetivoGlobal);
+    uint32_t index = pokemonPosicionPerteneceALista(pokemon->nombre,objetivoGlobal);
     if(index != ERROR) {
         if(((t_pokemon_cantidad*)list_get(objetivoGlobal,index))->cantidad > 0)
             return true;
@@ -432,8 +462,13 @@ void procesarMensajeCaught(t_caught_pokemon* caughtPoke) {
 		if(caughtPoke->catchStatus == 1) {
 			printf("El entrenador %i pudo capturar a %s\n", tr->id, poke);
 			list_add(tr->pokemonCapturados, poke);
+			tr->deadlock = entrenadorEnDeadlock(tr);
+			if(tr->deadlock) {
+				printf("El entrenador %i quedo en deadlock\n", tr->id);
+				sem_post(&mutexDetector);
+			}
 		} else {
-			
+			actualizarObjetivoGlobal(poke, false);
 			printf("El entrenador %i no pudo capturar a %s\n", tr->id, poke);
 		}
 		tr->pokemonPlanificado = NULL;
@@ -443,4 +478,24 @@ void procesarMensajeCaught(t_caught_pokemon* caughtPoke) {
 	} else {
 		printf("El mensaje no corresponde a ningun entrenador de este Team\n");
 	}
+}
+
+t_list* pokesQueNoQuiere(t_entrenador* tr) {
+	t_list* mangaDeKokemones = list_create();
+	for(uint32_t i = 0; i < list_size(tr->pokemonCapturados); i++) {
+		if (!perteneceALista(list_get(tr->pokemonCapturados, i), tr->pokemonObjetivo)) {
+			list_add(mangaDeKokemones, list_get(tr->pokemonCapturados, i));
+		}
+	}
+	return mangaDeKokemones;
+}
+
+t_list* pokesQueSiQuiere(t_entrenador* tr, t_list* pokes) {
+	t_list* digimons = list_create();
+	for(uint32_t i = 0; i < list_size(tr->pokemonCapturados); i++) {
+		if (perteneceALista(list_get(tr->pokemonCapturados, i), pokes)) {
+			list_add(digimons, list_get(tr->pokemonCapturados, i));
+		}
+	}
+	return digimons;
 }
