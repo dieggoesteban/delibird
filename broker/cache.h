@@ -3,6 +3,7 @@
 
 #include "global-includes.h"
 #include "models.h"
+#include "cacheSerializador.h"
 #include <signal.h>
 #include <sys/time.h>
 
@@ -72,7 +73,7 @@ void consolidar();
 void cacheMessage(t_message* message);
 void dispatchCachedMessages(t_cache_dispatch_info* dispatchInfo);
 void dump();
-void writeData(cache_message* administrative, t_holes* targetHole, void* message);
+void writeData(cache_message* administrative, t_holes* targetHole, t_cache_buffer* bufferMessage);
 
 t_holes* createHole(void* startAddress, uint32_t length);
 t_partition* createPartition(void* startAddress, uint32_t length);

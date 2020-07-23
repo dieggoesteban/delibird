@@ -304,9 +304,9 @@ void subscribeNewModule(uint32_t idNewModule, uint32_t socket_cliente, uint32_t 
 	cache_dispatch_info->suscripcion = suscripcion;
 	cache_dispatch_info->mq_cod = mq_cod;
 
-	// pthread_t dispatchCache;
-	// pthread_create(&dispatchCache, NULL, (void*)dispatchCachedMessages, suscripcion);
-	// pthread_detach(dispatchCache);
+	pthread_t dispatchCache;
+	pthread_create(&dispatchCache, NULL, (void*)dispatchCachedMessages, cache_dispatch_info);
+	pthread_join(dispatchCache, NULL);
 }
 
 void addMessageToQueue(t_message* message, t_message_queue* messageQueue)

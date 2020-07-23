@@ -113,7 +113,7 @@ void memoria_particiones(t_message* message)
 {
     //log_info(broker_custom_logger, "Dynamic Partitions Algorithm\n");
     cache_message* administrative = (cache_message*)malloc(sizeof(cache_message));
-    void* addressFromMessageToCopy;
+    t_cache_buffer* addressFromMessageToCopy;
     uint32_t sizeOfMessage;
 
     switch (message->mq_cod)
@@ -123,21 +123,24 @@ void memoria_particiones(t_message* message)
             t_new_pokemon* newPoke = (t_new_pokemon*)message->mensaje;
             cache_new_pokemon cache_newPoke;
 
-            cache_newPoke.nameLength = newPoke->sizeNombre;
-            cache_newPoke.pokeName = malloc(newPoke->sizeNombre);
+            cache_newPoke.nameLength = newPoke->sizeNombre - 1;
+            log_debug(broker_custom_logger, "Size name: %i", cache_newPoke.nameLength);
+            cache_newPoke.pokeName = malloc(cache_newPoke.nameLength);
             cache_newPoke.cantidad = newPoke->posicionCantidad->cantidad;
             cache_newPoke.posX = newPoke->posicionCantidad->posicion_x;
             cache_newPoke.posY = newPoke->posicionCantidad->posicion_y;
-            memcpy(cache_newPoke.pokeName, newPoke->nombre, newPoke->sizeNombre);
+            memcpy(cache_newPoke.pokeName, string_substring(newPoke->nombre, 0, cache_newPoke.nameLength), cache_newPoke.nameLength);
             
             administrative->idMessage = newPoke->ID_mensaje_recibido;
             administrative->mq_cod = NEW_POKEMON;
-            administrative->length = (sizeof(uint32_t) * 4 + (cache_newPoke.nameLength - 1));
             administrative->suscriptoresEnviados = list_duplicate(message->suscriptoresEnviados);
             administrative->suscriptoresConfirmados = list_duplicate(message->suscriptoresConfirmados);
             
-            addressFromMessageToCopy = &cache_newPoke;
-            sizeOfMessage = administrative->length;
+            t_cache_buffer* buffer = serializar_cacheNewPokemon(&cache_newPoke);
+            addressFromMessageToCopy = buffer;
+            sizeOfMessage = buffer->size;
+            log_debug(broker_custom_logger, "Size buffer: %i", buffer->size);
+            administrative->length = buffer->size;
             break;
         }
         case APPEARED_POKEMON:
@@ -282,7 +285,7 @@ void memoria_particiones(t_message* message)
     writeData(administrative, targetHole, addressFromMessageToCopy);
 }
 
-void writeData(cache_message* administrative, t_holes* targetHole, void* message)
+void writeData(cache_message* administrative, t_holes* targetHole, t_cache_buffer* bufferMessage)
 {
     t_partition* partition = createPartition(targetHole->pStart, targetHole->length);
     partition->id = administrative->idMessage;
@@ -293,7 +296,7 @@ void writeData(cache_message* administrative, t_holes* targetHole, void* message
     pthread_mutex_unlock(&s_partitions);
     
     pthread_mutex_lock(&s_cache);
-        memcpy(administrative->startAddress, message, administrative->length);
+        memcpy(administrative->startAddress, bufferMessage->stream, bufferMessage->size);
     pthread_mutex_unlock(&s_cache);
 }
 
@@ -359,11 +362,39 @@ t_holes* reemplazo_lru(uint32_t bytes){ return createHole(0, 0); }
 
 void dispatchCachedMessages(t_cache_dispatch_info* dispatchInfo)
 {
+    uint32_t _belongs_to_queue(cache_message* message) {
+        return message->mq_cod == dispatchInfo->mq_cod;
+    }
+
+    t_list* readyToSend = list_create(); //Va a tener la lista de t_message para enviar
+    t_list* tempMetadatas = list_create(); //Lista de cache_message
+
+    pthread_mutex_lock(&s_partitions);
+    pthread_mutex_lock(&s_holes);
+    pthread_mutex_lock(&s_metadatas);
     switch (dispatchInfo->mq_cod)
     {
         case NEW_POKEMON:
         {
+            //Se obtiene la metadata de los mensajes que pertenecen a esa cola
+            cache_message* currentMetadata;
+            tempMetadatas = list_filter(metadatas, (void*)_belongs_to_queue);
 
+            currentMetadata = list_get(tempMetadatas, 0);
+            pthread_mutex_lock(&s_cache);
+            t_cache_buffer* buffer = malloc(sizeof(t_cache_buffer));
+            buffer->stream = malloc(currentMetadata->length);
+            memcpy(buffer->stream, currentMetadata->startAddress, currentMetadata->length);
+
+            cache_new_pokemon* newPoke = deserializar_cacheNewPokemon(buffer);
+            log_debug(broker_custom_logger, "Poke name desde cache: %s", newPoke->pokeName);
+            log_debug(broker_custom_logger, "Poke name desde cache: %i", newPoke->posY);
+            log_debug(broker_custom_logger, "Poke name desde cache: %i", newPoke->posX);
+            log_debug(broker_custom_logger, "Poke name desde cache: %i", newPoke->cantidad);
+            log_debug(broker_custom_logger, "Poke name desde cache: %i", newPoke->nameLength);
+            pthread_mutex_unlock(&s_cache);
+
+            //log_debug(broker_custom_logger, "Descached new poke: %s", rawMessage->nombre);
             break;
         }
         case APPEARED_POKEMON:
@@ -372,6 +403,9 @@ void dispatchCachedMessages(t_cache_dispatch_info* dispatchInfo)
             break;
         }
     }
+    pthread_mutex_unlock(&s_metadatas);
+    pthread_mutex_unlock(&s_holes);
+    pthread_mutex_unlock(&s_partitions);
 }
 
 void dump()
