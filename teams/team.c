@@ -67,6 +67,9 @@ int main(int argc, char *argv[])
     if (pthread_create(&threadEXEC,NULL,(void*)planificadorEXEC,(void*)getAlgoritmo(ALGORITMO)) != 0)
         printf("Error EXEC\n");
 
+    if (pthread_create(&threadSERVER,NULL,(void*)iniciar_servidor,NULL) != 0)
+        printf("Error  SERVIDOR\n");
+
     if (pthread_create(&threadDETECT_DISCON,NULL,(void*)detectarDesconexion,NULL) != 0)
         printf("Error DETECTOR DESCONEXION\n");
 

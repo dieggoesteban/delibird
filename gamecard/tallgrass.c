@@ -546,6 +546,8 @@ void atenderGetPokemon(t_getPokemon_indexSem* getPokemonSem){
     t_localized_pokemon* localizedPokemon;
     char* pathFilesPokemon = string_duplicate(pathFiles);
     string_append(&pathFilesPokemon,getPokemonSem->getPokemon->nombre);
+    printf("EL PATH EN LOCALIZED: %s\n", pathFilesPokemon);
+
     char* pathMetadataPoke = agregarAPath(pathFilesPokemon,"/Metadata.txt");
 
     if(existeDirectorio(pathFilesPokemon)){
@@ -557,6 +559,8 @@ void atenderGetPokemon(t_getPokemon_indexSem* getPokemonSem){
         localizedPokemon = escribirLocalizedPokemon(getPokemonSem->getPokemon, pathMetadataPoke);
         sleep(tiempoOperacion);
         signalSemYModificacionOpen(getPokemonSem->indexSemaforo, pathMetadataPoke);
+        printf("LOCALIZED DEL POKEMON: NOMBRE: %s, CANTIDAD DE POSICIONES: %i, POSX1: %i, POSX2: %i\n", localizedPokemon->nombre, localizedPokemon->cantidadPosiciones, ((t_posicion*)list_get(localizedPokemon->posiciones, 0))->posicion_x, ((t_posicion*)list_get(localizedPokemon->posiciones, 0))->posicion_y);
+
         mandarLOCALIZED(localizedPokemon);
 
         printf("termino la operacion de LOCALIZED_POKEMON de %s\n", getPokemonSem->getPokemon->nombre);
@@ -641,9 +645,9 @@ bool estaOpen(char* nombrePokemon){
     uint32_t indexSemaforo =  encontrarSemaforoDelPoke(nombrePokemon,semaforosPokemon);
     if (sem_getvalue(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, indexSemaforo))->semPoke), &valorSem) == 0){
         if(valorSem > 0){
-            archivoCerrado = true;
             log_info(logger,"ESTA CERRADO EL ARCHIVO");
         }else{
+            archivoCerrado = true;
             log_info(logger,"ESTA ABIERTO EL ARCHIVO");
         }
 

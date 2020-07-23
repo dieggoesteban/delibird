@@ -569,7 +569,6 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 
 		free(posicion);
 		free(appearedPokemon);
-
 	}
 	else if (strcmp(tipo_mensaje, "CATCH_POKEMON") == 0)
 	{

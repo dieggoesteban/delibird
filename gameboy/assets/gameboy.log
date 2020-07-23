@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [INFO] 14:49:12:593 gameboy/(10655:10655): Se ha recibido el id del mensaje enviado: 1
 [INFO] 14:53:54:399 gameboy/(10740:10740): Se ha recibido el id del mensaje enviado: 1
 [INFO] 16:23:17:583 gameboy/(13016:13016): Se ha recibido el id del mensaje enviado: 1
@@ -133,3 +134,15 @@
 [INFO] 22:48:45:605 gameboy/(18749:18749): entro a appeared_pokemon
 [INFO] 22:48:54:976 gameboy/(18761:18761): entro a appeared_pokemon
 [INFO] 22:49:05:741 gameboy/(18763:18763): entro a appeared_pokemon
+=======
+[INFO] 20:06:31:364 gameboy/(31024:31024): entro a get_pokemon
+[INFO] 20:10:24:525 gameboy/(31331:31331): entro a get_pokemon
+>>>>>>> gamecard-hilos
+[INFO] 22:57:18:301 gameboy/(19682:19682): entro a appeared_pokemon
+[INFO] 22:57:42:137 gameboy/(19683:19683): entro a appeared_pokemon
+[INFO] 22:59:28:610 gameboy/(19751:19751): entro a appeared_pokemon
+[INFO] 23:00:37:129 gameboy/(19780:19780): entro a appeared_pokemon
+[INFO] 23:00:37:132 gameboy/(19782:19782): entro a appeared_pokemon
+[INFO] 23:00:37:135 gameboy/(19784:19784): entro a appeared_pokemon
+[INFO] 23:00:37:137 gameboy/(19786:19786): entro a appeared_pokemon
+[INFO] 23:00:37:145 gameboy/(19788:19788): entro a appeared_pokemon

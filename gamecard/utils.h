@@ -39,6 +39,5 @@ t_list* dictionaryToListPosiciones(t_dictionary* dictionary);
 uint32_t encontrarSemaforoDelPoke(char* nombrePoke, t_list* listaSem);
 char* getMQName(uint32_t mq);
 t_suscribe* getSuscribe(uint32_t mq);
-uint32_t getIndexSemaforo(char* nombrePoke,t_list* lista);
 
 #endif /* UTILS_H_ */

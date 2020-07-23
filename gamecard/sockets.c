@@ -186,7 +186,7 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd)
 			log_info(logger, "SIZE BUFFER EN NEW: %i\n", buffer->size);
 			t_new_pokemon *newPoke = deserializar_newPokemon(buffer);
 			printf("Nombre del poke new: %s\n", newPoke->nombre);
-			t_acknowledgement* ack = crearAcknowledgement(idModule,newPoke->ID_mensaje_recibido, NEW_POKEMON);
+			// t_acknowledgement* ack = crearAcknowledgement(idModule,newPoke->ID_mensaje_recibido, NEW_POKEMON);
 			// t_posicion* posicion = crearPosicion(newPoke->posicionCantidad->posicion_x, newPoke->posicionCantidad->posicion_y);
 			// t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(0, newPoke->ID_mensaje_recibido, newPoke->nombre, posicion);
 
@@ -199,9 +199,9 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd)
 			
 			t_newPokemon_indexSem* newPokeSem = crearNewPokemonIndexSem(indexSem, newPoke);
 
-			pthread_t sendAck;
-			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
-			pthread_detach(sendAck);
+			// pthread_t sendAck;
+			// pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
+			// pthread_detach(sendAck);
 			pthread_t hiloAtenderNewPoke;
 			pthread_create(&hiloAtenderNewPoke, NULL, atenderNewPokemon,(void*)newPokeSem);
 			pthread_detach(hiloAtenderNewPoke);
@@ -215,7 +215,7 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd)
 
 			// t_caught_pokemon* caughtPoke = crearCaughtPokemon(0,catchPoke->ID_mensaje_recibido,1);
 
-			t_acknowledgement* ack = crearAcknowledgement(idModule ,catchPoke->ID_mensaje_recibido, CATCH_POKEMON);
+			// t_acknowledgement* ack = crearAcknowledgement(idModule ,catchPoke->ID_mensaje_recibido, CATCH_POKEMON);
 
 			uint32_t indexSem = getIndexSemaforo(catchPoke->nombre, semaforosPokemon);
 			printf("INDEX QUE ME DA SOCKET: %i\n", indexSem);
@@ -226,9 +226,9 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd)
 			
 			t_catchPokemon_indexSem* catchPokeSem = crearCatchPokemonIndexSem(indexSem, catchPoke);
 
-			pthread_t sendAck;
-			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
-			pthread_detach(sendAck);
+			// pthread_t sendAck;
+			// pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
+			// pthread_detach(sendAck);
 			pthread_t hiloAtenderCatchPoke;
 			pthread_create(&hiloAtenderCatchPoke, NULL, (void*)atenderCatchPokemon,(void*)catchPokeSem);
 			pthread_detach(hiloAtenderCatchPoke);
@@ -240,7 +240,7 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd)
 			t_get_pokemon *getPoke = deserializar_getPokemon(buffer);
 			log_info(logger, getPoke->nombre);
 
-			t_acknowledgement* ack = crearAcknowledgement(idModule ,getPoke->ID_mensaje_recibido, CATCH_POKEMON);
+			// t_acknowledgement* ack = crearAcknowledgement(idModule ,getPoke->ID_mensaje_recibido, GET_POKEMON);
 			uint32_t indexSem = getIndexSemaforo(getPoke->nombre, semaforosPokemon);
 			printf("INDEX QUE ME DA SOCKET: %i\n", indexSem);
 			if(indexSem == ERROR){
@@ -250,9 +250,9 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd)
 			
 			t_getPokemon_indexSem* getPokeSem = crearGetPokemonIndexSem(indexSem, getPoke);
 
-			pthread_t sendAck;
-			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
-			pthread_detach(sendAck);
+			// pthread_t sendAck;
+			// pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
+			// pthread_detach(sendAck);
 			pthread_t hiloAtenderGetPoke;
 			pthread_create(&hiloAtenderGetPoke, NULL, (void*)atenderGetPokemon,(void*)getPokeSem);
 			pthread_detach(hiloAtenderGetPoke);
@@ -348,7 +348,7 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 			t_get_pokemon *getPoke = deserializar_getPokemon(buffer);
 			log_info(logger, getPoke->nombre);
 
-			t_acknowledgement* ack = crearAcknowledgement(idModule ,getPoke->ID_mensaje_recibido, CATCH_POKEMON);
+			t_acknowledgement* ack = crearAcknowledgement(idModule ,getPoke->ID_mensaje_recibido, GET_POKEMON);
 
 			uint32_t indexSem = getIndexSemaforo(getPoke->nombre, semaforosPokemon);
 			printf("INDEX QUE ME DA SOCKET: %i\n", indexSem);
