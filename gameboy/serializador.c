@@ -604,11 +604,17 @@ t_paquete* getPaquete(t_list* listaArgumentos, char* tipo_mensaje)
 	}
 	else if (strcmp(tipo_mensaje, "CAUGHT_POKEMON") == 0)
 	{
-		t_caught_pokemon* pokemon = malloc(sizeof(t_caught_pokemon));
+		t_caught_pokemon* pokemon;
 
-		pokemon->ID_mensaje_recibido = 0;
-		pokemon->ID_mensaje_original = (uint32_t)atoi((char*)list_get(listaArgumentos,0));
-		pokemon->catchStatus = (uint32_t)atoi((char*)list_get(listaArgumentos,1));
+		if(string_equals_ignore_case((char*)list_get(listaArgumentos,1), "OK")){
+			pokemon = crearCaughtPokemon(0, (uint32_t)atoi((char*)list_get(listaArgumentos,0)), 1);
+			printf("ENTRA EN EL OK CON EL STATUS %i\n", pokemon->catchStatus);
+		}else{
+			pokemon = crearCaughtPokemon(0, (uint32_t)atoi((char*)list_get(listaArgumentos,0)), 0);
+			printf("ENTRA EN EL FAIL CON EL STATUS %i\n", pokemon->catchStatus);
+		}
+
+		
 
 		paquete = serializar_caughtPokemon(pokemon);
 
