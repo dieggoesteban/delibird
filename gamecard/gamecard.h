@@ -58,6 +58,7 @@ pthread_mutex_t mutexListaSemsCatch;
 pthread_mutex_t mutexListaSemsGet;
 
 
+
 //SEMAFOROS
 sem_t semReconexion;
 sem_t waitForFinish;

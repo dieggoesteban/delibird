@@ -634,8 +634,6 @@ void* atenderNewPokemon(void* newPokemonParam){
     }
     
     escribirNewPokemon(newPokemonATexto(newPokeSem->newPokemon), pathMetadataPoke);
-    sleep(tiempoOperacion);
-    signalSemYModificacionOpen(newPokeSem->indexSemaforo, pathMetadataPoke);
 
     t_posicion* posicion = crearPosicion(newPokeSem->newPokemon->posicionCantidad->posicion_x, newPokeSem->newPokemon->posicionCantidad->posicion_y);
 	t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(0, newPokeSem->newPokemon->ID_mensaje_recibido, newPokeSem->newPokemon->nombre, posicion);
@@ -644,6 +642,10 @@ void* atenderNewPokemon(void* newPokemonParam){
     free(appearedPokemon);
 
     printf("termino la operacion de NEW_POKEMON de %s\n", newPokemonATexto(newPokeSem->newPokemon));
+
+    sleep(tiempoOperacion);
+    signalSemYModificacionOpen(newPokeSem->indexSemaforo, pathMetadataPoke);
+
     free(newPokeSem->newPokemon);
     free(newPokeSem);
     return NULL;
@@ -665,7 +667,10 @@ bool estaOpen(char* nombrePokemon){
     return archivoOpen;
 }
 
-
+// bool estaOpenArchivo(char* pathMetadataPoke){
+//     t_config metadataPoke = 
+//     // char* valorOpen = co
+// }
 
 void waitSemYModificacionOpen(uint32_t indexSemaforo, char* pathMetadataPoke){
     printf("EL INDEX DEL SEM ES: %i\n", indexSemaforo);
@@ -693,7 +698,9 @@ void* reintentarOperacion(void* nombrePoke){
     uint32_t i = 0;
     while(archivoOpen){
         sleep(tiempoReintentoOperacion);
+        // pthread_mutex_lock(&mutexEstaOpen);
         archivoOpen = estaOpen(nombrePoke);
+        // pthread_mutex_unlock(&mutexEstaOpen);
         i++;
         printf("reintento numero %i\n", i);
         log_info(logger, "reintento numeo %i", i);
