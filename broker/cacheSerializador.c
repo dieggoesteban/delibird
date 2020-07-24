@@ -225,3 +225,26 @@ t_new_pokemon* newPokemon_cacheToMessage(cache_new_pokemon* cacheNewPokemon, cac
     t_new_pokemon* newPokemon = crearNewPokemon(metadata->idMessage, cacheNewPokemon->pokeName, posCant);
     return newPokemon;
 }
+
+t_appeared_pokemon* appearedPokemon_cacheToMessage(cache_appeared_pokemon* cacheAppearedPokemon, cache_message* metadata)
+{
+    t_posicion* pos = crearPosicion(cacheAppearedPokemon->posX, cacheAppearedPokemon->posY);
+    t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(metadata->idMessage, cacheAppearedPokemon->pokeName, pos);
+    return appearedPokemon;
+}
+t_catch_pokemon* catchPokemon_cacheToMessage(cache_catch_pokemon* cacheCatchPokemon, cache_message* metadata)
+{
+    t_posicion* pos = crearPosicion(cacheCatchPokemon->posX, cacheCatchPokemon->posY);
+    t_catch_pokemon* catchPokemon = crearCatchPokemon(metadata->idMessage, cacheCatchPokemon->pokeName, pos);
+    return catchPokemon;
+}
+t_caught_pokemon* caughtPokemon_cacheToMessage(cache_caught_pokemon* cacheCaughtPokemon, cache_message* metadata)
+{
+    t_caught_pokemon* caughtPokemon = crearCaughtPokemon(metadata->idMessage, metadata->idCorrelational, cacheCaughtPokemon->seAtrapo);
+    return caughtPokemon;
+}
+t_get_pokemon* getPokemon_cacheToMessage(cache_get_pokemon* cacheGetPokemon, cache_message* metadata)
+{
+    t_get_pokemon* getPokemon = crearGetPokemon(metadata->idMessage, cacheGetPokemon->pokeName);
+}
+//t_localized_pokemon* localizedPokemon_cacheToMessage(cache_localized_pokemon* cacheLocalizedPokemon, cache_message* metadata);

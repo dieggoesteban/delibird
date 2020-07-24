@@ -81,6 +81,7 @@ t_partition* createPartition(void* startAddress, uint32_t length);
 
 void showHoles();
 void showPartitions();
+void updatePartitionLRU_byDataAddress(void* startAddress);
 uint32_t mem_address_menor_a_mayor(t_holes* hole1, t_holes* hole2);
 uint32_t existHolesBetweenPartitions();
 

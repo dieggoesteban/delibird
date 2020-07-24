@@ -269,7 +269,9 @@ void receiveAcknowledgement(t_acknowledgement* ack, uint32_t socket_cliente)
 		pthread_mutex_unlock(&targetMessage->s_suscriptoresConfirmados);
 	}
 	else
-		log_warning(broker_custom_logger, "Mensaje con id %i no encontrado en la cola %s", ack->idMessageReceived, messageQueue->name);
+	{
+		//log_debug(broker_custom_logger, "Mensaje con id %i no encontrado en la cola %s", ack->idMessageReceived, messageQueue->name);
+	}
 }
 
 void subscribeNewModule(uint32_t idNewModule, uint32_t socket_cliente, uint32_t mq_cod)
