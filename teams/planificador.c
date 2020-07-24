@@ -178,7 +178,7 @@ void* modoDesconectado() {
             if(valorSem > 0){
                 sem_wait(&mutexBLOCKED);
                 if(list_size(colaBLOCKED) > 0) {
-                    printf("Entre porque me odio\n");
+                    // printf("Entre porque me odio\n");
                     for(uint32_t i = 0; i < list_size(colaBLOCKED); i++) {
                         t_entrenador* tr = (t_entrenador*)list_get(colaBLOCKED,i);
                         defaultCaptura(tr);
@@ -214,7 +214,12 @@ void* planificadorEXEC(void* arg) {
                 } else {
                     printf("Entrenador %i puede capturar y va a BLOCKED\n", entrenador->id);
                     entrenador->enEspera = true;
-                    mandarCATCH(entrenador);
+                    int valorSem;
+                    if (sem_getvalue(&estaDesconectado, &valorSem) == 0){
+                        if(valorSem == 0){
+                            mandarCATCH(entrenador);
+                        }
+                    }
                     moverEntrenadorDeCola(colaEXEC, colaBLOCKED, entrenador);
                     if(list_size(colaREADY) > 0) {
                         t_entrenador* nuevoEntrenador = alg(NULL);
@@ -233,7 +238,12 @@ void* planificadorEXEC(void* arg) {
                     if(entrenador->pokemonPlanificado != NULL) {
                         printf("Entrenador %i puede capturar y va a BLOCKED\n", entrenador->id);
                         entrenador->enEspera = true;
-                        mandarCATCH(entrenador);
+                        int valorSem;
+                        if (sem_getvalue(&estaDesconectado, &valorSem) == 0){
+                            if(valorSem == 0){
+                                mandarCATCH(entrenador);
+                            }
+                        }                      
                         moverEntrenadorDeCola(colaEXEC, colaBLOCKED, entrenador);
                         if(list_size(colaREADY) > 0) {
                             t_entrenador* nuevoEntrenador = alg(NULL);
