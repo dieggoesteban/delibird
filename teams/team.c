@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
     entrenadoresCatch = list_create();
 
     sem_init(&mutexDetector, 0, 0);
+    sem_init(&estaDesconectado, 0, 0);
     sem_init(&mutexNEW, 0, 1);
     sem_init(&mutexREADY, 0, 1);
     sem_init(&mutexBLOCKED, 0, 1);
@@ -70,6 +71,9 @@ int main(int argc, char *argv[])
     if (pthread_create(&threadSERVER,NULL,(void*)iniciar_servidor,NULL) != 0)
         printf("Error  SERVIDOR\n");
 
+    if (pthread_create(&threadMODO_DEFAULT,NULL,(void*)modoDesconectado,NULL) != 0)
+        printf("Error MODO DEFAULT\n");
+
     if (pthread_create(&threadDETECT_DISCON,NULL,(void*)detectarDesconexion,NULL) != 0)
         printf("Error DETECTOR DESCONEXION\n");
 
@@ -82,6 +86,7 @@ int main(int argc, char *argv[])
     pthread_join(threadDETECT_DEADLOCK, NULL);
     pthread_join(threadRECONNECT, NULL);
     pthread_join(threadSERVER, NULL);
+    pthread_join(threadMODO_DEFAULT, NULL);
     pthread_join(threadDETECT_DISCON, NULL);
 
     terminar_programa();

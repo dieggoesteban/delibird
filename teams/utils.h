@@ -100,4 +100,5 @@ uint32_t turnosHastaPokemon(t_pokemon_posicion* pokemon, t_entrenador* entrenado
 t_entrenador* cambiarPosicionEntrenador(t_entrenador* entrenador, uint32_t posX, uint32_t posY);
 void moverEntrenadorAPokemon(t_entrenador* entrenador);
 void actualizarPosicion(t_entrenador* entrenador);
+void defaultCaptura(t_entrenador* tr);
 #endif /* UTILS_H_ */

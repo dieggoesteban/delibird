@@ -135,7 +135,7 @@ void inicializarEntrenadores() {
 
 		t_list* objetivos = arrayToList((void*)string_split(objetivosEntrenadores[i],"|"));
 		t_list* pokemon = list_create();
-		if(pokemonEntrenadores[i]) {
+		if(pokemonEntrenadores[i] != NULL) {
 			pokemon = arrayToList((void*)string_split(pokemonEntrenadores[i],"|"));
 		}
 		char** coordenadas = string_split(posicionesEntrenadores[i],"|");
@@ -499,4 +499,21 @@ t_list* pokesQueSiQuiere(t_entrenador* tr, t_list* pokes) {
 		}
 	}
 	return digimons;
+}
+
+void defaultCaptura(t_entrenador* tr) {
+	if(tr->enEspera) {
+		tr->enEspera = false;
+		char* poke = malloc(strlen(tr->pokemonPlanificado->nombre)+1);
+		memcpy(poke, tr->pokemonPlanificado->nombre, strlen(tr->pokemonPlanificado->nombre)+1);
+		printf("MODO DEFAULT: El entrenador %i pudo capturar a %s\n", tr->id, poke);
+		list_add(tr->pokemonCapturados, poke);
+		tr->deadlock = entrenadorEnDeadlock(tr);
+		if(tr->deadlock) {
+			printf("El entrenador %i quedo en deadlock\n", tr->id);
+			sem_post(&mutexDetector);
+		}
+		tr->pokemonPlanificado = NULL;
+		list_add(colaBLOCKED,tr);
+	}
 }

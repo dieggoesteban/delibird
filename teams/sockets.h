@@ -21,9 +21,10 @@
 
 t_log* logger;
 t_config* config;
-pthread_t thread;
+
 char* IP;
 char* PUERTO;
+
 
 t_list* objetivoGlobal;
 t_list* pokemonesEnMapa;
@@ -32,6 +33,7 @@ t_suscribe* suscribeCaught;
 t_suscribe* suscribeAppeared;
 t_suscribe* suscribeLocalized;
 
+pthread_t thread;
 pthread_t threadSUSCRIBE_CAUGHT;
 pthread_t threadSUSCRIBE_APPEARED;
 pthread_t threadSUSCRIBE_LOCALIZED;
@@ -40,6 +42,7 @@ sem_t counterPokesEnMapa;
 sem_t counterEntrenadoresCatch;
 sem_t mutexPokesEnMapa;
 sem_t mutexReconnect;
+sem_t estaDesconectado;
 sem_t detectorDesconexion;
 
 uint32_t idModule;

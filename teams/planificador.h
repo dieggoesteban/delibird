@@ -35,6 +35,7 @@ sem_t counterEntrenadoresCatch;
 sem_t mutexEntrenadoresCatch;
 sem_t pokesObjetivoGlobal;
 sem_t mutexDetector;
+sem_t estaDesconectado;
 
 t_list* objetivoGlobal;
 t_list* pokemonesEnMapa; // lucario pikachu pikachu pikachu squirtle
@@ -59,5 +60,6 @@ t_entrenador_posicion* getIntercambio(t_entrenador* tr1, t_entrenador* tr2);
 void* planificadorREADY();
 void* planificadorEXEC(void*);
 void* detectorDeIntercambio();
+void* modoDesconectado();
 
 #endif /* PLANIFICADOR_H_ */
