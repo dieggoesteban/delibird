@@ -190,6 +190,9 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd)
 
 			uint32_t indexSem;
 
+			// char* pathFilesPokemon = string_duplicate(pathFiles);
+    		// string_append(&pathFilesPokemon,newPoke->nombre);
+
 
 			pthread_mutex_lock(&mutexListaSemsNew);
 			indexSem = getIndexSemaforo(newPoke->nombre, semaforosPokemon);
@@ -198,6 +201,7 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd)
 			 	t_semaforo_pokemon* semPoke = crearSemaforoPokemon(newPoke->nombre);
 				indexSem = list_add(semaforosPokemon,semPoke);
 			}
+
 			
 			t_newPokemon_indexSem* newPokeSem = crearNewPokemonIndexSem(indexSem, newPoke);
 			pthread_mutex_unlock(&mutexListaSemsNew);

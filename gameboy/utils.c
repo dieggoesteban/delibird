@@ -1,15 +1,14 @@
 
 #include "utils.h"
 
-void cortarArgumentos(int lengthArray, char *argumentos[], char *arrayTemp[])
-{
-	uint32_t j = 0;
+t_list* cortarArgumentos(int lengthArray, char *argumentos[])
+{	t_list* lista = list_create();
 
 	for (uint32_t i = 3; i < lengthArray; i++)
 	{
-		arrayTemp[j] = argumentos[i];
-		j++;
+		list_add(lista,argumentos[i]);
 	}
+	return lista;
 }
 
 uint32_t getColaDeMensajes(char* queue) {
@@ -95,6 +94,14 @@ uint32_t perteneceAlArray(char *val, char *arr[], uint32_t size)
 }
 
 uint32_t arraySize(void* arr[]) {
+	uint32_t size = 0;
+	while(arr[size] != NULL) {
+		size++;
+	}
+	return size;
+}
+
+uint32_t arraySizeChar(char* arr[]) {
 	uint32_t size = 0;
 	while(arr[size] != NULL) {
 		size++;

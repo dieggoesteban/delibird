@@ -17,7 +17,7 @@
 // void liberar_conexion(int socket_cliente);
 
 //PAQUETES
-t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje);
+t_paquete* getPaquete(t_list* listaArgumentos, char* tipo_mensaje);
 void liberarPaquete(t_paquete* paquete);
 void* serializar_paquete(t_paquete* paquete, int bytes);
 

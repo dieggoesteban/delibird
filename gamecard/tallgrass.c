@@ -627,7 +627,7 @@ void* atenderNewPokemon(void* newPokemonParam){
         // pthread_mutex_unlock(&mutexEstaOpen);
 
         if(estaOpenBool){
-            reintentandoOperacion(pathFilesPokemon);
+            reintentandoOperacion(newPokeSem->newPokemon->nombre);
         }
         log_info(logger,"el index de la lista de semaforos en el else: %i",newPokeSem->indexSemaforo);
         waitSemYModificacionOpen(newPokeSem->indexSemaforo, pathMetadataPoke);

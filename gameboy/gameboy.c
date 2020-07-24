@@ -22,8 +22,7 @@ int main(int argc, char *argv[])
         char *tipo_mensaje = argv[2];
         char *ip;
         char *puerto;
-        char *arrayArgumentos[argc - 3];
-        cortarArgumentos(argc, argv, arrayArgumentos);
+        t_list* listaArgumentos = cortarArgumentos(argc, argv);
         uint32_t isValid = procesarComando(&ip, &puerto, proceso, tipo_mensaje);
 
         if (isValid == 1)
@@ -44,7 +43,7 @@ int main(int argc, char *argv[])
             }
             else
             {
-                paquete = getPaquete(arrayArgumentos, tipo_mensaje);
+                paquete = getPaquete(listaArgumentos, tipo_mensaje);
                 enviarMensaje(paquete, conexion);
                 
                 //serve_client(&conexion);
