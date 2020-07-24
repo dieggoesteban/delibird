@@ -326,11 +326,21 @@ bool entrenadorLlegoASuDestino(void* entrenador) {
 	return llegoAPoke || llegoAEntrenador;
 }
 
-void moverEntrenadorAPokemon(t_entrenador* entrenador){ 
+void moverEntrenador(t_entrenador* entrenador){ 
     uint32_t entrenadorPosX = entrenador->posicion->posicion_x;
     uint32_t entrenadorPosY = entrenador->posicion->posicion_y; 
-    uint32_t pokePosX = entrenador->pokemonPlanificado->posicion->posicion_x;
-    uint32_t pokePosY = entrenador->pokemonPlanificado->posicion->posicion_y;
+	
+	uint32_t pokePosX; 
+    uint32_t pokePosY; 
+    
+	if(entrenador->entrenadorPlanificado != NULL){
+		pokePosX = entrenador->entrenadorPlanificado->posicion->posicion_x;
+		pokePosY = entrenador->entrenadorPlanificado->posicion->posicion_y;
+	}else if(entrenador->pokemonPlanificado != NULL){
+		pokePosX = entrenador->pokemonPlanificado->posicion->posicion_x;
+		pokePosY = entrenador->pokemonPlanificado->posicion->posicion_y;
+	}
+
 
     if((pokePosX - entrenadorPosX) == 0){
         if(pokePosY > entrenadorPosY)
@@ -339,7 +349,7 @@ void moverEntrenadorAPokemon(t_entrenador* entrenador){
             entrenador = cambiarPosicionEntrenador(entrenador, entrenadorPosX, entrenadorPosY-1);
     }
     else {
-        if(entrenador->pokemonPlanificado->posicion->posicion_x > entrenadorPosX)
+        if(pokePosX > entrenadorPosX)
             entrenador = cambiarPosicionEntrenador(entrenador, entrenadorPosX+1, entrenadorPosY);
         else
             entrenador = cambiarPosicionEntrenador(entrenador, entrenadorPosX-1, entrenadorPosY);
@@ -480,12 +490,37 @@ void procesarMensajeCaught(t_caught_pokemon* caughtPoke) {
 	}
 }
 
+t_list* obtenerCantPokes(t_list* lista){
+	t_list* lista2 = list_create();
+	t_list* listAux = list_create();
+	for(int i = 0; i < list_size(lista); i++){
+		char* poke = (char*)list_get(lista,i);
+		if(!perteneceALista(poke, listAux)){
+			uint32_t cantidad = perteneceAListaContador(poke, lista);
+			list_add(lista2, setPokemonCantidad(poke,cantidad));
+			list_add(listAux, poke);
+		}
+	}
+	list_destroy(listAux);
+	return lista2;
+}
+
+
 t_list* pokesQueNoQuiere(t_entrenador* tr) {
 	t_list* mangaDeKokemones = list_create();
+	t_list* pokesCapturados = obtenerCantPokes(tr->pokemonCapturados);
 	printf("SIZE DE POKES CAPTURADOS POR ENTRENADOR: %i\n", list_size(tr->pokemonCapturados));
-	for(uint32_t i = 0; i < list_size(tr->pokemonCapturados); i++) {
-		if (!perteneceALista(list_get(tr->pokemonCapturados, i), tr->pokemonObjetivo)) {
-			list_add(mangaDeKokemones, list_get(tr->pokemonCapturados, i));
+	for(uint32_t i = 0; i < list_size(pokesCapturados); i++) {
+		t_pokemon_cantidad* pokeCant = (t_pokemon_cantidad*)list_get(pokesCapturados,i);
+		uint32_t cantidad = perteneceAListaContador(pokeCant->nombre, tr->pokemonObjetivo);
+		if(cantidad < pokeCant->cantidad){
+			for(int j = 0; j < pokeCant->cantidad - cantidad; j++){
+				list_add(mangaDeKokemones,pokeCant->nombre);
+			}
+		}else if(cantidad == 0){
+			for(int s = 0; s < pokeCant->cantidad; s++){
+				list_add(mangaDeKokemones,pokeCant->nombre);
+			}
 		}
 	}
 	return mangaDeKokemones;
@@ -493,16 +528,19 @@ t_list* pokesQueNoQuiere(t_entrenador* tr) {
 
 t_list* pokesQueSiQuiere(t_entrenador* tr, t_list* pokes) {
 	t_list* digimons = list_create();
-	for(uint32_t i = 0; i < list_size(tr->pokemonCapturados); i++) {
-		if (perteneceALista(list_get(tr->pokemonCapturados, i), pokes)) {
-			list_add(digimons, list_get(tr->pokemonCapturados, i));
+	for(uint32_t i = 0; i < list_size(tr->pokemonObjetivo); i++) {
+		if (perteneceALista((char*)list_get(tr->pokemonObjetivo, i), pokes)) {
+			list_add(digimons, list_get(tr->pokemonObjetivo, i));
 		}
 	}
 	return digimons;
 }
 
-void defaultCaptura(t_entrenador* tr) {
-	if(tr->enEspera) {
+void defaultCaptura(uint32_t index) {
+	t_entrenador* tr = (t_entrenador*)list_get(colaBLOCKED,index);
+
+	if(tr->enEspera && !tr->deadlock) {
+		list_remove(colaBLOCKED,index);
 		tr->enEspera = false;
 		char* poke = malloc(strlen(tr->pokemonPlanificado->nombre)+1);
 		memcpy(poke, tr->pokemonPlanificado->nombre, strlen(tr->pokemonPlanificado->nombre)+1);
