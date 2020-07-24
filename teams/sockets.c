@@ -17,6 +17,13 @@ int crear_conexion(char *ip, char* puerto) {
 			server_info->ai_socktype, server_info->ai_protocol);
 
 	if (connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen) == -1) {
+		int valorSem;
+		if (sem_getvalue(&estaDesconectado, &valorSem) == 0){
+            if(valorSem == 0){
+				printf("Activando modo default \n");
+				sem_post(&estaDesconectado);
+            }
+        }
 		return ERROR;
 	}
 
@@ -36,6 +43,8 @@ void establecerConexionBroker() {
 
     if (suscribeAppeared->conexion != -1) {
         printf("Se establecio una conexion con el Broker :D\n");
+		printf("Desactivando modo default \n");
+		sem_wait(&estaDesconectado);
         mandarGET();
         if(pthread_create(&threadSUSCRIBE_CAUGHT,NULL,(void*)suscribe,(void*)suscribeCaught) != 0)
             printf("Error CAUGHT\n");
@@ -72,7 +81,8 @@ void detectarDesconexion() {
 		sem_wait(&detectorDesconexion);
 		sem_wait(&detectorDesconexion);
 		printf("Se desconecto el Broker :c\n");
-
+		printf("Activando modo default \n");
+		sem_post(&estaDesconectado);
 		sem_post(&mutexReconnect);
 	}
 }

@@ -171,13 +171,24 @@ t_entrenador_posicion* getIntercambio(t_entrenador* tr1, t_entrenador* tr2) {
     else return NULL;
 }
 
-//             quiere      -      no quiere
-
-//entrenador 1 pikachu     -      charmander
-
-//entrenador 2 charmander  -      bulbasaur
-
-//entrenador 3 bulbasaur   -      pikachu      -   
+void* modoDesconectado() {
+    int valorSem;
+    while(1) {
+        if (sem_getvalue(&estaDesconectado, &valorSem) == 0){
+            if(valorSem > 0){
+                sem_wait(&mutexBLOCKED);
+                if(list_size(colaBLOCKED) > 0) {
+                    printf("Entre porque me odio\n");
+                    for(uint32_t i = 0; i < list_size(colaBLOCKED); i++) {
+                        t_entrenador* tr = (t_entrenador*)list_get(colaBLOCKED,i);
+                        defaultCaptura(tr);
+                    }
+                }
+                sem_post(&mutexBLOCKED);
+            }
+        }
+    }
+}
 
 void* planificadorBLOCKED() {
     printf("Hilo BLOCKED ejecutando\n");
