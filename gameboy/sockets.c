@@ -45,7 +45,7 @@ void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente) {
 void modoSuscriptor(void* arg) {
 	suscribe = (t_suscribe_gameboy*) arg;
 	t_register_module* registerModule = crearSuscribe(suscribe->messageQueue, ID_MODULE); //TODO: Tomar del config
-	t_paquete *paquete = serializar_registerModule(registerModule);
+	t_paquete *paquete = serializar_registerModule(registerModule, SUBSCRIBE);
 
 	free(registerModule);
     enviarMensaje(paquete, suscribe->conexion);
@@ -58,11 +58,6 @@ void modoSuscriptor(void* arg) {
 void temporizador (void* tiempo) {
 	uint32_t temp = (uint32_t) tiempo;
 	sleep(temp);
-	if(shutdown(suscribe->conexion, 2) == -1)
-	{
-		printf("Shutdown error: %s\n", strerror(errno));		
-	}
-	close(suscribe->conexion);
 	pthread_exit(&hiloSuscriptor);
 }
 

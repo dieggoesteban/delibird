@@ -888,15 +888,15 @@ uint64_t getTimestamp()
 
 void freeCacheMessage(cache_message* cacheMessage)
 {
-    list_destroy_and_destroy_elements(cacheMessage->suscriptoresConfirmados, free);
-    list_destroy_and_destroy_elements(cacheMessage->suscriptoresEnviados, free);
+    list_destroy(cacheMessage->suscriptoresConfirmados);
+    list_destroy(cacheMessage->suscriptoresEnviados);
     free(cacheMessage);
 }
 
 void freeCacheSystem()
 {
-    list_destroy_and_destroy_elements(partitions, free);
-    list_destroy_and_destroy_elements(holes, free);
+    list_destroy(partitions);
+    list_destroy(holes);
     list_destroy_and_destroy_elements(metadatas, (void*)freeCacheMessage);
     free(cache);
 }

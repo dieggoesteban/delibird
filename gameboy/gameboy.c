@@ -39,6 +39,14 @@ int main(int argc, char *argv[])
                 pthread_create(&hiloTemporizador, NULL, (void*)temporizador, (void*)temp);
                 pthread_detach(hiloSuscriptor);
                 pthread_join(hiloTemporizador, NULL);
+
+                t_register_module* unsubscribe = crearSuscribe(suscribe->messageQueue, ID_MODULE);
+                t_paquete* paquete = serializar_registerModule(unsubscribe, UNSUBSCRIBE);
+                free(unsubscribe);
+                enviarMensaje(paquete, crear_conexion(ip, puerto));
+                close(suscribe->conexion);
+                close(conexion);
+
                 log_info(logger, "Conexion con broker finalizada");
             }
             else

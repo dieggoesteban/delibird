@@ -22,6 +22,7 @@ typedef enum
     SUBSCRIBE = 7,
 	MENSAJE_RECIBIDO = 8,
 	ACKNOWLEDGEMENT = 9,
+	UNSUBSCRIBE = 11
 } operation_cod;
 
 typedef struct {

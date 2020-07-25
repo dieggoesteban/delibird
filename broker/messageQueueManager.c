@@ -104,6 +104,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 	{
 		case SUBSCRIBE:
 		{
+			log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
 			t_register_module* registerModule = deserializar_registerModule(buffer);
 			subscribeNewModule(registerModule->moduleId, socket_cliente, registerModule->messageQueue);
 			free(registerModule);
@@ -125,6 +126,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 		}
 		case NEW_POKEMON:
 		{
+			log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
 			t_message_queue* messageQueue = getMessageQueueById(operation_cod);
 			t_new_pokemon* newPoke = deserializar_newPokemon(buffer);
 			t_message* message = crearMessage();
@@ -143,6 +145,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 		}
 		case APPEARED_POKEMON:
 		{
+			log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
 			t_message_queue* messageQueue = getMessageQueueById(operation_cod);
 			t_appeared_pokemon* appearedPoke = deserializar_appearedPokemon(buffer);
 			t_message* message = crearMessage(appearedPoke, APPEARED_POKEMON);
@@ -161,6 +164,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 		}
 		case GET_POKEMON:
 		{
+			log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
 			t_message_queue* messageQueue = getMessageQueueById(operation_cod);
 			t_get_pokemon* getPoke = deserializar_getPokemon(buffer);
 			t_message* message = crearMessage(getPoke, GET_POKEMON);
@@ -179,6 +183,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 		}
 		case CAUGHT_POKEMON:
 		{
+			log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
 			t_message_queue* messageQueue = getMessageQueueById(operation_cod);
 			t_caught_pokemon* caughtPoke = deserializar_caughtPokemon(buffer);
 			t_message* message = crearMessage(caughtPoke, CAUGHT_POKEMON);
@@ -197,6 +202,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 		}
 		case LOCALIZED_POKEMON:
 		{
+			log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
 			t_message_queue* messageQueue = getMessageQueueById(operation_cod);
 			t_localized_pokemon* localizedPoke = deserializar_localizedPokemon(buffer);
 			t_message* message = crearMessage(localizedPoke, LOCALIZED_POKEMON);
@@ -215,6 +221,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 		}
 		case CATCH_POKEMON:
 		{
+			log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
 			t_message_queue* messageQueue = getMessageQueueById(operation_cod);
 			t_catch_pokemon* catchPoke = deserializar_catchPokemon(buffer);
 			t_message* message = crearMessage(catchPoke, CATCH_POKEMON);
@@ -330,9 +337,11 @@ void unsubscribeModule(uint32_t idNewModule, uint32_t socket_cliente, uint32_t m
 	foundSuscripcion = (t_suscripcion*)list_find(messageQueue->subscribers, (void*)_is_the_registration);
 
 	if(foundSuscripcion == NULL)
+	{
+		log_debug(broker_custom_logger, "founSuscription not found");
 		return;
+	}
 	
-	pthread_mutex_lock(&messageQueue->s_subscribers);
 	pthread_mutex_lock(&messageQueue->s_mensajes);
 	t_suscripcion* targetSuscription;
 	for(uint32_t i = 0; i < list_size(messageQueue->subscribers); i++)
@@ -340,10 +349,10 @@ void unsubscribeModule(uint32_t idNewModule, uint32_t socket_cliente, uint32_t m
 		targetSuscription = (t_suscripcion*)list_get(messageQueue->subscribers, i);
 		if(targetSuscription->idModule == foundSuscripcion->idModule)
 		{
-			shutdown(targetSuscription->socket, 2);
-			close(targetSuscription->socket);
 			log_debug(broker_custom_logger, "Se ha desuscripto el modulo id %i con el socket %i de la cola %s", 
 				targetSuscription->idModule, targetSuscription->socket, messageQueue->name);
+			shutdown(targetSuscription->socket, 2);
+			close(targetSuscription->socket);
 			list_remove(messageQueue->subscribers, i);
 			break;
 		}
@@ -531,8 +540,8 @@ uint32_t asignarMessageId()
 //Cleaning
 void freeMessage(t_message* message) 
 {
-	list_destroy_and_destroy_elements(message->suscriptoresEnviados, free);
-	list_destroy_and_destroy_elements(message->suscriptoresConfirmados, free);
+	list_destroy(message->suscriptoresEnviados);
+	list_destroy(message->suscriptoresConfirmados);
 	free(message->mensaje);
 	free(message);
 }
@@ -540,6 +549,6 @@ void freeMessage(t_message* message)
 void freeMessageQueue(t_message_queue* messageQueue)
 {
 	list_destroy_and_destroy_elements(messageQueue->mensajes, (void*)freeMessage);
-	list_destroy_and_destroy_elements(messageQueue->subscribers, free);
+	list_destroy(messageQueue->subscribers);
 	free(messageQueue);
 }
