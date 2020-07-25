@@ -349,69 +349,62 @@ t_holes* reemplazo_fifo(uint32_t bytes)
 
 t_holes* reemplazo_lru(uint32_t bytes)
 { 
-    uint32_t bytesToAlloc = 0;
-    if(bytes > TAMANO_MINIMO_PARTICION)
-        bytesToAlloc = bytes;
-    else
-        bytesToAlloc = TAMANO_MINIMO_PARTICION;
+    t_partition* targetLruPartition = NULL;
 
-    t_partition* targetLRU_Partition = NULL;
-
-    t_list* tempPartitionsList = list_duplicate(partitions);
-    uint32_t _lastUse_menor_a_mayor (t_partition* partition1, t_partition* partition2) {
+    //Se crea una copia para ordenarla por fifo
+    pthread_mutex_lock(&s_partitions);
+        t_list* tempPartitionsList = list_duplicate(partitions);
+    pthread_mutex_unlock(&s_partitions);
+    uint32_t _lru_menor_a_mayor (t_partition* partition1, t_partition* partition2) {
         return partition1->lastUse < partition2->lastUse;
     }
-    list_sort(tempPartitionsList, (void*)_lastUse_menor_a_mayor);
+    list_sort(tempPartitionsList, (void*)_lru_menor_a_mayor);
 
-    while (targetLRU_Partition == NULL || targetLRU_Partition->length < bytesToAlloc)
-    {
-        if(list_size(tempPartitionsList) == 0)
-        {
-            log_warning(broker_custom_logger, "No hay particiones para reemplazar que satisfagan %d bytes", bytesToAlloc);
-            return NULL;
-        }
+    //Se toma el numero de fifo de la primera particion despues del orden
+    targetLruPartition = (t_partition*)list_get(tempPartitionsList, 0);
 
-        //Se toma el numero de fifo de la primera particion despues del orden
-        t_partition* targetLRU_Partition = (t_partition*)list_get(tempPartitionsList, 0);
-        if(targetLRU_Partition->length < bytesToAlloc)
-        {
-            list_remove(tempPartitionsList, 0);
-            continue;
-        }
-        uint32_t fifoToDelete = targetLRU_Partition->fifoPosition; //Podemos usar su valor de fifo para ubicarlo
-        free(targetLRU_Partition);
-
-        //Se ubica a la victima en la lista original y se crea el nuevo hueco con sus datos
-        uint32_t _is_the_one_with_fifo_number(t_partition* partition) {
-            return partition->fifoPosition == fifoToDelete;
-        }
-
-        pthread_mutex_lock(&s_partitions);
-            t_partition* victim = (t_partition*)list_find(partitions, (void*)_is_the_one_with_fifo_number);
-        pthread_mutex_unlock(&s_partitions);
-
-        if(victim == NULL) {
-            log_error(broker_custom_logger, "No se encontro particion victima");
-            exit(1);
-        }
-        t_holes* newFreeSpace = createHole(victim->pStart, victim->length);
-        
-        //Se elimina de la lista de particiones
-        t_partition* currentPartition;
-        pthread_mutex_lock(&s_partitions);
-        for(uint32_t i = 0; i < list_size(partitions); i++)
-            {
-                currentPartition = list_get(partitions, i);
-                if(currentPartition->fifoPosition == victim->fifoPosition)
-                {
-                    list_remove(partitions, i);
-                    break;
-                }
-            }
-        pthread_mutex_unlock(&s_partitions);
-        return newFreeSpace;
+    if(targetLruPartition == NULL) {
+        log_error(broker_custom_logger, "Target Fifo Partition es NULL");
+        exit(1);
     }
-    return NULL;
+
+    uint32_t fifoToDelete = targetLruPartition->fifoPosition;
+
+    free(targetLruPartition);
+
+    //Se ubica a la victima en la lista original y se crea el nuevo hueco con sus datos
+    uint32_t _is_the_one_with_fifo_number(t_partition* partition) {
+        return partition->fifoPosition == fifoToDelete;
+    }
+
+    pthread_mutex_lock(&s_partitions);
+        t_partition* victim = (t_partition*)list_find(partitions, (void*)_is_the_one_with_fifo_number);
+    pthread_mutex_unlock(&s_partitions);
+
+    if(victim == NULL) {
+        log_error(broker_custom_logger, "No se encontro particion victima");
+        exit(1);
+    }
+    t_holes* newFreeSpace = createHole(victim->pStart, victim->length);
+    
+    //Se elimina de la lista de particiones
+    t_partition* currentPartition;
+    pthread_mutex_lock(&s_partitions);
+    for(uint32_t i = 0; i < list_size(partitions); i++)
+        {
+            currentPartition = list_get(partitions, i);
+            if(currentPartition->fifoPosition == victim->fifoPosition)
+            {
+                list_remove(partitions, i);
+                break;
+            }
+        }
+    list_destroy(tempPartitionsList);
+    pthread_mutex_unlock(&s_partitions);
+    pthread_mutex_lock(&s_holes);
+        list_add(holes, (void*)newFreeSpace);
+    pthread_mutex_unlock(&s_holes);
+    return newFreeSpace;
 }
 
 void reallocPartition(t_partition* previousPartition, t_partition* newAllocatedPartition)
@@ -712,8 +705,7 @@ t_holes* particionLibre_ff(uint32_t bytes)
                 list_add(holes, (void*)splittedHole);
                 result = createHole(currentHole->pStart, bytesToAlloc);
                 t_holes* holeToDelete = list_remove(holes, i);
-                free(holeToDelete);
-                //list_sort(holes, (void*)mem_address_menor_a_mayor);
+                free(holeToDelete);                
                 break;
             }
             else if (currentHole->length == bytesToAlloc)
@@ -738,29 +730,48 @@ t_holes* particionLibre_bf(uint32_t bytes)
     else
         bytesToAlloc = TAMANO_MINIMO_PARTICION;
 
-    void* result = NULL;
-    t_holes* currentHole;
-    t_holes* bestHole;
-
+    t_holes* result = NULL;
+    t_holes* currentHole = NULL;
+    t_holes* bestHole = NULL;
+    uint32_t indexOfBestHole = -1;
     pthread_mutex_lock(&s_holes);
-        for(uint32_t i = 0; i < list_size(holes); i++)
+        for(int i = 0; i < list_size(holes); i++)
         {
             currentHole = list_get(holes, i);
             if(bestHole == NULL && currentHole->length >= bytesToAlloc)
+            {
                 bestHole = currentHole;
+                indexOfBestHole = i;
+            }
             else if (currentHole->length >= bytesToAlloc && currentHole->length < bestHole->length)
             {
                 bestHole = currentHole;
-                if(bestHole->length == bytesToAlloc)
+                indexOfBestHole = i;
+                if(bestHole->length == bytesToAlloc) //Si justo tiene el tamaño justo no hay que buscar mas
                     break;
-            }      
+            } 
+        }
+
+        if(bestHole->length == bytesToAlloc) //No hace falta dividir el hueco
+        {
+            result = createHole(currentHole->pStart, bytesToAlloc);
+            t_holes* holeToDelete = list_remove(holes, indexOfBestHole);
+            free(holeToDelete);
+        }
+        else
+        {
+            //Hacer el split
+            t_holes* splittedHole = createHole(currentHole->pStart + bytesToAlloc, (currentHole->length - bytesToAlloc));
+            list_add(holes, (void*)splittedHole);
+            result = createHole(currentHole->pStart, bytesToAlloc);
+            t_holes* holeToDelete = list_remove(holes, indexOfBestHole);
+            free(holeToDelete);
+            list_sort(holes, (void*)mem_address_menor_a_mayor);
         }
     pthread_mutex_unlock(&s_holes);
-
-    result = bestHole;
+    
     return result;
 }
-
 
 //AUX Methods
 t_holes* createHole(void* startAddress, uint32_t length)
@@ -842,9 +853,7 @@ uint32_t existHolesBetweenPartitions()
 
 uint64_t getTimestamp()
 {
-    struct timeval valor;
-    gettimeofday(&valor, NULL);
-    unsigned long long result = (((unsigned long long )valor.tv_sec) * 1000 + ((unsigned long) valor.tv_usec));
-    uint64_t tiempo = result;
-    return tiempo;
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return 1000000 * tv.tv_sec + tv.tv_usec;
 }
