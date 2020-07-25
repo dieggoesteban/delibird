@@ -63,6 +63,7 @@ t_list* colaEXEC;
 t_list* colaBLOCKED;
 t_list* colaEXIT;
 t_list* entrenadoresCatch;
+t_list* trIds;
 
 //UTILIDADES ARRAYS/LISTS/QUEUE
 uint32_t arraySize(void* arr[]);
@@ -107,4 +108,6 @@ void moverEntrenador(t_entrenador* entrenador);
 void pasosParaIntercambio(t_entrenador* entrenador);
 void actualizarPosicion(t_entrenador* entrenador);
 void defaultCaptura(uint32_t index);
+uint32_t getEstimacion(uint32_t estReal, uint32_t estAnterior);
+uint32_t getTiempoReal(t_entrenador* tr);
 #endif /* UTILS_H_ */

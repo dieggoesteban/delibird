@@ -152,6 +152,7 @@ typedef struct
     t_list* pokemonCapturados;
     t_list* pokemonObjetivo;
     uint32_t cantidadObjetivo;
+	uint32_t estimacionAnterior;
     t_pokemon_posicion* pokemonPlanificado;
 	t_entrenador_posicion* entrenadorPlanificado;
 	bool enEspera;

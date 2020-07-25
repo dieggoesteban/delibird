@@ -37,6 +37,7 @@ sem_t pokesObjetivoGlobal;
 sem_t mutexDetector;
 sem_t mutexEXIT;
 sem_t estaDesconectado;
+sem_t waitForFinish;
 
 t_list* objetivoGlobal;
 t_list* pokemonesEnMapa; // lucario pikachu pikachu pikachu squirtle
