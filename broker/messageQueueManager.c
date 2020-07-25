@@ -177,7 +177,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 			t_message* message = crearMessage(caughtPoke, CAUGHT_POKEMON);
 
 			message->id = asignarMessageId();
-			message->idCorrelativo = 0;
+			message->idCorrelativo = caughtPoke->ID_mensaje_original;
 			message->mq_cod = CAUGHT_POKEMON;
 			caughtPoke->ID_mensaje_recibido = message->id;
 			message->mensaje = caughtPoke;
@@ -195,7 +195,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 			t_message* message = crearMessage(localizedPoke, LOCALIZED_POKEMON);
 
 			message->id = asignarMessageId();
-			message->idCorrelativo = 0;
+			message->idCorrelativo = localizedPoke->ID_mensaje_original;
 			message->mq_cod = LOCALIZED_POKEMON;
 			localizedPoke->ID_mensaje_recibido = message->id;
 			message->mensaje = localizedPoke;

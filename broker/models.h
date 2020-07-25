@@ -202,8 +202,8 @@ typedef struct {
 typedef struct {
 	uint32_t nameLength;
 	char* pokeName;
-	uint32_t cantidadPos;
-	uint32_t* posiciones;
+	uint32_t cantParesCoords; 
+	void* posiciones;
 } cache_localized_pokemon;
 
 typedef struct {

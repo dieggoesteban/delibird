@@ -187,20 +187,44 @@ cache_get_pokemon* deserializar_cacheGetPokemon(t_cache_buffer* buffer)
 	return getPokemon;
 }
 
-t_cache_buffer* serializar_cacheLocalizedPokemon(cache_localized_pokemon* localizedPokemon)
+t_cache_buffer* serializar_cacheLocalizedPokemon(cache_localized_pokemon* localizedPokemon, t_list* posiciones)
 {
     t_cache_buffer* localizedPokemon_buffer = malloc(sizeof(t_cache_buffer));
-    // getPokemon_buffer->size = (sizeof(uint32_t) + (getPokemon->nameLength));
+    localizedPokemon_buffer->size = 
+        (sizeof(uint32_t) * 2 + localizedPokemon->cantParesCoords * sizeof(uint32_t) * 2  + (localizedPokemon->nameLength));
 
-    // void* stream = malloc(getPokemon_buffer->size);
-    // uint32_t offset = 0;
+    void* stream = malloc(localizedPokemon_buffer->size);
+    uint32_t offset = 0;
 
-    // memcpy(stream + offset, &getPokemon->nameLength, sizeof(uint32_t));
-    // offset += sizeof(uint32_t);
-    // memcpy(stream + offset, getPokemon->pokeName, getPokemon->nameLength);
-    // offset += getPokemon->nameLength;
+    t_posicion* posicion;
 
-    //localizedPokemon_buffer->stream = stream;
+    localizedPokemon->posiciones = malloc(localizedPokemon->cantParesCoords * sizeof(uint32_t) * 2);
+    for(uint32_t i = 0; i < list_size(posiciones); i++)
+    {
+        posicion = (t_posicion*)list_get(posiciones, i);
+        memcpy(localizedPokemon->posiciones + offset, &posicion->posicion_x,  sizeof(uint32_t));
+        offset += sizeof(uint32_t); //x
+        memcpy(localizedPokemon->posiciones + offset, &posicion->posicion_y,  sizeof(uint32_t));
+        offset += sizeof(uint32_t); //y
+    }
+
+    offset = 0;
+
+    memcpy(stream + offset, &localizedPokemon->nameLength, sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+    memcpy(stream + offset, &localizedPokemon->cantParesCoords, sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+    for(uint32_t i = 0; i < localizedPokemon->cantParesCoords; i++)
+    {
+        memcpy(stream + offset, &localizedPokemon->posiciones, sizeof(uint32_t)); //Pos X
+        offset += sizeof(uint32_t);
+        memcpy(stream + offset, &localizedPokemon->posiciones, sizeof(uint32_t)); //Pos Y
+        offset += sizeof(uint32_t);
+    }
+    memcpy(stream + offset, localizedPokemon->pokeName, localizedPokemon->nameLength);
+    offset += localizedPokemon->nameLength;
+
+    localizedPokemon_buffer->stream = stream;
 
 	return localizedPokemon_buffer;
 }
@@ -208,13 +232,25 @@ cache_localized_pokemon* deserializar_cacheLocalizedPokemon(t_cache_buffer* buff
 {
     cache_localized_pokemon* localizedPokemon = (cache_localized_pokemon*)malloc(sizeof(cache_localized_pokemon));
 
-	//void* stream = buffer->stream;
-	// memcpy(&(getPokemon->nameLength), stream, sizeof(uint32_t));
-	// stream += sizeof(uint32_t);
-	// getPokemon->pokeName = malloc(getPokemon->nameLength + 1);
-	// memcpy(getPokemon->pokeName, stream, getPokemon->nameLength + 1);
-	// stream += getPokemon->nameLength + 1;
-    // string_append(&getPokemon->pokeName, "\0");
+    void* stream = buffer->stream;
+
+	memcpy(&(localizedPokemon->nameLength), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
+    memcpy(&(localizedPokemon->cantParesCoords), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
+
+    localizedPokemon->posiciones = malloc(localizedPokemon->cantParesCoords * sizeof(uint32_t) * 2);
+    for(uint32_t i = 0; i < localizedPokemon->cantParesCoords; i++)
+    {
+        memcpy(&localizedPokemon->posiciones, stream, sizeof(uint32_t)); //Pos X
+        stream += sizeof(uint32_t);
+        memcpy(&localizedPokemon->posiciones, stream, sizeof(uint32_t)); //Pos Y
+        stream += sizeof(uint32_t);
+    }
+	localizedPokemon->pokeName = malloc(localizedPokemon->nameLength + 1);
+	memcpy(localizedPokemon->pokeName, stream, localizedPokemon->nameLength);
+	stream += localizedPokemon->nameLength + 1;
+    strcpy(localizedPokemon->pokeName + localizedPokemon->nameLength, "\0");
 
 	return localizedPokemon;
 }
@@ -248,4 +284,25 @@ t_get_pokemon* getPokemon_cacheToMessage(cache_get_pokemon* cacheGetPokemon, cac
     t_get_pokemon* getPokemon = crearGetPokemon(metadata->idMessage, cacheGetPokemon->pokeName);
     return getPokemon;
 }
-//t_localized_pokemon* localizedPokemon_cacheToMessage(cache_localized_pokemon* cacheLocalizedPokemon, cache_message* metadata);
+t_localized_pokemon* localizedPokemon_cacheToMessage(cache_localized_pokemon* cacheLocalizedPokemon, cache_message* metadata)
+{
+    t_list* posiciones = list_create();
+    uint32_t offset = 0;
+    for (uint32_t i = 0; i < cacheLocalizedPokemon->cantParesCoords; i++)
+    {
+        t_posicion* posicion;
+        uint32_t x;
+        uint32_t y;
+        memcpy(&x, cacheLocalizedPokemon->posiciones + offset, sizeof(uint32_t));
+        offset += sizeof(uint32_t); //x
+        memcpy(&y, cacheLocalizedPokemon->posiciones + offset, sizeof(uint32_t));
+        offset += sizeof(uint32_t); //y
+        posicion = crearPosicion(x, y);
+        list_add(posiciones, (void*)posicion);
+    }
+    t_localized_pokemon* localizedPokemon = 
+        crearLocalizedPokemon(metadata->idMessage, metadata->idCorrelational, 
+        cacheLocalizedPokemon->pokeName, 
+        cacheLocalizedPokemon->cantParesCoords, posiciones);
+    return localizedPokemon;
+}

@@ -175,23 +175,23 @@ void memoria_particiones(t_message* message)
         }
         case LOCALIZED_POKEMON: 
         {
-            // t_localized_pokemon* localizedPoke = (t_localized_pokemon*)message->mensaje;
-            // cache_localized_pokemon cache_localizedPoke;
+            t_localized_pokemon* localizedPoke = (t_localized_pokemon*)message->mensaje;
+            cache_localized_pokemon cache_localizedPoke;
 
-            // cache_localizedPoke.nameLength = localizedPoke->sizeNombre;
-            // cache_localizedPoke.pokeName = malloc(localizedPoke->sizeNombre);
-            // cache_localizedPoke.posiciones = localizedPoke->cantidadPosiciones;
-
-            // memcpy(cache_localizedPoke.pokeName, localizedPoke->nombre, localizedPoke->sizeNombre);
+            cache_localizedPoke.nameLength = localizedPoke->sizeNombre - 1;
+            cache_localizedPoke.pokeName = malloc(cache_localizedPoke.nameLength);
+            cache_localizedPoke.cantParesCoords = localizedPoke->cantidadPosiciones;
+            memcpy(cache_localizedPoke.pokeName, string_substring(localizedPoke->nombre, 0, cache_localizedPoke.nameLength), cache_localizedPoke.nameLength);
             
-            // administrative->idMessage = localizedPoke->ID_mensaje_recibido;
-            // administrative->mq_cod = LOCALIZED_POKEMON;
-            // administrative->length = (sizeof(uint32_t) * 3 + (cache_localizedPoke.nameLength - 1));
-            // administrative->suscriptoresEnviados = list_duplicate(message->suscriptoresEnviados);
-            // administrative->suscriptoresConfirmados = list_duplicate(message->suscriptoresConfirmados);
+            administrative->idMessage = localizedPoke->ID_mensaje_recibido;
+            administrative->idCorrelational = localizedPoke->ID_mensaje_original;
+            administrative->mq_cod = LOCALIZED_POKEMON;
+            administrative->suscriptoresEnviados = list_duplicate(message->suscriptoresEnviados);
+            administrative->suscriptoresConfirmados = list_duplicate(message->suscriptoresConfirmados);
             
-            // addressFromMessageToCopy = &localizedPoke;
-            // sizeOfMessage = administrative->length;
+            t_cache_buffer* buffer = serializar_cacheLocalizedPokemon(&cache_localizedPoke, localizedPoke->posiciones);
+            addressFromMessageToCopy = buffer;
+            administrative->length = buffer->size;
             break;
         }
         default:
@@ -521,9 +521,15 @@ void dispatchCachedMessages(t_cache_dispatch_info* dispatchInfo)
                 }
                 case LOCALIZED_POKEMON:
                 {
-                    // cache_localized_pokemon* cache_localizedPokemon = deserializar_localizedPokemon(buffer);
-                    // t_localized_pokemon* localizedPoke = localizedPokemon_cacheToMessage(cache_localizedPokemon, currentMetadata);
-                    // message->mensaje = localizedPoke;
+                    cache_localized_pokemon* cache_localizedPokemon = deserializar_cacheLocalizedPokemon(buffer);
+                    t_localized_pokemon* localizedPoke = localizedPokemon_cacheToMessage(cache_localizedPokemon, currentMetadata);
+                    log_debug(broker_custom_logger, "Nombre LOCALIZED: %s", localizedPoke->nombre);
+                    for (uint32_t i = 0; i < localizedPoke->cantidadPosiciones; i++)
+                    {
+                        log_debug(broker_custom_logger, "Pos X: %i", ((t_posicion*)list_get(localizedPoke->posiciones, i))->posicion_x);
+                        log_debug(broker_custom_logger, "Pos Y: %i", ((t_posicion*)list_get(localizedPoke->posiciones, i))->posicion_y);
+                    }
+                    message->mensaje = localizedPoke;
                     break;
                 }
                 default:

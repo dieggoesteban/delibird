@@ -316,13 +316,14 @@ t_caught_pokemon* deserializar_caughtPokemon(t_buffer* buffer) {
     return pokemon;
 }
 
-t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon) {
+t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon){
 	t_buffer* buffer = malloc(sizeof(t_buffer));
-	uint32_t sizeListaPos = sizeof(t_posicion)* localizedPokemon->cantidadPosiciones;
+	uint32_t sizeListaPos = sizeof(uint32_t) * localizedPokemon->cantidadPosiciones * 2;
 
-	buffer->size = sizeof(uint32_t)*3 //ID_mensaje_recibido + ID_mensaje_original + sizePokemon
-					+ strlen(localizedPokemon->nombre)+1 //nombre pokemon
-					+ sizeListaPos; // se le multiplica la cantidad de items de la lista por su size en bytes
+	buffer->size = sizeof(uint32_t)*4 //ID_mensaje_recibido + ID_mensaje_original + sizePokemon
+				+ strlen(localizedPokemon->nombre)+1 //nombre pokemon
+				+ sizeListaPos; // se le multiplica la cantidad de items de la lista por su size en bytes
+
 
 	void* stream = malloc(buffer->size);
 	int offset = 0;
@@ -337,19 +338,24 @@ t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon) {
 	offset += strlen(localizedPokemon->nombre)+1;
 	memcpy(stream + offset, &localizedPokemon->cantidadPosiciones, sizeof(uint32_t));
 	offset += sizeof(uint32_t);
-	memcpy(stream + offset, localizedPokemon->posiciones, sizeListaPos);
+	for(uint32_t i = 0; i < localizedPokemon->cantidadPosiciones; i++){
+		memcpy(stream + offset, &(((t_posicion*)list_get(localizedPokemon->posiciones,i))->posicion_x),sizeof(uint32_t)); //HABIA QUE VER SI ESTO NO GENERA PROBLEMAS COMO EL CHAR* QUE NO SE ENVIABA
+		offset += sizeof(uint32_t);
+		memcpy(stream + offset, &(((t_posicion*)list_get(localizedPokemon->posiciones,i))->posicion_y),sizeof(uint32_t));
+		offset += sizeof(uint32_t);
+	}
 
 	buffer->stream = stream;
 
 	t_paquete* paquete = crear_paquete(LOCALIZED_POKEMON, buffer->size, buffer->stream);
 
-	return paquete;		
+	return paquete;			
 }
-t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer) {
+
+t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer){
 	t_localized_pokemon* localizedPokemon = malloc(sizeof(t_localized_pokemon));
 	
 	void* stream = buffer->stream;
-	uint32_t sizeListaPos;
 
 	memcpy(&(localizedPokemon->ID_mensaje_recibido), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
@@ -362,9 +368,18 @@ t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer) {
 	stream += localizedPokemon->sizeNombre;
 	memcpy(&(localizedPokemon->cantidadPosiciones), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
-	sizeListaPos = sizeof(t_posicion)* localizedPokemon->cantidadPosiciones;
-	memcpy(localizedPokemon->posiciones, stream, sizeListaPos); //HABIA QUE VER SI ESTO NO GENERA PROBLEMAS COMO EL CHAR* QUE NO SE ENVIABA
-
+	localizedPokemon->posiciones = list_create();
+	for(uint32_t i = 0; i < localizedPokemon->cantidadPosiciones; i++){
+		uint32_t x;
+		uint32_t y;
+		memcpy(&(x), stream, sizeof(uint32_t));
+		stream += sizeof(uint32_t);
+		memcpy(&(y), stream, sizeof(uint32_t));
+		stream += sizeof(uint32_t);
+		t_posicion* posicion = crearPosicion(x,y);
+		list_add(localizedPokemon->posiciones, posicion);
+		
+	}
 	return localizedPokemon;
 }
 
@@ -461,6 +476,20 @@ t_caught_pokemon* crearCaughtPokemon(uint32_t IDMensajeRecibido, uint32_t IDMens
     caughtPokemon->catchStatus = catchStatus;
 
     return caughtPokemon;
+}
+
+t_localized_pokemon* crearLocalizedPokemon(uint32_t IDMensajeRecibido,uint32_t IDMensajeOriginal, char* nombre, uint32_t sizePosicion, t_list* posicion) {
+	t_localized_pokemon* localizedPokemon = malloc(sizeof(t_localized_pokemon));
+
+	localizedPokemon->ID_mensaje_recibido = IDMensajeRecibido;
+	localizedPokemon->ID_mensaje_original = IDMensajeOriginal;
+	localizedPokemon->sizeNombre = strlen(nombre)+1;
+	localizedPokemon->nombre = nombre;
+	localizedPokemon->cantidadPosiciones = sizePosicion;
+	localizedPokemon->posiciones = list_create();
+	list_add_all(localizedPokemon->posiciones, posicion);
+
+	return localizedPokemon;
 }
 
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant) {
