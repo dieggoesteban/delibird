@@ -260,7 +260,7 @@ void receiveAcknowledgement(t_acknowledgement* ack, uint32_t socket_cliente)
 
 			uint32_t countSuscriptoresEnviados = list_size(targetMessage->suscriptoresEnviados);
 			uint32_t countSuscriptoresConfirmados = list_size(targetMessage->suscriptoresConfirmados);		
-			log_info(broker_custom_logger, "Confirmados: %i/%i", countSuscriptoresConfirmados , countSuscriptoresEnviados);
+			log_info(broker_custom_logger, "Recibido ack del cliente id %i por el mensaje id %i", targetSuscriptor->idModule , targetMessage->id);
 			
 			if(countSuscriptoresEnviados == countSuscriptoresConfirmados && countSuscriptoresConfirmados == targetMessage->countSuscriptoresObjetivo)
 				sem_post(&targetMessage->s_puedeEliminarse);
@@ -378,7 +378,7 @@ void sendMessageFromQueue(t_message* message, t_suscripcion* suscriptor)
 		pthread_mutex_lock(&message->s_suscriptoresEnviados);
 			list_add(message->suscriptoresEnviados, suscriptor);
 		pthread_mutex_unlock(&message->s_suscriptoresEnviados);
-		log_info(broker_custom_logger, "Mensaje id %i enviado a suscriptor %i", message->id, suscriptor->socket);
+		log_info(logger, "Mensaje id %i enviado a suscriptor %i", message->id, suscriptor->socket);
 	}
 }
 
@@ -479,4 +479,20 @@ uint32_t asignarMessageId()
 	pthread_mutex_unlock(&s_counterMessageId);
 	
     return globalMessageCounterId;
+}
+
+//Cleaning
+void freeMessage(t_message* message) 
+{
+	list_destroy_and_destroy_elements(message->suscriptoresEnviados, free);
+	list_destroy_and_destroy_elements(message->suscriptoresConfirmados, free);
+	free(message->mensaje);
+	free(message);
+}
+
+void freeMessageQueue(t_message_queue* messageQueue)
+{
+	list_destroy_and_destroy_elements(messageQueue->mensajes, (void*)freeMessage);
+	list_destroy_and_destroy_elements(messageQueue->subscribers, free);
+	free(messageQueue);
 }

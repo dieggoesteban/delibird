@@ -43,3 +43,7 @@ uint32_t asignarMessageId();
 
 //Orden superior
 uint32_t message_found(t_message* message);
+
+//Cleaning
+void freeMessage(t_message* message);
+void freeMessageQueue(t_message_queue* messageQueue);

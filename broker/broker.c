@@ -72,15 +72,15 @@ void terminarPrograma()
     
     log_info(broker_custom_logger, "Finalizando broker...");
 
-    free(newPokemonMessageQueue);
-    free(appearedPokemonMessageQueue);
-    free(catchPokemonMessageQueue);
-    free(caughtPokemonMessageQueue);
-    free(getPokemonMessageQueue);
-    free(localizedPokemonMessageQueue);
-    free(cache);
-    log_info(broker_custom_logger, "Broker finalizado correctamente");
+    freeMessageQueue(newPokemonMessageQueue);
+    freeMessageQueue(appearedPokemonMessageQueue);
+    freeMessageQueue(catchPokemonMessageQueue);
+    freeMessageQueue(caughtPokemonMessageQueue);
+    freeMessageQueue(getPokemonMessageQueue);
+    freeMessageQueue(localizedPokemonMessageQueue);
+    freeCacheSystem();
 
+    log_info(broker_custom_logger, "Broker finalizado correctamente");
     config_destroy(config);
     log_destroy(logger);
     log_destroy(broker_custom_logger);

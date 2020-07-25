@@ -88,5 +88,8 @@ uint32_t existHolesBetweenPartitions();
 
 uint64_t getTimestamp();
 
-
+void freePartition(t_partition* partition);
+void freeHole(t_holes* hole);
+void freeCacheMessage(cache_message* cacheMessage);
+void freeCacheSystem();
 #endif /* CACHE_H_ */

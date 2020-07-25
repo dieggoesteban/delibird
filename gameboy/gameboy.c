@@ -7,11 +7,10 @@ t_config *config;
 
 int main(int argc, char *argv[])
 {   
-    srand(time(NULL));
-    ID_MODULE = rand() % 40;
     config = config_create("./assets/gameboy.config");
     logger = log_create("./assets/gameboy.log", "gameboy", true, LOG_LEVEL_INFO);
     gameboy_custom_logger = log_create("./assets/gameboy_custom.log", "gameboy", true, LOG_LEVEL_INFO);
+    ID_MODULE = (uint32_t)atoi(config_get_string_value(config, "ID_MODULO"));
 
     ipBroker = config_get_string_value(config, "IP_BROKER");
     puertoBroker = config_get_string_value(config, "PUERTO_BROKER");

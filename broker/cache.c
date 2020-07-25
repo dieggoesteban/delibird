@@ -202,7 +202,6 @@ void memoria_particiones(t_message* message)
     uint32_t partitionsSize;
     uint32_t acumFreeSpace = 0;
     t_holes* targetHole = algoritmo_particion_libre(addressFromMessageToCopy->size); //Me asegura que de ese hole puedo sacar la particion minima por config
-    
     if(targetHole != NULL)
         acumFreeSpace += targetHole->length;
     while(targetHole == NULL || acumFreeSpace < addressFromMessageToCopy->size)
@@ -220,9 +219,6 @@ void memoria_particiones(t_message* message)
                 if(targetHole != NULL)
                     acumFreeSpace += targetHole->length;
 
-                if(acumFreeSpace >= addressFromMessageToCopy->size)
-                    targetHole = algoritmo_particion_libre(addressFromMessageToCopy->size);
-                    
                 continue;
             }
         }
@@ -285,6 +281,7 @@ void writeData(cache_message* administrative, t_holes* targetHole, t_cache_buffe
         memcpy(administrative->startAddress, bufferMessage->stream, bufferMessage->size);
         free(bufferMessage);
     pthread_mutex_unlock(&s_cache);
+    log_info(logger, "Se ha guardado el mensaje id %i en la cache. Posicion de inicio: %p", administrative->idMessage, administrative->startAddress);
 }
 
 t_holes* reemplazo_fifo(uint32_t bytes)
@@ -579,10 +576,21 @@ void dump()
         //Si es una particion ocupada
         if(currentBlock->free == 'X')
         {
-            currentMetadata = (cache_message*)list_find(metadatas, (void*)_is_the_metadata);
-            printf("Particion %i:  %p - %p    [%c]    Size: %ib    LRU: %llu    COLA: %i   ID: %i\n", 
-                i+1, currentBlock->pStart, currentBlock->pLimit, currentBlock->free, currentBlock->length, currentBlock->lastUse
-                , currentMetadata->mq_cod, currentMetadata->idMessage);
+            //Es igual pero le pone un espacio para acomodar columnas
+            if(currentBlock->length < 10)
+            {
+                currentMetadata = (cache_message*)list_find(metadatas, (void*)_is_the_metadata);
+                printf("Particion %i:  %p - %p    [%c]    Size: %ib     LRU: %llu    COLA: %i   ID: %i\n", 
+                    i+1, currentBlock->pStart, currentBlock->pLimit, currentBlock->free, currentBlock->length, currentBlock->lastUse
+                    , currentMetadata->mq_cod, currentMetadata->idMessage);
+            }
+            else
+            {
+                currentMetadata = (cache_message*)list_find(metadatas, (void*)_is_the_metadata);
+                printf("Particion %i:  %p - %p    [%c]    Size: %ib    LRU: %llu    COLA: %i   ID: %i\n", 
+                    i+1, currentBlock->pStart, currentBlock->pLimit, currentBlock->free, currentBlock->length, currentBlock->lastUse
+                    , currentMetadata->mq_cod, currentMetadata->idMessage);
+            }
         }
         else
         {
@@ -592,6 +600,7 @@ void dump()
     }
     pthread_mutex_unlock(&s_metadatas);
     printf("\n");
+    log_info(logger, "Se ha solicitado un dump de la memoria cache");
 }
 
 void consolidar()
@@ -668,6 +677,9 @@ void compactar()
         if(targetPartition == NULL) //No hay particiones continuas a ese hueco
             return;
         
+        if(targetPartitionIndex < 0)
+            log_error(broker_custom_logger, "targetPartitionIndex < 0");
+
         //Se hace un swap entre la particion y el hueco
         t_partition* relocatedPartition = createPartition(hole->pStart, targetPartition->length);
         t_holes* relocatedHole = createHole(relocatedPartition->pLimit + 1, hole->length);
@@ -687,7 +699,7 @@ void compactar()
     pthread_mutex_unlock(&s_holes);
     pthread_mutex_unlock(&s_partitions);
     consolidar();
-    //dump();
+    log_info(logger, "Se ha realizado una compactacion");
 }
 
 t_holes* particionLibre_ff(uint32_t bytes) 
@@ -711,7 +723,7 @@ t_holes* particionLibre_ff(uint32_t bytes)
                 list_add(holes, (void*)splittedHole);
                 result = createHole(currentHole->pStart, bytesToAlloc);
                 t_holes* holeToDelete = list_remove(holes, i);
-                free(holeToDelete);                
+                free(holeToDelete);
                 break;
             }
             else if (currentHole->length == bytesToAlloc)
@@ -758,6 +770,9 @@ t_holes* particionLibre_bf(uint32_t bytes)
             } 
         }
 
+        if(bestHole == NULL)
+            return NULL;
+
         if(bestHole->length == bytesToAlloc) //No hace falta dividir el hueco
         {
             result = createHole(currentHole->pStart, bytesToAlloc);
@@ -790,6 +805,7 @@ t_holes* createHole(void* startAddress, uint32_t length)
     hole->lastUse = getTimestamp();
     return hole;
 }
+
 void showHoles()
 {
     t_holes* currentHole;
@@ -818,6 +834,7 @@ t_partition* createPartition(void* startAddress, uint32_t length)
     pthread_mutex_unlock(&s_partitionCounter);
     return partition;
 }
+
 void showPartitions()
 {
     t_partition* currentPartition;
@@ -862,4 +879,20 @@ uint64_t getTimestamp()
     struct timeval tv;
     gettimeofday(&tv, NULL);
     return 1000000 * tv.tv_sec + tv.tv_usec;
+}
+
+
+void freeCacheMessage(cache_message* cacheMessage)
+{
+    list_destroy_and_destroy_elements(cacheMessage->suscriptoresConfirmados, free);
+    list_destroy_and_destroy_elements(cacheMessage->suscriptoresEnviados, free);
+    free(cacheMessage);
+}
+
+void freeCacheSystem()
+{
+    list_destroy_and_destroy_elements(partitions, free);
+    list_destroy_and_destroy_elements(holes, free);
+    list_destroy_and_destroy_elements(metadatas, (void*)freeCacheMessage);
+    free(cache);
 }

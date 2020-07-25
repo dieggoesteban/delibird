@@ -83,6 +83,7 @@ void esperar_cliente(uint32_t socket_servidor)
 	uint32_t socket_cliente = accept(socket_servidor, (void *)&dir_cliente, &tam_direccion);
 	if (socket_cliente != -1)
 	{
+		log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
 		pthread_create(&serverThread, NULL, (void *)serve_client, &socket_cliente);
 		pthread_join(serverThread, NULL);
 	}
