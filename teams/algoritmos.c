@@ -10,6 +10,7 @@ t_entrenador *FIFO(t_entrenador* e) {
 }
 
 t_entrenador *SJF(t_entrenador* e) {
+    printf("Ejecutando SJF-SD\n");
     sem_wait(&mutexREADY);
     t_list* ready = list_duplicate(colaREADY);
     sem_post(&mutexREADY);

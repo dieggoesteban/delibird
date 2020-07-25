@@ -138,15 +138,15 @@ bool ordenarPokemon(void* a, void* b) {
 
 void inicializarEntrenadores() {
 	char** objetivosEntrenadores = config_get_array_value(config,"OBJETIVOS_ENTRENADORES"); //Obtiene el array desde config, pero mal. Labura como un split de un string, separa por comas y eso es un elemento del array que genera. Por eso mismo el algoritmo feo de abajo
-	char** pokemonEntrenadores = config_get_array_value(config,"POKEMON_ENTRENADORES");
+	t_list* pokemonEntrenadores = arrayToList((void*)config_get_array_value(config,"POKEMON_ENTRENADORES"));
 	char** posicionesEntrenadores = config_get_array_value(config,"POSICIONES_ENTRENADORES");
 	cantEntrenadores = arraySize((void*)objetivosEntrenadores);
 	for(uint32_t i = 0; i < arraySize((void*)objetivosEntrenadores); i++) {
 
 		t_list* objetivos = arrayToList((void*)string_split(objetivosEntrenadores[i],"|"));
 		t_list* pokemon = list_create();
-		if(pokemonEntrenadores[i] != NULL) {
-			pokemon = arrayToList((void*)string_split(pokemonEntrenadores[i],"|"));
+		if(list_get(pokemonEntrenadores, i) != NULL) {
+			pokemon = arrayToList((void*)string_split(list_get(pokemonEntrenadores, i),"|"));
 		}
 		char** coordenadas = string_split(posicionesEntrenadores[i],"|");
 		t_posicion* posicion = crearPosicion((uint32_t)atoi(coordenadas[0]),(uint32_t)atoi(coordenadas[1]));

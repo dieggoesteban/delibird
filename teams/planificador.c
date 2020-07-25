@@ -199,7 +199,7 @@ t_entrenador_posicion* getIntercambio(t_entrenador* tr1, t_entrenador* tr2) {
 
     bool ambosEstanDisponibles = !tr1->enEspera && !tr2->enEspera;
 
-    if((list_size(pokesQueQuiere1) > 0 || list_size(pokesQueQuiere2) > 0) && ambosEstanDisponibles) {
+    if(list_size(pokesQueQuiere1) > 0 && ambosEstanDisponibles) {
         printf("Entrenador 1 - %i quiere: ", tr1->id);
         if(list_size(pokesQueQuiere1) > 0) {
             for(uint32_t i = 0; i < list_size(pokesQueQuiere1); i++) {
