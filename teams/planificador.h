@@ -35,6 +35,7 @@ sem_t counterEntrenadoresCatch;
 sem_t mutexEntrenadoresCatch;
 sem_t pokesObjetivoGlobal;
 sem_t mutexDetector;
+sem_t mutexEXIT;
 sem_t estaDesconectado;
 
 t_list* objetivoGlobal;
@@ -43,6 +44,8 @@ t_list* objetivoGlobal; //3 lucario 1 pikachu 2 squirtle
 t_list* entrenadoresCatch;
 
 uint32_t cicloCPU;
+uint32_t idModule;
+uint32_t cantEntrenadores;
 bool desalojo;
 
 //INICIALIZACION HILOS
@@ -60,6 +63,8 @@ t_entrenador_posicion* getIntercambio(t_entrenador* tr1, t_entrenador* tr2);
 void* planificadorREADY();
 void* planificadorEXEC(void*);
 void* detectorDeIntercambio();
-void* modoDesconectado();
+void realizarIntercambio(t_entrenador* tr);
+void modoDesconectado();
+void* planificadorEXIT();
 
 #endif /* PLANIFICADOR_H_ */

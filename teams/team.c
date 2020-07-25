@@ -10,6 +10,7 @@ void handler() {
 int main(int argc, char *argv[])
 {
     config = config_create("./assets/team.config");
+    cantEntrenadores = 0;
     
     if(argv[1]) {
         idModule = atoi(argv[1]);
@@ -18,7 +19,6 @@ int main(int argc, char *argv[])
         idModule = (uint32_t)config_get_int_value(config,"ID_MODULE");
     }
 
-    sem_init(&waitForFinish, 0, 0);
     signal(SIGINT, handler);
 
     printf("Id modulo: %i \n", idModule);
@@ -45,13 +45,14 @@ int main(int argc, char *argv[])
     sem_init(&mutexREADY, 0, 1);
     sem_init(&mutexBLOCKED, 0, 1);
     sem_init(&mutexEXEC, 0, 1);
-    sem_init(&mutexEXIT, 0, 1);
+    sem_init(&mutexEXIT, 0, 0);
     sem_init(&mutexPokesEnMapa, 0, 1);
     sem_init(&counterPokesEnMapa, 0, 0);
     sem_init(&counterEntrenadoresCatch, 0, 0);
     sem_init(&mutexReconnect, 0, 0);
     sem_init(&mutexEntrenadoresCatch, 0, 1);
     sem_init(&pokesObjetivoGlobal, 0, 1);
+    sem_init(&waitForFinish, 0, 0);
     
     inicializarTeam();
     establecerConexionBroker();
@@ -69,10 +70,10 @@ int main(int argc, char *argv[])
         printf("Error EXEC\n");
 
     if (pthread_create(&threadSERVER,NULL,(void*)iniciar_servidor,NULL) != 0)
-        printf("Error  SERVIDOR\n");
+        printf("Error SERVIDOR\n");
 
-    if (pthread_create(&threadMODO_DEFAULT,NULL,(void*)modoDesconectado,NULL) != 0)
-        printf("Error MODO DEFAULT\n");
+    if (pthread_create(&threadEXIT,NULL,(void*)planificadorEXIT,NULL) != 0)
+        printf("Error EXIT\n");
 
     if (pthread_create(&threadDETECT_DISCON,NULL,(void*)detectarDesconexion,NULL) != 0)
         printf("Error DETECTOR DESCONEXION\n");
@@ -81,12 +82,12 @@ int main(int argc, char *argv[])
         printf("Error RECONEXION\n");
 
     pthread_detach(finalizarPrograma);
+    //pthread_detach(threadMODO_DEFAULT);
     pthread_join(threadREADY, NULL);
     pthread_join(threadEXEC, NULL);
     pthread_join(threadDETECT_DEADLOCK, NULL);
     pthread_join(threadRECONNECT, NULL);
     pthread_join(threadSERVER, NULL);
-    pthread_join(threadMODO_DEFAULT, NULL);
     pthread_join(threadDETECT_DISCON, NULL);
 
     terminar_programa();
@@ -101,11 +102,16 @@ void terminar_programa() {
     // pthread_exit(&threadSUSCRIBE_CAUGHT);
     // pthread_exit(&threadSUSCRIBE_APPEARED);
     // pthread_exit(&threadSUSCRIBE_LOCALIZED);
-    // pthread_exit(&threadSERVER);
 
-    liberar_conexion(suscribeCaught->conexion);
-    liberar_conexion(suscribeAppeared->conexion);
-    liberar_conexion(suscribeLocalized->conexion);
+    if(suscribeCaught->conexion != -1) {
+        liberar_conexion(suscribeCaught->conexion);
+    }
+    if(suscribeAppeared->conexion != -1) {
+        liberar_conexion(suscribeAppeared->conexion);
+    }
+    if(suscribeLocalized->conexion != -1) {
+        liberar_conexion(suscribeLocalized->conexion);
+    }
 
     free(suscribeCaught);
     free(suscribeAppeared);

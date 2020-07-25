@@ -26,6 +26,7 @@ t_list* objetivoGlobal;
 t_list* pokemonesEnMapa;
 uint32_t pid;
 uint32_t cicloCPU;
+uint32_t cantEntrenadores;
 
 //INICIALIZACION
 u_int32_t getCantidadEntrenadores();
@@ -38,6 +39,7 @@ void actualizarObjetivoGlobal(char* poke, bool restar);
 //SEMAFOROS
 
 sem_t mutexEXEC;
+sem_t mutexEXIT;
 sem_t mutexBLOCKED;
 sem_t mutexPokesEnMapa;
 sem_t mutexDetector;
@@ -66,6 +68,7 @@ uint32_t arraySize(void* arr[]);
 t_list* arrayToList(void* arr[]);
 bool perteneceAlArray(char* val, char* arr[], uint32_t size);
 bool perteneceALista(char *val, t_list* lista);
+uint32_t getIndexList(char *val, t_list* lista);
 uint32_t perteneceAListaContador(char *val, t_list* lista);
 bool list_equals(t_list* list1, t_list* list2);
 t_queue* listToQueue(t_list* lista);

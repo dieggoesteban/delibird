@@ -24,6 +24,7 @@ char* ALGORITMO;
 
 //GLOBALES
 uint32_t idModule;
+uint32_t cantEntrenadores;
 
 t_list* objetivoGlobal;
 t_list* pokemonesEnMapa;
@@ -41,6 +42,7 @@ t_suscribe* suscribeLocalized;
 
 pthread_t threadREADY;
 pthread_t threadEXEC;
+pthread_t threadEXIT;
 pthread_t threadSERVER;
 pthread_t threadSUSCRIBE_CAUGHT;
 pthread_t threadSUSCRIBE_APPEARED;
@@ -48,7 +50,6 @@ pthread_t threadSUSCRIBE_LOCALIZED;
 pthread_t threadRECONNECT;
 pthread_t threadDETECT_DISCON;
 pthread_t threadDETECT_DEADLOCK;
-pthread_t threadMODO_DEFAULT;
 pthread_t finalizarPrograma;
 
 sem_t mutexNEW;

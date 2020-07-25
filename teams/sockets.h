@@ -16,6 +16,7 @@
 #include<pthread.h>
 #include<semaphore.h>
 #include "serializador.h"
+#include "planificador.h"
 #include "utils.h"
 #include "models.h"
 

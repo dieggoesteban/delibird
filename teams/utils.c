@@ -33,6 +33,16 @@ bool perteneceALista(char *val, t_list* lista) {
 	return false;
 }
 
+uint32_t getIndexList(char *val, t_list* lista) {
+	for (uint32_t i = 0; i < list_size(lista); i++) {
+		char* word = list_get(lista, i);
+		if (strcmp(word, val) == 0) {
+			return i;
+		}
+	}
+	return ERROR;
+}
+
 t_queue* listToQueue(t_list* lista){
 	t_queue* queue = queue_create();
 	for(uint32_t i = 0; i < list_size(lista); i++){
@@ -130,7 +140,7 @@ void inicializarEntrenadores() {
 	char** objetivosEntrenadores = config_get_array_value(config,"OBJETIVOS_ENTRENADORES"); //Obtiene el array desde config, pero mal. Labura como un split de un string, separa por comas y eso es un elemento del array que genera. Por eso mismo el algoritmo feo de abajo
 	char** pokemonEntrenadores = config_get_array_value(config,"POKEMON_ENTRENADORES");
 	char** posicionesEntrenadores = config_get_array_value(config,"POSICIONES_ENTRENADORES");
-
+	cantEntrenadores = arraySize((void*)objetivosEntrenadores);
 	for(uint32_t i = 0; i < arraySize((void*)objetivosEntrenadores); i++) {
 
 		t_list* objetivos = arrayToList((void*)string_split(objetivosEntrenadores[i],"|"));
@@ -295,7 +305,7 @@ bool entrenadorCumplioObjetivo(t_entrenador* entrenador) {
 bool entrenadorDisponible(void* entrenador) {
 	t_entrenador* trainer = (t_entrenador*) entrenador;
 
-	return (!entrenadorEnDeadlock(trainer) && !trainer->enEspera);
+	return (!entrenadorEnDeadlock(trainer) && !entrenadorCumplioObjetivo(trainer) && !trainer->enEspera);
 }
 
 t_entrenador* cambiarPosicionEntrenador(t_entrenador* entrenador, uint32_t posX, uint32_t posY) {
@@ -485,6 +495,7 @@ void procesarMensajeCaught(t_caught_pokemon* caughtPoke) {
 		sem_wait(&mutexBLOCKED);
 		list_add(colaBLOCKED,tr);
 		sem_post(&mutexBLOCKED);
+		sem_post(&mutexEXIT);
 	} else {
 		printf("El mensaje no corresponde a ningun entrenador de este Team\n");
 	}
@@ -553,5 +564,6 @@ void defaultCaptura(uint32_t index) {
 		}
 		tr->pokemonPlanificado = NULL;
 		list_add(colaBLOCKED,tr);
+		sem_post(&mutexEXIT);
 	}
 }
