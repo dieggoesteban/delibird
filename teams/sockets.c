@@ -112,9 +112,10 @@ void mandarGET() {
 
 	char* ip = config_get_string_value(config, "IP_BROKER");
     char* puerto = config_get_string_value(config, "PUERTO_BROKER");
-    uint32_t conexion = crear_conexion(ip, puerto);
+    //uint32_t conexion = crear_conexion(ip, puerto);
 
 	for(uint32_t i=0;i<list_size(objetivoGlobal);i++) {
+		uint32_t conexion = crear_conexion(ip, puerto);
 		t_pokemon_cantidad* poke = (t_pokemon_cantidad*)list_get(objetivoGlobal,i);
 		if(poke->cantidad > 0) {
 			//sendGET(poke->nombre);
@@ -123,9 +124,10 @@ void mandarGET() {
 			log_info(logger, "Mandando GET %s\n",poke->nombre);
 			free(getPokemon);
 			enviarMensaje(paquete, conexion);
+			liberar_conexion(conexion);
 		}
 	}
-	liberar_conexion(conexion);
+	//liberar_conexion(conexion);
 }
 
 void suscribe(void* structSuscribe) {
