@@ -279,6 +279,7 @@ t_acknowledgement* deserializar_acknowledgement(t_buffer* buffer);
 
 t_paquete* serializar_registerModule(t_register_module* registerModule);
 t_register_module* deserializar_registerModule(t_buffer* buffer);
+t_paquete* serializar_desconexion(t_register_module* registerModule);
 
 t_paquete* serializar_akc(t_akc* akc);
 t_akc* deserializar_akc(t_buffer* buffer);

@@ -322,6 +322,23 @@ t_get_pokemon* deserializar_getPokemon(t_buffer* buffer){
     return pokemon;
 }
 
+t_paquete* serializar_desconexion(t_register_module* registerModule) {
+	t_buffer* registerModuleBuffer = malloc(sizeof(t_buffer));
+	registerModuleBuffer->size = sizeof(uint32_t) * 2;
+	void* stream = malloc(registerModuleBuffer->size);
+	int offset = 0;
+
+	memcpy(stream + offset, &(registerModule->messageQueue), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+    memcpy(stream + offset, &(registerModule->moduleId), sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+
+	registerModuleBuffer->stream = stream;
+	t_paquete* paquete = crear_paquete(DESCONEXION, registerModuleBuffer->size, registerModuleBuffer->stream);
+
+	return paquete;
+}
+
 //Register Module serialization
 t_paquete* serializar_registerModule(t_register_module* registerModule) {
 	t_buffer* registerModuleBuffer = malloc(sizeof(t_buffer));

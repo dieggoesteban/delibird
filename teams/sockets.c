@@ -29,6 +29,17 @@ void liberar_conexion(uint32_t socket_cliente) {
 	close(socket_cliente);
 }
 
+void desconectarBroker(uint32_t mq) {
+	t_register_module* reg = crearSuscribe(mq, idModule);
+	t_paquete* paquete = serializar_desconexion(reg);
+
+	uint32_t con = escuchaBroker();
+
+	enviarMensaje(paquete, con);
+	liberar_conexion(con);
+
+}
+
 void establecerConexionBroker() {
     suscribeCaught = getSuscribe(CAUGHT_POKEMON);
     suscribeAppeared = getSuscribe(APPEARED_POKEMON);

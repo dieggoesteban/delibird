@@ -114,6 +114,10 @@ void terminar_programa() {
         liberar_conexion(suscribeLocalized->conexion);
     }
 
+    desconectarBroker(CAUGHT_POKEMON);
+    desconectarBroker(APPEARED_POKEMON);
+    desconectarBroker(LOCALIZED_POKEMON);
+    
     free(suscribeCaught);
     free(suscribeAppeared);
     free(suscribeLocalized);

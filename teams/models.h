@@ -21,7 +21,8 @@ typedef enum
     SUBSCRIBE = 7,
 	MENSAJE_RECIBIDO = 8,
 	ACKNOWLEDGEMENT = 9,
-	CONFIRMACION_MSJ = 10
+	CONFIRMACION_MSJ = 10,
+	DESCONEXION = 11
 } operation_cod;
 
 //struct que se manda como confirmacion de recibo de mensaje por parte de los modulos hacia el broker
