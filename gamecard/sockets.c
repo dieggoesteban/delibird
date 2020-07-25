@@ -225,20 +225,20 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd)
 			uint32_t indexSem = getIndexSemaforo(catchPoke->nombre, semaforosPokemon);
 			printf("INDEX QUE ME DA SOCKET: %i\n", indexSem);
 			if(indexSem == ERROR){
-			 	t_caught_pokemon* caughtPoke = crearCaughtPokemon(0,catchPoke->ID_mensaje_recibido,0);
-				log_warning(logger,"No existe el pokemon %s en tallgrass", catchPoke->nombre);
-        		
-        		mandarCAUGHT(caughtPoke);
+			 	t_semaforo_pokemon* semPoke = crearSemaforoPokemon(catchPoke->nombre);
+				indexSem = list_add(semaforosPokemon,semPoke);
 			}
-			
 			t_catchPokemon_indexSem* catchPokeSem = crearCatchPokemonIndexSem(indexSem, catchPoke);
 
-			pthread_t sendAck;
-			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
-			pthread_detach(sendAck);
 			pthread_t hiloAtenderCatchPoke;
 			pthread_create(&hiloAtenderCatchPoke, NULL, (void*)atenderCatchPokemon,(void*)catchPokeSem);
 			pthread_detach(hiloAtenderCatchPoke);
+
+			
+			
+			pthread_t sendAck;
+			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
+			pthread_detach(sendAck);
 
 
 			free(buffer->stream);
@@ -256,21 +256,24 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd)
 			uint32_t indexSem = getIndexSemaforo(getPoke->nombre, semaforosPokemon);
 			printf("INDEX QUE ME DA SOCKET: %i\n", indexSem);
 			if(indexSem == ERROR){
-			 	t_localized_pokemon* localizedPokemon = crearLocalizedPokemon(0, getPoke->ID_mensaje_recibido, getPoke->nombre, 0,list_create());
-        		mandarLOCALIZED(localizedPokemon);
+			 	t_semaforo_pokemon* semPoke = crearSemaforoPokemon(getPoke->nombre);
+				indexSem = list_add(semaforosPokemon,semPoke);
 			}
 			
 			t_getPokemon_indexSem* getPokeSem = crearGetPokemonIndexSem(indexSem, getPoke);
 
-			pthread_t sendAck;
-			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
-			pthread_detach(sendAck);
 			pthread_t hiloAtenderGetPoke;
 			pthread_create(&hiloAtenderGetPoke, NULL, (void*)atenderGetPokemon,(void*)getPokeSem);
 			pthread_detach(hiloAtenderGetPoke);
+		
+			pthread_t sendAck;
+			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
+			pthread_detach(sendAck);
 
 			free(buffer->stream);
 			free(buffer);
+			
+			break;
 			
 			break;
 		}
@@ -334,18 +337,16 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 			uint32_t indexSem = getIndexSemaforo(catchPoke->nombre, semaforosPokemon);
 			printf("INDEX QUE ME DA SOCKET: %i\n", indexSem);
 			if(indexSem == ERROR){
-			 	t_caught_pokemon* caughtPoke = crearCaughtPokemon(0,catchPoke->ID_mensaje_recibido,0);
-				log_warning(logger,"No existe el pokemon %s en tallgrass", catchPoke->nombre);
-        		
-        		mandarCAUGHT(caughtPoke);
-			}else{
-				t_catchPokemon_indexSem* catchPokeSem = crearCatchPokemonIndexSem(indexSem, catchPoke);
-
-				pthread_t hiloAtenderCatchPoke;
-				pthread_create(&hiloAtenderCatchPoke, NULL, (void*)atenderCatchPokemon,(void*)catchPokeSem);
-				pthread_detach(hiloAtenderCatchPoke);
-
+			 	t_semaforo_pokemon* semPoke = crearSemaforoPokemon(catchPoke->nombre);
+				indexSem = list_add(semaforosPokemon,semPoke);
 			}
+			t_catchPokemon_indexSem* catchPokeSem = crearCatchPokemonIndexSem(indexSem, catchPoke);
+
+			pthread_t hiloAtenderCatchPoke;
+			pthread_create(&hiloAtenderCatchPoke, NULL, (void*)atenderCatchPokemon,(void*)catchPokeSem);
+			pthread_detach(hiloAtenderCatchPoke);
+
+			
 			
 			pthread_t sendAck;
 			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
@@ -367,16 +368,16 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 			uint32_t indexSem = getIndexSemaforo(getPoke->nombre, semaforosPokemon);
 			printf("INDEX QUE ME DA SOCKET: %i\n", indexSem);
 			if(indexSem == ERROR){
-			 	t_localized_pokemon* localizedPokemon = crearLocalizedPokemon(0, getPoke->ID_mensaje_recibido, getPoke->nombre, 0,list_create());
-        		mandarLOCALIZED(localizedPokemon);
+			 	t_semaforo_pokemon* semPoke = crearSemaforoPokemon(getPoke->nombre);
+				indexSem = list_add(semaforosPokemon,semPoke);
 			}
-			else{
-				t_getPokemon_indexSem* getPokeSem = crearGetPokemonIndexSem(indexSem, getPoke);
+			
+			t_getPokemon_indexSem* getPokeSem = crearGetPokemonIndexSem(indexSem, getPoke);
 
-				pthread_t hiloAtenderGetPoke;
-				pthread_create(&hiloAtenderGetPoke, NULL, (void*)atenderGetPokemon,(void*)getPokeSem);
-				pthread_detach(hiloAtenderGetPoke);
-			}
+			pthread_t hiloAtenderGetPoke;
+			pthread_create(&hiloAtenderGetPoke, NULL, (void*)atenderGetPokemon,(void*)getPokeSem);
+			pthread_detach(hiloAtenderGetPoke);
+		
 			pthread_t sendAck;
 			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
 			pthread_detach(sendAck);
