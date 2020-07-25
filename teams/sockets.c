@@ -221,6 +221,24 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd) {
 				free(buffer);
 				break;
 			}
+		case LOCALIZED_POKEMON:
+			{
+				//log_info(logger, "SIZE BUFFER EN NEW: %i", buffer->size);
+				// deserializar_appearedPokemon(buffer);
+				t_localized_pokemon* localizedPoke = deserializar_localizedPokemon(buffer);
+
+				log_info(logger, "LOCALIZED: Llego %s", localizedPoke->nombre);
+				for(uint32_t i = 0; i < localizedPoke->cantidadPosiciones; i++){
+					t_pokemon_posicion* poke = crearPokemonPosicion(localizedPoke->nombre, (t_posicion*)list_get(localizedPoke->posiciones,i));
+					insertPokeEnMapa(poke);
+					log_info(logger," - X: %i, Y: %i",((t_posicion*)list_get(localizedPoke->posiciones,i))->posicion_x, ((t_posicion*)list_get(localizedPoke->posiciones,i))->posicion_y);
+				}
+
+				free(localizedPoke);
+				free(buffer->stream);
+				free(buffer);
+				break;
+			}
 		case 0:
 			pthread_exit(NULL);
 		case -1:
@@ -273,6 +291,24 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 				procesarMensajeCaught(caughtPoke);
 				t_acknowledgement* ack = crearAcknowledgement(idModule, caughtPoke->ID_mensaje_recibido,CAUGHT_POKEMON);
 				enviarAck(ack);
+				free(buffer->stream);
+				free(buffer);
+				break;
+			}
+		case LOCALIZED_POKEMON:
+			{
+				//log_info(logger, "SIZE BUFFER EN NEW: %i", buffer->size);
+				// deserializar_appearedPokemon(buffer);
+				t_localized_pokemon* localizedPoke = deserializar_localizedPokemon(buffer);
+
+				log_info(logger, "LOCALIZED: Llego %s", localizedPoke->nombre);
+				for(uint32_t i = 0; i < localizedPoke->cantidadPosiciones; i++){
+					t_pokemon_posicion* poke = crearPokemonPosicion(localizedPoke->nombre, (t_posicion*)list_get(localizedPoke->posiciones,i));
+					insertPokeEnMapa(poke);
+					log_info(logger," - X: %i, Y: %i",((t_posicion*)list_get(localizedPoke->posiciones,i))->posicion_x, ((t_posicion*)list_get(localizedPoke->posiciones,i))->posicion_y);
+				}
+
+				free(localizedPoke);
 				free(buffer->stream);
 				free(buffer);
 				break;
