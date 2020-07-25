@@ -88,5 +88,5 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 void mandarAPPEARED(t_appeared_pokemon* appearedPoke);
 void mandarCAUGHT(t_caught_pokemon* caughtPoke);
 void mandarLOCALIZED(t_localized_pokemon* localizedPoke);
-
+void desconectarBroker(uint32_t mq);
 #endif /* SOCKETS_H_ */

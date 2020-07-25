@@ -1,13 +1,30 @@
 
 #include "hiloEntrenador.h"
 
-void cicloVidaEntrenador(t_entrenador* entrenador) {
+void hiloEntrenador(uint32_t trId) {
     //ya se inicializaron los entrenadores y estan todos en new
+    uint32_t index = getEntrenadorByID(trId, colaNEW);
+    sem_wait(&mutexNEW);
+    t_entrenador* entrenador = list_get(colaNEW, index);
+    sem_post(&mutexNEW);
     while(!entrenadorCumplioObjetivo(entrenador)) {
         sem_wait(&entrenador->mutex); //el primer wait espera a que le asignen un pokemon y pueda empezar.
-        moverEntrenador(entrenador);
+        sem_wait(&mutexEXEC);
+        entrenador = (t_entrenador*)list_get(colaEXEC, 0);
+        sem_post(&mutexEXEC);
+        if(entrenador->entrenadorPlanificado != NULL) {
+            if(entrenador->entrenadorPlanificado->tiempoEjecucion == 0) {
+                pasosParaIntercambio(entrenador);
+            } else {
+                moverEntrenador(entrenador);
+            }
+        } else {
+            moverEntrenador(entrenador);
+        }
+        sem_wait(&mutexEXEC);
+        entrenador = (t_entrenador*)list_get(colaEXEC, 0);
+        sem_post(&mutexEXEC);
     }
-    
 }
 
 //exec 

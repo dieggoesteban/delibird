@@ -72,8 +72,10 @@ void compactar();
 void consolidar();
 
 void cacheMessage(t_message* message);
+void reallocPartition(t_partition* previousPartition, t_partition* newAllocatedPartition);
 void dispatchCachedMessages(t_cache_dispatch_info* dispatchInfo);
 void dump();
+void dumpConsole();
 void writeData(cache_message* administrative, t_holes* targetHole, t_cache_buffer* bufferMessage);
 
 t_holes* createHole(void* startAddress, uint32_t length);
@@ -87,5 +89,8 @@ uint32_t existHolesBetweenPartitions();
 
 uint64_t getTimestamp();
 
-
+void freePartition(t_partition* partition);
+void freeHole(t_holes* hole);
+void freeCacheMessage(cache_message* cacheMessage);
+void freeCacheSystem();
 #endif /* CACHE_H_ */

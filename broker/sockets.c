@@ -105,7 +105,7 @@ void serve_client(uint32_t *socket_cliente)
 	}
 	else if (recvResult == 0)
 	{
-		printf("El cliente %i cerro la conexion\n", *socket_cliente);
+		//printf("El cliente %i cerro la conexion\n", *socket_cliente);
 		liberar_conexion(*socket_cliente);
 		return;
 	}

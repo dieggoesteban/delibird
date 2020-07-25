@@ -15,13 +15,19 @@ int main()
     signal(SIGUSR1, dump);
     
     sem_init(&waitForFinish, 0, 0);
-
+    
     //Inicializar parámetros
+    remove("./dumps/cache_dump.txt");
+    remove("./assets/broker.log");
+    remove("./assets/broker_custom.log");
+    
     config = config_create("./assets/broker.config");
 	logger = log_create("./assets/broker.log", "broker", true, LOG_LEVEL_INFO);
     broker_custom_logger = log_create("./assets/broker_custom.log", "broker", true, LOG_LEVEL_DEBUG);
     IP = config_get_string_value(config, "IP_BROKER");
     PUERTO = config_get_string_value(config, "PUERTO_BROKER");
+
+    log_debug(broker_custom_logger, "PID de Broker %i", getpid());
 
     inicializarCounterMessageId();
 
@@ -40,7 +46,7 @@ int main()
     pthread_create(&serverThread, NULL, (void *)iniciar_servidor, NULL);
 
     //Iniciar cache
-    // pthread_create(&cacheThread, NULL, (void *)startCache, NULL);
+    pthread_create(&cacheThread, NULL, (void *)startCache, NULL);
     
     //Activar envio de mensajes en las colas
     pthread_create(&newPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromQueue, newPokemonMessageQueue);
@@ -55,7 +61,7 @@ int main()
 
     //Cierre de threads
     pthread_join(serverThread, NULL);
-    // pthread_join(cacheThread, NULL);
+    pthread_join(cacheThread, NULL);
     pthread_join(newPokemonMessageQueue->dispatchMessagesThread, NULL);
     pthread_join(appearedPokemonMessageQueue->dispatchMessagesThread, NULL);
     pthread_join(catchPokemonMessageQueue->dispatchMessagesThread, NULL);
@@ -72,15 +78,15 @@ void terminarPrograma()
     
     log_info(broker_custom_logger, "Finalizando broker...");
 
-    free(newPokemonMessageQueue);
-    free(appearedPokemonMessageQueue);
-    free(catchPokemonMessageQueue);
-    free(caughtPokemonMessageQueue);
-    free(getPokemonMessageQueue);
-    free(localizedPokemonMessageQueue);
-    free(cache);
-    log_info(broker_custom_logger, "Broker finalizado correctamente");
+    freeMessageQueue(newPokemonMessageQueue);
+    freeMessageQueue(appearedPokemonMessageQueue);
+    freeMessageQueue(catchPokemonMessageQueue);
+    freeMessageQueue(caughtPokemonMessageQueue);
+    freeMessageQueue(getPokemonMessageQueue);
+    freeMessageQueue(localizedPokemonMessageQueue);
+    freeCacheSystem();
 
+    log_info(broker_custom_logger, "Broker finalizado correctamente");
     config_destroy(config);
     log_destroy(logger);
     log_destroy(broker_custom_logger);

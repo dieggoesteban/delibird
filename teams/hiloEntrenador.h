@@ -32,8 +32,7 @@ sem_t mutexEXEC;
 sem_t mutexBLOCKED;
 sem_t mutexEXIT;
 
-
-void cicloVidaEntrenador(t_entrenador* entrenador);
+void hiloEntrenador(uint32_t trId);
 
 #endif /* HILOENTRENADOR_H_ */
 

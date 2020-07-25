@@ -23,7 +23,7 @@ cache_caught_pokemon* deserializar_cacheCaughtPokemon(t_cache_buffer* buffer);
 t_cache_buffer* serializar_cacheGetPokemon(cache_get_pokemon* getPokemon);
 cache_get_pokemon* deserializar_cacheGetPokemon(t_cache_buffer* buffer);
 
-t_cache_buffer* serializar_cacheLocalizedPokemon(cache_localized_pokemon* localizedPokemon);
+t_cache_buffer* serializar_cacheLocalizedPokemon(cache_localized_pokemon* localizedPokemon, t_list* posiciones);
 cache_localized_pokemon* deserializar_cacheLocalizedPokemon(t_cache_buffer* buffer);
 
 t_new_pokemon* newPokemon_cacheToMessage(cache_new_pokemon* cacheNewPokemon, cache_message* metadata);

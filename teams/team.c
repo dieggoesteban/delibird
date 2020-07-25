@@ -38,6 +38,7 @@ int main(int argc, char *argv[])
     colaEXIT = list_create();
     pokemonesEnMapa = list_create();
     entrenadoresCatch = list_create();
+    trIds = list_create();
 
     sem_init(&mutexDetector, 0, 0);
     sem_init(&estaDesconectado, 0, 0);
@@ -113,6 +114,10 @@ void terminar_programa() {
         liberar_conexion(suscribeLocalized->conexion);
     }
 
+    desconectarBroker(CAUGHT_POKEMON);
+    desconectarBroker(APPEARED_POKEMON);
+    desconectarBroker(LOCALIZED_POKEMON);
+    
     free(suscribeCaught);
     free(suscribeAppeared);
     free(suscribeLocalized);
@@ -144,9 +149,20 @@ void inicializarTeam()
     inicializarPid();
     inicializarEntrenadores();
     setObjetivoGlobal();
-    
+    pthread_t threadsEntrenadores[cantEntrenadores];
 
+    for(uint32_t i = 0; i < cantEntrenadores; i++) {
+        if (pthread_create(&threadsEntrenadores[i], NULL, (void *)hiloEntrenador, (void*)list_get(trIds, i)) != 0) {
+          printf("No se puedo crear el hilo %i", i);
+          break;
+        }
+    }
 
+    for(uint32_t i = 0; i < cantEntrenadores; i++) {
+        if (pthread_detach(threadsEntrenadores[i]) != 0) {
+          printf("No se pudo hacer un detach del hilo %i\n", i);
+        }
+    }
     //asignar pokes por posicion cercana LISTO
 
     //hacer los algoritmos de planificacion EN ESO

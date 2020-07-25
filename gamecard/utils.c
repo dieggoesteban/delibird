@@ -140,12 +140,10 @@ uint32_t encontrarSemaforoDelPoke(char* nombrePoke, t_list* listaSem){
 
 char* dictionaryToString(t_dictionary* dictionary){
 	char* textoCompleto = string_new();
-	printf("llega a entrar a la funcion");
 
 	void keyAndValueToString(char* key, void* value){
 		string_append_with_format(&textoCompleto, "%s=", key);
 		string_append_with_format(&textoCompleto,"%s\n",(char*)value);
-		printf("esto transformo la funcion: %s\n", textoCompleto);
 	}
 	dictionary_iterator(dictionary,keyAndValueToString);
 	return textoCompleto;
@@ -180,10 +178,8 @@ char* getMQName(uint32_t mq) {
 }
 
 t_suscribe* getSuscribe(uint32_t mq) {
-	printf("Intentando SUSCRIBE en %s...\n", getMQName(mq));
 	t_suscribe* suscribe = malloc(sizeof(t_suscribe));
     uint32_t conexion = escuchaBroker();
-	printf("la Conexion es: %i y el MQ es %i\n", conexion,mq);
 
 	suscribe->conexion = conexion;
 	suscribe->messageQueue = mq;

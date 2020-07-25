@@ -40,13 +40,23 @@ void enviarMensaje(t_paquete *paquete, uint32_t socket_cliente)
 	free(stream);
 }
 
+void desconectarBroker(uint32_t mq) {
+	t_register_module* reg = crearSuscribe(mq, idModule);
+	t_paquete* paquete = serializar_desconexion(reg);
+
+	uint32_t con = escuchaBroker();
+
+	enviarMensaje(paquete, con);
+	liberar_conexion(con);
+
+}
+
 void establecerConexionBroker() {
     suscribeNew = getSuscribe(NEW_POKEMON);
     suscribeCatch = getSuscribe(CATCH_POKEMON);
     suscribeGet = getSuscribe(GET_POKEMON);
 
     if (suscribeNew->conexion != -1) {
-		printf("Conexion: %i\n", suscribeNew->conexion);
         printf("Se establecio una conexion con el Broker :D\n");
 
     	if(pthread_create(&threadSUSCRIBE_NEW,NULL,(void*)suscribe,(void*)suscribeNew) != 0)
@@ -172,32 +182,23 @@ void serve_client(uint32_t *socket)
 		cod_op = -1;
 	if(cod_op > 0 && cod_op < 11) {
 		buffer = recibir_buffer(*socket);
-		
 	}
 	process_request(cod_op, buffer, *socket);
 }
 
 void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd)
 {
-	log_info(logger,"atendiendo al cliente %i\n", cliente_fd);
 	switch (cod_op)
 	{
 		case NEW_POKEMON:
 		{
-			log_debug(logger,"ENTRA POR PROCESS REQUEST");
-			log_info(logger, "SIZE BUFFER EN NEW: %i\n", buffer->size);
 			t_new_pokemon *newPoke = deserializar_newPokemon(buffer);
-			printf("Nombre del poke new: %s\n", newPoke->nombre);
+			log_info(logger, "NEW_POKEMON ingresado: %s", newPoke->nombre);
 
 			uint32_t indexSem;
 
-			// char* pathFilesPokemon = string_duplicate(pathFiles);
-    		// string_append(&pathFilesPokemon,newPoke->nombre);
-
-
 			pthread_mutex_lock(&mutexListaSemsNew);
 			indexSem = getIndexSemaforo(newPoke->nombre, semaforosPokemon);
-			printf("INDEX QUE ME DA SOCKET: %i\n", indexSem);
 			if(indexSem == ERROR){
 			 	t_semaforo_pokemon* semPoke = crearSemaforoPokemon(newPoke->nombre);
 				indexSem = list_add(semaforosPokemon,semPoke);
@@ -217,30 +218,25 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd)
 		}
 		case CATCH_POKEMON:
 		{
-			log_info(logger, "SIZE BUFFER EN NEW: %i\n", buffer->size);
 			t_catch_pokemon *catchPoke = deserializar_catchPokemon(buffer);
+			uint32_t indexSem;
 
-			t_acknowledgement* ack = crearAcknowledgement(idModule ,catchPoke->ID_mensaje_recibido, CATCH_POKEMON);
+			log_info(logger, "CATCH_POKEMON ingresado: %s", catchPoke->nombre);
 
-			uint32_t indexSem = getIndexSemaforo(catchPoke->nombre, semaforosPokemon);
-			printf("INDEX QUE ME DA SOCKET: %i\n", indexSem);
+			pthread_mutex_lock(&mutexListaSemsCatch);
+			indexSem = getIndexSemaforo(catchPoke->nombre, semaforosPokemon);
+
 			if(indexSem == ERROR){
 			 	t_semaforo_pokemon* semPoke = crearSemaforoPokemon(catchPoke->nombre);
 				indexSem = list_add(semaforosPokemon,semPoke);
 			}
+			
 			t_catchPokemon_indexSem* catchPokeSem = crearCatchPokemonIndexSem(indexSem, catchPoke);
+			pthread_mutex_unlock(&mutexListaSemsCatch);
 
 			pthread_t hiloAtenderCatchPoke;
 			pthread_create(&hiloAtenderCatchPoke, NULL, (void*)atenderCatchPokemon,(void*)catchPokeSem);
 			pthread_detach(hiloAtenderCatchPoke);
-
-			
-			
-			pthread_t sendAck;
-			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
-			pthread_detach(sendAck);
-
-
 			free(buffer->stream);
 			free(buffer);
 		
@@ -249,31 +245,26 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd)
 		case GET_POKEMON:
 		{
 			t_get_pokemon *getPoke = deserializar_getPokemon(buffer);
-			log_info(logger, getPoke->nombre);
+	
 
-			t_acknowledgement* ack = crearAcknowledgement(idModule ,getPoke->ID_mensaje_recibido, GET_POKEMON);
+			log_info(logger, "GET_POKEMON ingresado: %s", getPoke->nombre);
+			uint32_t indexSem;
 
-			uint32_t indexSem = getIndexSemaforo(getPoke->nombre, semaforosPokemon);
-			printf("INDEX QUE ME DA SOCKET: %i\n", indexSem);
+			pthread_mutex_lock(&mutexListaSemsGet);
+			indexSem = getIndexSemaforo(getPoke->nombre, semaforosPokemon);
 			if(indexSem == ERROR){
 			 	t_semaforo_pokemon* semPoke = crearSemaforoPokemon(getPoke->nombre);
 				indexSem = list_add(semaforosPokemon,semPoke);
 			}
 			
 			t_getPokemon_indexSem* getPokeSem = crearGetPokemonIndexSem(indexSem, getPoke);
+			pthread_mutex_unlock(&mutexListaSemsGet);
 
 			pthread_t hiloAtenderGetPoke;
 			pthread_create(&hiloAtenderGetPoke, NULL, (void*)atenderGetPokemon,(void*)getPokeSem);
 			pthread_detach(hiloAtenderGetPoke);
-		
-			pthread_t sendAck;
-			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
-			pthread_detach(sendAck);
-
 			free(buffer->stream);
 			free(buffer);
-			
-			break;
 			
 			break;
 		}
@@ -300,14 +291,12 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 	switch (cod_op) {
 		case NEW_POKEMON:
 		{
-			log_debug(logger,"ENTRA POR SUSCRIBE REQUEST");
-			log_info(logger, "SIZE BUFFER EN NEW: %i\n", buffer->size);
 			t_new_pokemon *newPoke = deserializar_newPokemon(buffer);
-			printf("Nombre del poke new: %s\n", newPoke->nombre);
+			log_info(logger, "NEW_POKEMON ingresado: %s", newPoke->nombre);
+
 			t_acknowledgement* ack = crearAcknowledgement(idModule,newPoke->ID_mensaje_recibido, NEW_POKEMON);
 
 			uint32_t indexSem = getIndexSemaforo(newPoke->nombre, semaforosPokemon);
-			printf("INDEX QUE ME DA SOCKET: %i\n", indexSem);
 			if(indexSem == ERROR){
 			 	t_semaforo_pokemon* semPoke = crearSemaforoPokemon(newPoke->nombre);
 				indexSem = list_add(semaforosPokemon,semPoke);
@@ -329,28 +318,27 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 		}
 		case CATCH_POKEMON:
 		{
-			log_info(logger, "SIZE BUFFER EN NEW: %i\n", buffer->size);
 			t_catch_pokemon *catchPoke = deserializar_catchPokemon(buffer);
+
+			log_info(logger, "CATCH_POKEMON ingresado: %s", catchPoke->nombre);
 
 			t_acknowledgement* ack = crearAcknowledgement(idModule ,catchPoke->ID_mensaje_recibido, CATCH_POKEMON);
 
 			uint32_t indexSem = getIndexSemaforo(catchPoke->nombre, semaforosPokemon);
-			printf("INDEX QUE ME DA SOCKET: %i\n", indexSem);
+
 			if(indexSem == ERROR){
 			 	t_semaforo_pokemon* semPoke = crearSemaforoPokemon(catchPoke->nombre);
 				indexSem = list_add(semaforosPokemon,semPoke);
 			}
+			
 			t_catchPokemon_indexSem* catchPokeSem = crearCatchPokemonIndexSem(indexSem, catchPoke);
 
-			pthread_t hiloAtenderCatchPoke;
-			pthread_create(&hiloAtenderCatchPoke, NULL, (void*)atenderCatchPokemon,(void*)catchPokeSem);
-			pthread_detach(hiloAtenderCatchPoke);
-
-			
-			
 			pthread_t sendAck;
 			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
 			pthread_detach(sendAck);
+			pthread_t hiloAtenderCatchPoke;
+			pthread_create(&hiloAtenderCatchPoke, NULL, (void*)atenderCatchPokemon,(void*)catchPokeSem);
+			pthread_detach(hiloAtenderCatchPoke);
 
 
 			free(buffer->stream);
@@ -361,12 +349,12 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 		case GET_POKEMON:
 		{
 			t_get_pokemon *getPoke = deserializar_getPokemon(buffer);
-			log_info(logger, getPoke->nombre);
+			
+			log_info(logger, "CATCH_POKEMON ingresado: %s", getPoke->nombre);			
 
 			t_acknowledgement* ack = crearAcknowledgement(idModule ,getPoke->ID_mensaje_recibido, GET_POKEMON);
 
 			uint32_t indexSem = getIndexSemaforo(getPoke->nombre, semaforosPokemon);
-			printf("INDEX QUE ME DA SOCKET: %i\n", indexSem);
 			if(indexSem == ERROR){
 			 	t_semaforo_pokemon* semPoke = crearSemaforoPokemon(getPoke->nombre);
 				indexSem = list_add(semaforosPokemon,semPoke);
@@ -374,13 +362,12 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 			
 			t_getPokemon_indexSem* getPokeSem = crearGetPokemonIndexSem(indexSem, getPoke);
 
-			pthread_t hiloAtenderGetPoke;
-			pthread_create(&hiloAtenderGetPoke, NULL, (void*)atenderGetPokemon,(void*)getPokeSem);
-			pthread_detach(hiloAtenderGetPoke);
-		
 			pthread_t sendAck;
 			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
 			pthread_detach(sendAck);
+			pthread_t hiloAtenderGetPoke;
+			pthread_create(&hiloAtenderGetPoke, NULL, (void*)atenderGetPokemon,(void*)getPokeSem);
+			pthread_detach(hiloAtenderGetPoke);
 
 			free(buffer->stream);
 			free(buffer);
@@ -405,8 +392,8 @@ t_buffer *recibir_buffer(uint32_t socket_cliente)
 	int size;
 
 	recv(socket_cliente, &size, sizeof(int), MSG_WAITALL);
-	printf("SOcket cliente: %i\n", socket_cliente);
-	printf("Buffer size: %d\n", size);
+	// printf("SOcket cliente: %i\n", socket_cliente);
+	// printf("Buffer size: %d\n", size);
 	buffer->size = size;
 	buffer->stream = malloc(buffer->size);
 	recv(socket_cliente, buffer->stream, buffer->size, MSG_WAITALL);
@@ -418,7 +405,6 @@ uint32_t escuchaBroker(){
 	char* IP_BROKER = config_get_string_value(config,"IP_BROKER");
     char* PUERTO_BROKER = config_get_string_value(config,"PUERTO_BROKER");
 	uint32_t conexion = crear_conexion(IP_BROKER, PUERTO_BROKER);
-	printf("CONEXION: %i\n", conexion);
 
 	return conexion;
 }
@@ -444,12 +430,11 @@ void mandarAPPEARED(t_appeared_pokemon* appearedPoke) {
 
 		t_id_mensaje_recibido* confirmacion = deserializar_idMensajeRecibido(buffer);
 
-		printf("El id de mensaje APPEARED_POKEMON asignado es %i\n", (uint32_t)confirmacion->id_mensajeEnviado);
+		log_info(logger,"El id de mensaje APPEARED_POKEMON asignado es %i\n", (uint32_t)confirmacion->id_mensajeEnviado);
 	}
 	if(conexion != ERROR){
     	liberar_conexion(conexion);
 	}
-
 }
 
 void mandarCAUGHT(t_caught_pokemon* caughtPoke) {
@@ -472,7 +457,7 @@ void mandarCAUGHT(t_caught_pokemon* caughtPoke) {
 
 		t_id_mensaje_recibido* confirmacion = deserializar_idMensajeRecibido(buffer);
 
-		printf("El id de mensaje CAUGHT_POKEMON asignado es %i\n", (uint32_t)confirmacion->id_mensajeEnviado);
+		log_info(logger,"El id de mensaje CAUGHT_POKEMON asignado es %i\n", (uint32_t)confirmacion->id_mensajeEnviado);
 	}
 
 
@@ -501,9 +486,8 @@ void mandarLOCALIZED(t_localized_pokemon* localizedPoke) {
 
 		t_id_mensaje_recibido* confirmacion = deserializar_idMensajeRecibido(buffer);
 
-		printf("El id de mensaje LOCALIZED_POKEMON asignado es %i\n", (uint32_t)confirmacion->id_mensajeEnviado);
+		log_info(logger,"El id de mensaje LOCALIZED_POKEMON asignado es %i\n", (uint32_t)confirmacion->id_mensajeEnviado);
 	}
-
 
     if(conexion != ERROR){
     	liberar_conexion(conexion);

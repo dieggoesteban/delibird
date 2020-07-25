@@ -15,6 +15,7 @@
 #include "utils.h"
 #include "models.h"
 #include "planificador.h"
+#include "hiloEntrenador.h"
 
 char* IP;
 char* PUERTO;
@@ -35,6 +36,7 @@ t_list* colaREADY;
 t_list* colaEXEC;
 t_list* colaBLOCKED;
 t_list* colaEXIT;
+t_list* trIds;
 
 t_suscribe* suscribeCaught;
 t_suscribe* suscribeAppeared;

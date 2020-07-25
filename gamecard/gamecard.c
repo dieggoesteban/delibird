@@ -60,6 +60,10 @@ void terminar_programa(){
         liberar_conexion(suscribeGet->conexion);
     }
 
+    desconectarBroker(NEW_POKEMON);
+    desconectarBroker(CATCH_POKEMON);
+    desconectarBroker(GET_POKEMON);
+
     free(suscribeNew);
     free(suscribeCatch);
     free(suscribeGet);

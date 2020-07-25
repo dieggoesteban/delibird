@@ -29,45 +29,51 @@ void liberar_conexion(uint32_t socket_cliente) {
 	close(socket_cliente);
 }
 
+void desconectarBroker(uint32_t mq) {
+	t_register_module* reg = crearSuscribe(mq, idModule);
+	t_paquete* paquete = serializar_desconexion(reg);
+
+	uint32_t con = escuchaBroker();
+
+	enviarMensaje(paquete, con);
+	liberar_conexion(con);
+
+}
+
 void establecerConexionBroker() {
     suscribeCaught = getSuscribe(CAUGHT_POKEMON);
     suscribeAppeared = getSuscribe(APPEARED_POKEMON);
     suscribeLocalized = getSuscribe(LOCALIZED_POKEMON);
 
     if (suscribeAppeared->conexion != -1) {
-        printf("Se establecio una conexion con el Broker :D\n");
-		printf("Desactivando modo default \n");
+        log_info(logger, "Se establecio una conexion con el Broker :D");
+		log_info(logger, "Desactivando modo default \n");
 		int valorSem;
 		if (sem_getvalue(&estaDesconectado, &valorSem) == 0){
-            if(valorSem != 0){
+            if(valorSem != 0) {
 				sem_wait(&estaDesconectado);
             }
         }
         mandarGET();
-        if(pthread_create(&threadSUSCRIBE_CAUGHT,NULL,(void*)suscribe,(void*)suscribeCaught) != 0)
-            printf("Error CAUGHT\n");
 
-        if(pthread_create(&threadSUSCRIBE_APPEARED,NULL,(void*)suscribe,(void*)suscribeAppeared) != 0)
-            printf("Error APPEARED\n");
-
-        if(pthread_create(&threadSUSCRIBE_LOCALIZED,NULL,(void*)suscribe,(void*)suscribeLocalized) != 0)
-            printf("Error LOCALIZED\n");
+		pthread_create(&threadSUSCRIBE_CAUGHT,NULL,(void*)suscribe,(void*)suscribeCaught);
+		pthread_create(&threadSUSCRIBE_APPEARED,NULL,(void*)suscribe,(void*)suscribeAppeared);
+		pthread_create(&threadSUSCRIBE_LOCALIZED,NULL,(void*)suscribe,(void*)suscribeLocalized);
 
         pthread_detach(threadSUSCRIBE_CAUGHT);
         pthread_detach(threadSUSCRIBE_APPEARED);
         pthread_detach(threadSUSCRIBE_LOCALIZED);
     }
     else {
-        printf("No se pudo establecer una conexion con el Broker :c\n");
+        log_info(logger, "No se pudo establecer una conexion con el Broker :c\n");
 		int valorSem;
 		if (sem_getvalue(&estaDesconectado, &valorSem) == 0){
             if(valorSem == 0){
-				printf("Activando modo default \n");
+				log_info(logger, "Activando modo default");
 				modoDesconectado();
 				sem_post(&estaDesconectado);
             }
         }
-        printf("Intentando reconexion en %i segundos...\n", (uint32_t)config_get_int_value(config,"TIEMPO_RECONEXION"));
         sem_post(&mutexReconnect);
     }
 }
@@ -76,7 +82,7 @@ void reconectarBroker() {
 	while(1) {
 		sem_wait(&mutexReconnect);
 		sleep((uint32_t)config_get_int_value(config,"TIEMPO_RECONEXION"));
-		printf("Intentando reconexion con Broker...\n");
+		log_info(logger, "Intentando reconexion con Broker...\n");
 		establecerConexionBroker();
 	}
 }
@@ -86,8 +92,8 @@ void detectarDesconexion() {
 		sem_wait(&detectorDesconexion);
 		sem_wait(&detectorDesconexion);
 		sem_wait(&detectorDesconexion);
-		printf("Se desconecto el Broker :c\n");
-		printf("Activando modo default \n");
+		log_info(logger, "Se desconecto el Broker :c\n");
+		log_info(logger, "Activando modo default \n");
 		modoDesconectado();
 		sem_post(&estaDesconectado);
 		sem_post(&mutexReconnect);
@@ -106,20 +112,22 @@ void mandarGET() {
 
 	char* ip = config_get_string_value(config, "IP_BROKER");
     char* puerto = config_get_string_value(config, "PUERTO_BROKER");
-    uint32_t conexion = crear_conexion(ip, puerto);
+    //uint32_t conexion = crear_conexion(ip, puerto);
 
 	for(uint32_t i=0;i<list_size(objetivoGlobal);i++) {
+		uint32_t conexion = crear_conexion(ip, puerto);
 		t_pokemon_cantidad* poke = (t_pokemon_cantidad*)list_get(objetivoGlobal,i);
 		if(poke->cantidad > 0) {
 			//sendGET(poke->nombre);
 			t_get_pokemon* getPokemon = crearGetPokemon(11, poke->nombre);
 			t_paquete* paquete = serializar_getPokemon(getPokemon);
-			printf("GET %s\n",poke->nombre);
+			log_info(logger, "Mandando GET %s\n",poke->nombre);
 			free(getPokemon);
 			enviarMensaje(paquete, conexion);
+			liberar_conexion(conexion);
 		}
 	}
-	liberar_conexion(conexion);
+	//liberar_conexion(conexion);
 }
 
 void suscribe(void* structSuscribe) {
@@ -127,7 +135,7 @@ void suscribe(void* structSuscribe) {
 
 	t_register_module* suscribe = crearSuscribe(s->messageQueue, idModule);
 	t_paquete* paquete = serializar_registerModule(suscribe);
-	printf("SUSCRIBE %i \n", s->messageQueue);
+	log_info(logger, "SUSCRIBE %i \n", s->messageQueue);
 	free(suscribe);
 	enviarMensaje(paquete, s->conexion);
 	
@@ -167,7 +175,6 @@ void iniciar_servidor(void)
 
     freeaddrinfo(servinfo);
 
-	printf("Iniciando servidor...\n");
     while(1)
     	esperar_cliente(socket_servidor);
 }
@@ -206,7 +213,7 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd) {
 				// deserializar_appearedPokemon(buffer);
 				t_appeared_pokemon* appearedPoke = deserializar_appearedPokemon(buffer);
 				t_pokemon_posicion* poke = crearPokemonPosicion(appearedPoke->nombre, appearedPoke->posicion);
-				printf("Llego un poke %s\n", poke->nombre);
+				log_info(logger, "APPEARED: Llego %s", poke->nombre);
 				insertPokeEnMapa(poke);
 
 				free(appearedPoke);
@@ -217,7 +224,30 @@ void process_request(uint32_t cod_op, t_buffer* buffer, uint32_t cliente_fd) {
 		case CAUGHT_POKEMON:
 			{
 				t_caught_pokemon* caughtPoke = deserializar_caughtPokemon(buffer);
+				if(caughtPoke->catchStatus == 1) {
+					log_info(logger, "CAUGHT: Llego para el mensaje %i que la captura fue exitosa", caughtPoke->ID_mensaje_original);
+				} else {
+					log_info(logger, "CAUGHT: Llego para el mensaje %i que la captura no fue exitosa", caughtPoke->ID_mensaje_original);
+				}
 				procesarMensajeCaught(caughtPoke);
+				free(buffer->stream);
+				free(buffer);
+				break;
+			}
+		case LOCALIZED_POKEMON:
+			{
+				//log_info(logger, "SIZE BUFFER EN NEW: %i", buffer->size);
+				// deserializar_appearedPokemon(buffer);
+				t_localized_pokemon* localizedPoke = deserializar_localizedPokemon(buffer);
+
+				log_info(logger, "LOCALIZED: Llego %s", localizedPoke->nombre);
+				for(uint32_t i = 0; i < localizedPoke->cantidadPosiciones; i++){
+					t_pokemon_posicion* poke = crearPokemonPosicion(localizedPoke->nombre, (t_posicion*)list_get(localizedPoke->posiciones,i));
+					insertPokeEnMapa(poke);
+					log_info(logger," - X: %i, Y: %i",((t_posicion*)list_get(localizedPoke->posiciones,i))->posicion_x, ((t_posicion*)list_get(localizedPoke->posiciones,i))->posicion_y);
+				}
+
+				free(localizedPoke);
 				free(buffer->stream);
 				free(buffer);
 				break;
@@ -254,7 +284,7 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 				// deserializar_appearedPokemon(buffer);
 				t_appeared_pokemon* appearedPoke = deserializar_appearedPokemon(buffer);
 				t_pokemon_posicion* poke = crearPokemonPosicion(appearedPoke->nombre, appearedPoke->posicion);
-				printf("Llego un poke %s\n", poke->nombre);
+				log_info(logger, "APPEARED: Llego %s", poke->nombre);
 				insertPokeEnMapa(poke);
 				t_acknowledgement* ack = crearAcknowledgement(idModule, appearedPoke->ID_mensaje_recibido,APPEARED_POKEMON);
 				enviarAck(ack);
@@ -266,10 +296,40 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 		case CAUGHT_POKEMON:
 			{
 				t_caught_pokemon* caughtPoke = deserializar_caughtPokemon(buffer);
-				printf("Me llego este mensaje con id correlativo %i\n", caughtPoke->ID_mensaje_original);
+				if(caughtPoke->catchStatus == 1) {
+					log_info(logger, "CAUGHT: Llego para el mensaje %i que la captura fue exitosa", caughtPoke->ID_mensaje_original);
+				} else {
+					log_info(logger, "CAUGHT: Llego para el mensaje %i que la captura no fue exitosa", caughtPoke->ID_mensaje_original);
+				}
 				procesarMensajeCaught(caughtPoke);
 				t_acknowledgement* ack = crearAcknowledgement(idModule, caughtPoke->ID_mensaje_recibido,CAUGHT_POKEMON);
 				enviarAck(ack);
+				free(buffer->stream);
+				free(buffer);
+				break;
+			}
+		case LOCALIZED_POKEMON:
+			{
+				//log_info(logger, "SIZE BUFFER EN NEW: %i", buffer->size);
+				// deserializar_appearedPokemon(buffer);
+				t_localized_pokemon* localizedPoke = deserializar_localizedPokemon(buffer);
+
+				if(localizedPoke->cantidadPosiciones > 0){
+					log_info(logger, "LOCALIZED: Llego %s", localizedPoke->nombre);
+
+					for(uint32_t i = 0; i < localizedPoke->cantidadPosiciones; i++){
+						t_pokemon_posicion* poke = crearPokemonPosicion(localizedPoke->nombre, (t_posicion*)list_get(localizedPoke->posiciones,i));
+						insertPokeEnMapa(poke);
+						log_info(logger," - X: %i, Y: %i",((t_posicion*)list_get(localizedPoke->posiciones,i))->posicion_x, ((t_posicion*)list_get(localizedPoke->posiciones,i))->posicion_y);
+					}
+				}else{
+					log_info(logger,"LOCALIZED: Llego %s sin posiciones", localizedPoke->nombre);
+				}
+
+				t_acknowledgement* ack = crearAcknowledgement(idModule, localizedPoke->ID_mensaje_recibido,LOCALIZED_POKEMON);
+				enviarAck(ack);
+
+				free(localizedPoke);
 				free(buffer->stream);
 				free(buffer);
 				break;

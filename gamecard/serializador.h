@@ -49,7 +49,7 @@ t_acknowledgement* deserializar_acknowledgement(t_buffer* buffer);
 t_paquete* serializar_idMensajeRecibido(t_id_mensaje_recibido* idMensajeRecibido);
 t_id_mensaje_recibido* deserializar_idMensajeRecibido(t_buffer* buffer);
 
-
+t_paquete* serializar_desconexion(t_register_module* registerModule);
 
 //CREACION DE LOS STRUCTS
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant);

@@ -56,6 +56,7 @@ void liberar_conexion(uint32_t socket_cliente);
 uint32_t escuchaBroker();
 void establecerConexionBroker();
 void reconectarBroker();
+void desconectarBroker(uint32_t mq);
 
 void mandarGET();
 void enviarAck(t_acknowledgement* ack);
