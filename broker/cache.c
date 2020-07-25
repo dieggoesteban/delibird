@@ -265,6 +265,7 @@ void memoria_particiones(t_message* message)
 
     //Cuando el targetPartition ya esté ubicado se meten los datos donde corresponda
     writeData(administrative, targetHole, addressFromMessageToCopy);
+    //dumpConsole();
 }
 
 void writeData(cache_message* administrative, t_holes* targetHole, t_cache_buffer* bufferMessage)
@@ -313,6 +314,7 @@ t_holes* reemplazo_fifo(uint32_t bytes)
     uint32_t _is_the_one_with_fifo_number(t_partition* partition) {
         return partition->fifoPosition == fifoToDelete;
     }
+    
 
     pthread_mutex_lock(&s_partitions);
         t_partition* victim = (t_partition*)list_find(partitions, (void*)_is_the_one_with_fifo_number);
@@ -327,11 +329,13 @@ t_holes* reemplazo_fifo(uint32_t bytes)
     //Se elimina de la lista de particiones
     t_partition* currentPartition;
     pthread_mutex_lock(&s_partitions);
+    void* addressToFindItsMetadata;
     for(uint32_t i = 0; i < list_size(partitions); i++)
         {
             currentPartition = list_get(partitions, i);
             if(currentPartition->fifoPosition == victim->fifoPosition)
             {
+                addressToFindItsMetadata = currentPartition->pStart;
                 list_remove(partitions, i);
                 break;
             }
@@ -605,6 +609,65 @@ void dump()
     pthread_mutex_unlock(&s_metadatas);
     printf("\n");
     log_info(logger, "Se ha solicitado un dump de la memoria cache");
+}
+
+void dumpConsole()
+{
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+
+    //Añadir locks
+    t_list* allMemory = list_create();
+
+    pthread_mutex_lock(&s_partitions);
+        list_add_all(allMemory, partitions);
+    pthread_mutex_unlock(&s_partitions);
+    pthread_mutex_lock(&s_holes);
+        list_add_all(allMemory, holes);
+    pthread_mutex_unlock(&s_holes);
+
+    list_sort(allMemory, (void*)mem_address_menor_a_mayor);
+
+    printf("\nDump: %02d/%02d/%d %02d:%02d:%02d\n",
+        tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);
+    t_partition* currentBlock;
+    cache_message* currentMetadata;
+    
+    pthread_mutex_lock(&s_metadatas);
+    for (uint32_t i = 0; i < list_size(allMemory); i++)
+    {
+        currentBlock = (t_partition*)list_get(allMemory, i);
+        uint32_t _is_the_metadata(cache_message* message) {
+            return message->idMessage == currentBlock->id;
+        }
+
+        //Si es una particion ocupada
+        if(currentBlock->free == 'X')
+        {
+            //Es igual pero le pone un espacio para acomodar columnas
+            if(currentBlock->length < 10)
+            {
+                currentMetadata = (cache_message*)list_find(metadatas, (void*)_is_the_metadata);
+                printf("Particion %i:  %p - %p    [%c]    Size: %ib     LRU: %llu    COLA: %i   ID: %i\n", 
+                    i+1, currentBlock->pStart, currentBlock->pLimit, currentBlock->free, currentBlock->length, currentBlock->lastUse
+                    , currentMetadata->mq_cod, currentMetadata->idMessage);
+            }
+            else
+            {
+                currentMetadata = (cache_message*)list_find(metadatas, (void*)_is_the_metadata);
+                printf("Particion %i:  %p - %p    [%c]    Size: %ib    LRU: %llu    COLA: %i   ID: %i\n", 
+                    i+1, currentBlock->pStart, currentBlock->pLimit, currentBlock->free, currentBlock->length, currentBlock->lastUse
+                    , currentMetadata->mq_cod, currentMetadata->idMessage);
+            }
+        }
+        else
+        {
+            printf("Particion %i:  %p - %p    [%c]    Size: %ib    LRU: -    COLA: -   ID: -\n", 
+                i+1, currentBlock->pStart, currentBlock->pLimit, currentBlock->free, currentBlock->length);
+        }
+    }
+    pthread_mutex_unlock(&s_metadatas);
+    printf("\n");
 }
 
 void consolidar()

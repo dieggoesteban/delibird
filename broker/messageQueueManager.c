@@ -136,7 +136,6 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 			message->mq_cod = NEW_POKEMON;
 			newPoke->ID_mensaje_recibido = message->id;
 			message->mensaje = newPoke;
-
 			log_info(logger, "Se ha recibido un mensaje del cliente %i en la cola %s", socket_cliente, messageQueue->name);
 			addMessageToQueue(message, messageQueue);
 
@@ -338,7 +337,7 @@ void unsubscribeModule(uint32_t idNewModule, uint32_t socket_cliente, uint32_t m
 
 	if(foundSuscripcion == NULL)
 	{
-		log_debug(broker_custom_logger, "founSuscription not found");
+		log_debug(broker_custom_logger, "founSubscription not found");
 		return;
 	}
 	
@@ -370,9 +369,9 @@ void unsubscribeModule(uint32_t idNewModule, uint32_t socket_cliente, uint32_t m
 void addMessageToQueue(t_message* message, t_message_queue* messageQueue)
 {
 	pthread_mutex_lock(&messageQueue->s_mensajes);
-		list_add(messageQueue->mensajes, message);
+		list_add(messageQueue->mensajes, (void*)message);
+		sem_post(&messageQueue->s_hayMensajes);
 	pthread_mutex_unlock(&messageQueue->s_mensajes);
-	sem_post(&messageQueue->s_hayMensajes);
 }
 
 void sendMessageFromQueue(t_message* message, t_suscripcion* suscriptor)
@@ -434,48 +433,49 @@ void sendMessageFromQueue(t_message* message, t_suscripcion* suscriptor)
 		pthread_mutex_lock(&message->s_suscriptoresEnviados);
 			list_add(message->suscriptoresEnviados, suscriptor);
 		pthread_mutex_unlock(&message->s_suscriptoresEnviados);
-		log_info(logger, "Mensaje id %i enviado a suscriptor %i", message->id, suscriptor->socket);
+		log_info(logger, "Mensaje id %i enviado a suscriptor %i", message->id, suscriptor->idModule);
 	}
 }
 
 void dispatchMessagesFromQueue(t_message_queue* messageQueue)
 {
-	t_message* message;
 	t_suscripcion* currentSubscriber;
 	uint32_t subscribersCount;
 	while(true)
 	{
 		sem_wait(&messageQueue->s_hayMensajes);
-		pthread_mutex_lock(&messageQueue->s_mensajes);
-			if(list_size(messageQueue->mensajes) > 0)
-				message = (t_message*)list_get(messageQueue->mensajes, 0);
+		t_message* message;
+		for(uint32_t i = 0; i < list_size(messageQueue->mensajes); i++)
+		{
+			message = (t_message*)list_get(messageQueue->mensajes, i);
+			pthread_mutex_lock(&messageQueue->s_subscribers);
+				subscribersCount = list_size(messageQueue->subscribers);
+				if(subscribersCount == 0)
+				{
+					sem_post(&message->s_puedeEliminarse);
+				}
+				message->countSuscriptoresObjetivo = subscribersCount;
+				for(uint32_t i = 0; i < subscribersCount; i++) {
+					currentSubscriber = (t_suscripcion*)list_get(messageQueue->subscribers, i);
+					sendMessageFromQueue(message, currentSubscriber);
+				}
+			pthread_mutex_unlock(&messageQueue->s_subscribers);	
+			
+			//Guardarlo en la cache
+			if(pthread_create(&message->caching, NULL, (void*)cacheMessage, message) < 0)
+				log_error(broker_custom_logger, "Error in pthread_create cacheMessage");
+			
+			if(pthread_detach(message->caching) != 0)
+				log_error(broker_custom_logger, "Error in pthread_join cacheMessage");		
+			
+			//Eliminarlo de la cola
+			if(pthread_create(&message->deleteFromQueue, NULL, (void*)deleteFromQueue, message) < 0)
+				log_error(broker_custom_logger, "Error in pthread_create deleteFromQueue");
+			
+			if(pthread_join(message->deleteFromQueue, NULL) != 0)
+				log_error(broker_custom_logger, "Error in pthread_detach deleteFromQueue");
+		}
 		pthread_mutex_unlock(&messageQueue->s_mensajes);
-
-		pthread_mutex_lock(&messageQueue->s_subscribers);
-			subscribersCount = list_size(messageQueue->subscribers);
-			if(subscribersCount == 0)
-			{
-				sem_post(&message->s_puedeEliminarse);
-			}
-			message->countSuscriptoresObjetivo = subscribersCount;
-			for(uint32_t i = 0; i < subscribersCount; i++) {
-				currentSubscriber = (t_suscripcion*)list_get(messageQueue->subscribers, i);
-				sendMessageFromQueue(message, currentSubscriber);
-			}
-		pthread_mutex_unlock(&messageQueue->s_subscribers);	
-
-		//Guardarlo en la cache
-		if(pthread_create(&message->caching, NULL, (void*)cacheMessage, message) < 0)
-		 	log_error(broker_custom_logger, "Error in pthread_create cacheMessage");
-		
-		 if(pthread_detach(message->caching) != 0)
-		 	log_error(broker_custom_logger, "Error in pthread_join cacheMessage");		
-
-		if(pthread_create(&message->deleteFromQueue, NULL, (void*)deleteFromQueue, message) < 0)
-			log_error(broker_custom_logger, "Error in pthread_create deleteFromQueue");
-		
-		if(pthread_detach(message->deleteFromQueue) != 0)
-			log_error(broker_custom_logger, "Error in pthread_detach deleteFromQueue");
 	}
 }
 
