@@ -99,3 +99,4 @@ dkms.conf
 
 broker/broker
 broker/core
+broker/dumps/cache_dump.txt

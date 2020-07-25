@@ -116,6 +116,13 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 			//log_info(broker_custom_logger, "Se ha recibido ACK de %i por el mensaje %i", socket_cliente, ack->idMessageReceived);
 			break;
 		}
+		case UNSUBSCRIBE:
+		{
+			t_register_module* unregisterModule = deserializar_registerModule(buffer);
+			unsubscribeModule(unregisterModule->moduleId, socket_cliente, unregisterModule->messageQueue);
+			free(unregisterModule);
+			break;
+		}
 		case NEW_POKEMON:
 		{
 			t_message_queue* messageQueue = getMessageQueueById(operation_cod);
@@ -309,6 +316,46 @@ void subscribeNewModule(uint32_t idNewModule, uint32_t socket_cliente, uint32_t 
 	pthread_t dispatchCache;
 	pthread_create(&dispatchCache, NULL, (void*)dispatchCachedMessages, cache_dispatch_info);
 	pthread_join(dispatchCache, NULL);
+}
+
+void unsubscribeModule(uint32_t idNewModule, uint32_t socket_cliente, uint32_t mq_cod)
+{
+	t_message_queue* messageQueue = getMessageQueueById(mq_cod);
+
+	t_suscripcion* foundSuscripcion;
+	pthread_mutex_lock(&messageQueue->s_subscribers);
+	uint32_t _is_the_registration(t_suscripcion* suscripcion) {
+		return suscripcion->idModule == idNewModule;
+	}
+	foundSuscripcion = (t_suscripcion*)list_find(messageQueue->subscribers, (void*)_is_the_registration);
+
+	if(foundSuscripcion == NULL)
+		return;
+	
+	pthread_mutex_lock(&messageQueue->s_subscribers);
+	pthread_mutex_lock(&messageQueue->s_mensajes);
+	t_suscripcion* targetSuscription;
+	for(uint32_t i = 0; i < list_size(messageQueue->subscribers); i++)
+	{
+		targetSuscription = (t_suscripcion*)list_get(messageQueue->subscribers, i);
+		if(targetSuscription->idModule == foundSuscripcion->idModule)
+		{
+			shutdown(targetSuscription->socket, 2);
+			close(targetSuscription->socket);
+			log_debug(broker_custom_logger, "Se ha desuscripto el modulo id %i con el socket %i de la cola %s", 
+				targetSuscription->idModule, targetSuscription->socket, messageQueue->name);
+			list_remove(messageQueue->subscribers, i);
+			break;
+		}
+	}
+	t_message* currentMessage;
+	for(uint32_t i = 0; i < list_size(messageQueue->mensajes); i++)
+	{
+		currentMessage = (t_message*)list_get(messageQueue->mensajes, i);
+		currentMessage->countSuscriptoresObjetivo--;
+	}
+	pthread_mutex_unlock(&messageQueue->s_mensajes);
+	pthread_mutex_unlock(&messageQueue->s_subscribers);
 }
 
 void addMessageToQueue(t_message* message, t_message_queue* messageQueue)
