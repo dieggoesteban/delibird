@@ -49,11 +49,12 @@ sem_t counterEntrenadoresCatch;
 
 //CREAR
 t_pokemon_posicion* crearPokemonPosicion(char* nombre, t_posicion* posicion);
+t_entrenador_posicion* crearEntrenadorPosicion(uint32_t id, t_posicion* posicion, t_entrenador* tr);
+
 t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* pokemon, uint32_t cantidadObjetivo);
 t_pokemon_cantidad* setPokemonCantidad(char* nombre, uint32_t cantidad);
 t_entrenador_catch* crearEntrenadorCatch(uint32_t mID, uint32_t trID);
 t_suscribe* getSuscribe(uint32_t mq);
-t_entrenador_posicion* crearEntrenadorPosicion(uint32_t id, t_posicion* posicion);
 
 //COLAS
 t_list* colaNEW;
@@ -100,8 +101,10 @@ bool tardaMenos(void* trA, void* trB);
 bool ordenarEntrenador(void* a, void* b);
 bool ordenarPokemon(void* a, void* b);
 uint32_t turnosHastaPokemon(t_pokemon_posicion* pokemon, t_entrenador* entrenador);
+uint32_t turnosHastaEntrenador(t_entrenador_posicion* tr, t_entrenador* entrenador);
 t_entrenador* cambiarPosicionEntrenador(t_entrenador* entrenador, uint32_t posX, uint32_t posY);
 void moverEntrenador(t_entrenador* entrenador);
+void pasosParaIntercambio(t_entrenador* entrenador);
 void actualizarPosicion(t_entrenador* entrenador);
 void defaultCaptura(uint32_t index);
 #endif /* UTILS_H_ */

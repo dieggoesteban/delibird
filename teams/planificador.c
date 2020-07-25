@@ -33,6 +33,7 @@ t_entrenador* asignarAEntrenador(t_pokemon_posicion* pokemon) {
     if(pokemonEnObjetivoGlobal(pokemon) && list_size(entrenadores) > 0) {
         entrenadorMP = getEntrenadorMejorPosicionado(pokemon, entrenadores);
         entrenadorMP->pokemonPlanificado = pokemon;
+        entrenadorMP->pokemonPlanificado->tiempoEjecucion = turnosHastaPokemon(pokemon, entrenadorMP);
     }
 
     list_destroy(blocked);
@@ -133,8 +134,7 @@ void* planificadorEXIT() {
     printf("───██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██───\n");
     printf("──██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██──\n");
     printf("─██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██─\n");
-    printf("─██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██─ \n");
-    printf("██▓▓▓▓▓▓▓▓▓███████▓▓▓▓▓▓▓▓▓██\n");
+    printf("─██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██─\n");
     printf("██▓▓▓▓▓▓▓▓▓███████▓▓▓▓▓▓▓▓▓██\n");
     printf("██▓▓▓▓▓▓▓▓██░░░░░██▓▓▓▓▓▓▓▓██\n");
     printf("██▓▓▓▓▓▓▓██░░███░░██▓▓▓▓▓▓▓██\n");
@@ -214,7 +214,7 @@ t_entrenador_posicion* getIntercambio(t_entrenador* tr1, t_entrenador* tr2) {
             }
         }
         printf("\n");
-        return crearEntrenadorPosicion(tr2->id, tr2->posicion);
+        return crearEntrenadorPosicion(tr2->id, tr2->posicion, tr1);
     }
     else return NULL;
 }
@@ -288,17 +288,23 @@ void* planificadorEXEC(void* arg) {
                 if(!entrenadorLlegoASuDestino(entrenador)) {
                     moverEntrenador(entrenador);
                 } else {
-                    printf("Entrenador %i puede capturar y va a BLOCKED\n", entrenador->id);
-                    entrenador->enEspera = true;
-                    int valorSem;
-                    if (sem_getvalue(&estaDesconectado, &valorSem) == 0){
-                        if(valorSem == 0){
-                            mandarCATCH(entrenador);
-                            moverEntrenadorDeCola(colaEXEC, colaBLOCKED, entrenador);
-                        } else {
-                            moverEntrenadorDeCola(colaEXEC, colaBLOCKED, entrenador);
-                            modoDesconectado();
+                    if(entrenador->pokemonPlanificado != NULL) {
+                        printf("Entrenador %i puede capturar y va a BLOCKED\n", entrenador->id);
+                        entrenador->enEspera = true;
+                        int valorSem;
+                        if (sem_getvalue(&estaDesconectado, &valorSem) == 0){
+                            if(valorSem == 0){
+                                mandarCATCH(entrenador);
+                                moverEntrenadorDeCola(colaEXEC, colaBLOCKED, entrenador);
+                            } else {
+                                moverEntrenadorDeCola(colaEXEC, colaBLOCKED, entrenador);
+                                modoDesconectado();
+                            }
                         }
+                    }
+                    else if(entrenador->entrenadorPlanificado != NULL) {
+                        printf("El entrenador %i puede realizar el intercambio con %i\n", entrenador->id, entrenador->entrenadorPlanificado->id);
+                        realizarIntercambio(entrenador);
                     }
                     if(list_size(colaREADY) > 0) {
                         t_entrenador* nuevoEntrenador = alg(NULL);
@@ -336,7 +342,15 @@ void* planificadorEXEC(void* arg) {
                         t_entrenador* nuevoEntrenador = alg(NULL);
                         printf("Entrenador %i pasa a EXEC\n", nuevoEntrenador->id);
                         moverEntrenadorDeCola(colaREADY, colaEXEC, nuevoEntrenador);
-                        moverEntrenador(nuevoEntrenador);
+                        if(nuevoEntrenador->entrenadorPlanificado != NULL) {
+                            if(nuevoEntrenador->entrenadorPlanificado->tiempoEjecucion == 0) {
+                                pasosParaIntercambio(nuevoEntrenador);
+                            } else {
+                                moverEntrenador(nuevoEntrenador);
+                            }
+                        } else {
+                            moverEntrenador(nuevoEntrenador);
+                        }
                     }
                 }
                 else if(desalojo && list_size(colaREADY) > 0) {
@@ -346,10 +360,26 @@ void* planificadorEXEC(void* arg) {
                         moverEntrenadorDeCola(colaEXEC, colaREADY, entrenador);
                         moverEntrenadorDeCola(colaREADY, colaEXEC, nuevoEntrenador);
                     }
-                    moverEntrenador(nuevoEntrenador);
+                    if(nuevoEntrenador->entrenadorPlanificado != NULL) {
+                        if(nuevoEntrenador->entrenadorPlanificado->tiempoEjecucion == 0) {
+                            pasosParaIntercambio(nuevoEntrenador);
+                        } else {
+                            moverEntrenador(nuevoEntrenador);
+                        }
+                    } else {
+                        moverEntrenador(nuevoEntrenador);
+                    }
                 }
                  else {
-                    moverEntrenador(entrenador);
+                    if(entrenador->entrenadorPlanificado != NULL) {
+                        if(entrenador->entrenadorPlanificado->tiempoEjecucion == 0) {
+                            pasosParaIntercambio(entrenador);
+                        } else {
+                            moverEntrenador(entrenador);
+                        }
+                    } else {
+                        moverEntrenador(entrenador);
+                    }
                 }
             }
         }

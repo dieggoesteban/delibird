@@ -259,11 +259,13 @@ t_pokemon_posicion* crearPokemonPosicion(char* nombre, t_posicion* posicion){
 	return pokemon;
 }
 
-t_entrenador_posicion* crearEntrenadorPosicion(uint32_t id, t_posicion* posicion) {
+t_entrenador_posicion* crearEntrenadorPosicion(uint32_t id, t_posicion* posicion, t_entrenador* trainer) {
 	t_entrenador_posicion* tr = malloc(sizeof(t_entrenador_posicion));
 
 	tr->id = id;
 	tr->posicion = posicion;
+	tr->tiempoEjecucion = turnosHastaEntrenador(tr, trainer);
+	tr->tiempoIntercambio = 5;
 
 	return tr;
 }
@@ -330,7 +332,7 @@ bool entrenadorLlegoASuDestino(void* entrenador) {
 	if(trainer->pokemonPlanificado != NULL) {
 		llegoAPoke = turnosHastaPokemon(trainer->pokemonPlanificado,trainer) == 0;
 	} else {
-		llegoAEntrenador = turnosHastaEntrenador(trainer->entrenadorPlanificado,trainer) == 0;
+		llegoAEntrenador = trainer->entrenadorPlanificado->tiempoIntercambio == 0;
 	}
 
 	return llegoAPoke || llegoAEntrenador;
@@ -339,18 +341,19 @@ bool entrenadorLlegoASuDestino(void* entrenador) {
 void moverEntrenador(t_entrenador* entrenador){ 
     uint32_t entrenadorPosX = entrenador->posicion->posicion_x;
     uint32_t entrenadorPosY = entrenador->posicion->posicion_y; 
-	
+
 	uint32_t pokePosX; 
     uint32_t pokePosY; 
     
 	if(entrenador->entrenadorPlanificado != NULL){
 		pokePosX = entrenador->entrenadorPlanificado->posicion->posicion_x;
 		pokePosY = entrenador->entrenadorPlanificado->posicion->posicion_y;
-	}else if(entrenador->pokemonPlanificado != NULL){
+		entrenador->entrenadorPlanificado->tiempoEjecucion -= 1;
+	} else if(entrenador->pokemonPlanificado != NULL){
 		pokePosX = entrenador->pokemonPlanificado->posicion->posicion_x;
 		pokePosY = entrenador->pokemonPlanificado->posicion->posicion_y;
+		entrenador->pokemonPlanificado->tiempoEjecucion -= 1;
 	}
-
 
     if((pokePosX - entrenadorPosX) == 0){
         if(pokePosY > entrenadorPosY)
@@ -368,6 +371,12 @@ void moverEntrenador(t_entrenador* entrenador){
 	actualizarPosicion(entrenador);
 }
 
+void pasosParaIntercambio(t_entrenador* entrenador) {
+	entrenador->entrenadorPlanificado->tiempoIntercambio -= 1;
+	printf("Entrenador %i puede realizar el intercambio en %i/5\n", (uint32_t)entrenador->id, (uint32_t)entrenador->entrenadorPlanificado->tiempoIntercambio);
+	actualizarPosicion(entrenador);
+}
+
 void actualizarPosicion(t_entrenador* entrenador) {
 	sem_wait(&mutexEXEC);
 	list_remove(colaEXEC,0);
@@ -378,9 +387,28 @@ void actualizarPosicion(t_entrenador* entrenador) {
 bool tardaMenos(void* trA, void* trB) {
 	t_entrenador* trainerA = (t_entrenador*) trA;
 	t_entrenador* trainerB = (t_entrenador*) trB;
+	
+	uint32_t cantTurnosA, cantTurnosB;
+	
+	if(trainerA->pokemonPlanificado != NULL) {
+		cantTurnosA = trainerA->pokemonPlanificado->tiempoEjecucion;
+	} else if (trainerA->entrenadorPlanificado != NULL) {
+		if(trainerA->entrenadorPlanificado > 0) {
+			cantTurnosA = trainerA->entrenadorPlanificado->tiempoEjecucion;
+		} else {
+			cantTurnosA = trainerA->entrenadorPlanificado->tiempoIntercambio;
+		}
+	}
 
-	uint32_t cantTurnosA = turnosHastaPokemon(trainerA->pokemonPlanificado,trainerA);
-	uint32_t cantTurnosB = turnosHastaPokemon(trainerB->pokemonPlanificado,trainerB);
+	if(trainerB->pokemonPlanificado != NULL) {
+		cantTurnosB = trainerB->pokemonPlanificado->tiempoEjecucion;
+	} else if (trainerB->entrenadorPlanificado != NULL) {
+		if(trainerB->entrenadorPlanificado > 0) {
+			cantTurnosB = trainerB->entrenadorPlanificado->tiempoEjecucion;
+		} else {
+			cantTurnosB = trainerB->entrenadorPlanificado->tiempoIntercambio;
+		}
+	}
 
 	return cantTurnosA < cantTurnosB;
 }

@@ -126,20 +126,23 @@ typedef struct{
 	char* nombre;
 } t_get_pokemon;
 
-typedef struct
-{
-    char* nombre;
-    t_posicion* posicion;
-} t_pokemon_posicion;
-
 typedef struct{
     char* nombre;
     uint32_t cantidad;
 }t_pokemon_cantidad;
 
+typedef struct
+{
+    char* nombre;
+    t_posicion* posicion;
+	uint32_t tiempoEjecucion;
+} t_pokemon_posicion;
+
 typedef struct {
 	uint32_t id;
 	t_posicion* posicion;
+	uint32_t tiempoEjecucion;
+	uint32_t tiempoIntercambio;
 }t_entrenador_posicion;
 
 typedef struct

@@ -37,7 +37,12 @@ void establecerConexionBroker() {
     if (suscribeAppeared->conexion != -1) {
         printf("Se establecio una conexion con el Broker :D\n");
 		printf("Desactivando modo default \n");
-		sem_wait(&estaDesconectado);
+		int valorSem;
+		if (sem_getvalue(&estaDesconectado, &valorSem) == 0){
+            if(valorSem != 0) {
+				sem_wait(&estaDesconectado);
+            }
+        }
         mandarGET();
         if(pthread_create(&threadSUSCRIBE_CAUGHT,NULL,(void*)suscribe,(void*)suscribeCaught) != 0)
             printf("Error CAUGHT\n");
