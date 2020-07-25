@@ -52,54 +52,7 @@ void startCache()
     //Memory allocation
     cache = malloc(TAMANO_MEMORIA);
     t_holes* initial = createHole(cache, TAMANO_MEMORIA);
-    list_add(holes, initial);
-
-    #pragma region Prueba de consolidacion
-
-        // t_holes* initialPart1 = createHole(cache, 1024);
-        // t_holes* initialPart2 = createHole(initialPart1->pLimit + 1, 1024);
-        // t_holes* initialPart3 = createHole(initialPart2->pLimit + 1, 512);
-        // t_holes* initialPart4 = createHole(initialPart3->pLimit + 12, 3096);
-
-        // list_add(holes, initialPart1);
-        // list_add(holes, initialPart2);
-        // list_add(holes, initialPart3);
-        // list_add(holes, initialPart4);
-        // showHoles();
-        // consolidar();
-        // printf("\n");
-        // showHoles();
-        // log_info(logger, "Cache module has started successfully\n");
-
-        // free(initial);
-        // free(cache);
-        // free(initialPart1);
-        // free(initialPart2);
-    
-    #pragma endregion
-    #pragma region Prueba de compactacion
-    /*
-    
-        t_partition* partition1 = createPartition(cache, 1024);
-        t_holes* initialPart1 = createHole(partition1->pLimit + 1, 512);
-        t_partition* partition2 = createPartition(initialPart1->pLimit + 1, 256);
-        t_holes* initialPart2 = createHole(partition2->pLimit + 1, 512);
-        t_partition* partition3 = createPartition(initialPart2->pLimit + 1, 128);
-        t_holes* initialPart3 = createHole(partition3->pLimit + 1, 512);
-
-        list_add(partitions, partition1);
-        list_add(partitions, partition2);
-        list_add(partitions, partition3);
-        list_add(holes, initialPart1);
-        list_add(holes, initialPart2);
-        list_add(holes, initialPart3);
-
-        compactar();
-
-        showPartitions();
-        showHoles();*/
-    #pragma endregion
-    
+    list_add(holes, initial);   
 }
 
 void memoria_buddySystem(t_message* message) 
@@ -264,6 +217,13 @@ void memoria_particiones(t_message* message)
             { 
                 compactar(); 
                 targetHole = algoritmo_particion_libre(addressFromMessageToCopy->size);
+
+                if(targetHole != NULL)
+                    acumFreeSpace += targetHole->length;
+
+                if(acumFreeSpace >= addressFromMessageToCopy->size)
+                    targetHole = algoritmo_particion_libre(addressFromMessageToCopy->size);
+                    
                 continue;
             }
         }
@@ -275,11 +235,15 @@ void memoria_particiones(t_message* message)
                 counterToCompactacion++;
             }
             else
-            {           
+            {          
                 compactar();
                 counterToCompactacion = 0;
                 targetHole = algoritmo_particion_libre(addressFromMessageToCopy->size);
                 pthread_mutex_unlock(&s_counterToCompactacion);
+
+                if(targetHole != NULL)
+                    acumFreeSpace += targetHole->length;
+
                 continue;
             }
             pthread_mutex_unlock(&s_counterToCompactacion);
@@ -329,7 +293,9 @@ t_holes* reemplazo_fifo(uint32_t bytes)
     t_partition* targetFifoPartition = NULL;
 
     //Se crea una copia para ordenarla por fifo
-    t_list* tempPartitionsList = list_duplicate(partitions);
+    pthread_mutex_lock(&s_partitions);
+        t_list* tempPartitionsList = list_duplicate(partitions);
+    pthread_mutex_unlock(&s_partitions);
     uint32_t _fifo_menor_a_mayor (t_partition* partition1, t_partition* partition2) {
         return partition1->fifoPosition < partition2->fifoPosition;
     }
@@ -337,6 +303,12 @@ t_holes* reemplazo_fifo(uint32_t bytes)
 
     //Se toma el numero de fifo de la primera particion despues del orden
     targetFifoPartition = (t_partition*)list_get(tempPartitionsList, 0);
+
+    if(targetFifoPartition == NULL) {
+        log_error(broker_custom_logger, "Target Fifo Partition es NULL");
+        exit(1);
+    }
+
     uint32_t fifoToDelete = targetFifoPartition->fifoPosition;
 
     free(targetFifoPartition);
@@ -441,6 +413,38 @@ t_holes* reemplazo_lru(uint32_t bytes)
         return newFreeSpace;
     }
     return NULL;
+}
+
+void reallocPartition(t_partition* previousPartition, t_partition* newAllocatedPartition)
+{
+    uint32_t _is_the_metadata(cache_message* message) {
+        return message->idMessage == previousPartition->id;
+    }
+    
+    pthread_mutex_lock(&s_metadatas);
+        cache_message* metadata = (cache_message*)list_find(metadatas, (void*)_is_the_metadata);
+    pthread_mutex_unlock(&s_metadatas);
+    if(metadata == NULL) {
+        log_error(broker_custom_logger, "No se encontro la metadata para la particion %i", previousPartition->id);
+        exit(1);
+    }
+
+    //Primero asignamos la metadata clave de la particion
+    newAllocatedPartition->id = previousPartition->id;
+    newAllocatedPartition->fifoPosition = previousPartition->fifoPosition;
+    newAllocatedPartition->lastUse = previousPartition->lastUse;
+
+    //Tomamos el mensaje para reubicarlo
+    t_cache_buffer* buffer = malloc(sizeof(t_cache_buffer));
+    buffer->stream = malloc(metadata->length);
+    buffer->size = metadata->length;
+    memcpy(buffer->stream, metadata->startAddress, metadata->length);
+
+    //Reubicamos a la nueva posicion
+    memcpy(newAllocatedPartition->pStart, buffer->stream, buffer->size);
+
+    //Actualizamos la metadata de la particion
+    metadata->startAddress = newAllocatedPartition->pStart;   
 }
 
 void dispatchCachedMessages(t_cache_dispatch_info* dispatchInfo)
@@ -566,6 +570,7 @@ void dump()
     t_partition* currentBlock;
     cache_message* currentMetadata;
     
+    pthread_mutex_lock(&s_metadatas);
     for (uint32_t i = 0; i < list_size(allMemory); i++)
     {
         currentBlock = (t_partition*)list_get(allMemory, i);
@@ -586,8 +591,9 @@ void dump()
             printf("Particion %i:  %p - %p    [%c]    Size: %ib    LRU: -    COLA: -   ID: -\n", 
                 i+1, currentBlock->pStart, currentBlock->pLimit, currentBlock->free, currentBlock->length);
         }
-
     }
+    pthread_mutex_unlock(&s_metadatas);
+    printf("\n");
 }
 
 void consolidar()
@@ -637,8 +643,7 @@ void compactar()
         return;
     }
 
-    //Primero asegurar que no haya huecos contiguos y luego ordenar ambas listas
-    consolidar();
+    //Ordenar ambas listas
     list_sort(partitions, (void*) mem_address_menor_a_mayor);
     list_sort(holes, (void*) mem_address_menor_a_mayor);
     uint32_t targetPartitionIndex;
@@ -669,18 +674,22 @@ void compactar()
         t_partition* relocatedPartition = createPartition(hole->pStart, targetPartition->length);
         t_holes* relocatedHole = createHole(relocatedPartition->pLimit + 1, hole->length);
 
+        //Hay que actualizar las nuevas direcciones de la particion
+        reallocPartition(targetPartition, relocatedPartition);
+
         list_remove(holes, 0);
         list_remove(partitions, targetPartitionIndex);
         list_add(holes, relocatedHole);
         list_add(partitions, relocatedPartition);
         list_sort(partitions, (void*) mem_address_menor_a_mayor);
         list_sort(holes, (void*) mem_address_menor_a_mayor);
-        consolidar();
 
         targetPartition = NULL;
     }
     pthread_mutex_unlock(&s_holes);
     pthread_mutex_unlock(&s_partitions);
+    consolidar();
+    //dump();
 }
 
 t_holes* particionLibre_ff(uint32_t bytes) 
@@ -691,6 +700,7 @@ t_holes* particionLibre_ff(uint32_t bytes)
     else
         bytesToAlloc = TAMANO_MINIMO_PARTICION;
 
+    log_debug(broker_custom_logger, "Bytes to alloc: %i", bytesToAlloc);
     t_holes* result = NULL;
     t_holes* currentHole = NULL;
     pthread_mutex_lock(&s_holes);
