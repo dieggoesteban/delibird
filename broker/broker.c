@@ -15,8 +15,12 @@ int main()
     signal(SIGUSR1, dump);
     
     sem_init(&waitForFinish, 0, 0);
-
+    
     //Inicializar parámetros
+    remove("./dumps/cache_dump.txt");
+    remove("./assets/broker.log");
+    remove("./assets/broker_custom.log");
+    
     config = config_create("./assets/broker.config");
 	logger = log_create("./assets/broker.log", "broker", true, LOG_LEVEL_INFO);
     broker_custom_logger = log_create("./assets/broker_custom.log", "broker", true, LOG_LEVEL_DEBUG);

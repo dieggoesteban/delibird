@@ -545,6 +545,9 @@ void dispatchCachedMessages(t_cache_dispatch_info* dispatchInfo)
 
 void dump()
 {
+    FILE* fp;
+    fp = fopen("./dumps/cache_dump.txt", "a");
+
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
 
@@ -560,7 +563,7 @@ void dump()
 
     list_sort(allMemory, (void*)mem_address_menor_a_mayor);
 
-    printf("\nDump: %02d/%02d/%d %02d:%02d:%02d\n",
+    fprintf(fp, "\nDump: %02d/%02d/%d %02d:%02d:%02d\n",
         tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);
     t_partition* currentBlock;
     cache_message* currentMetadata;
@@ -580,24 +583,25 @@ void dump()
             if(currentBlock->length < 10)
             {
                 currentMetadata = (cache_message*)list_find(metadatas, (void*)_is_the_metadata);
-                printf("Particion %i:  %p - %p    [%c]    Size: %ib     LRU: %llu    COLA: %i   ID: %i\n", 
+                fprintf(fp, "Particion %i:  %p - %p    [%c]    Size: %ib     LRU: %llu    COLA: %i   ID: %i\n", 
                     i+1, currentBlock->pStart, currentBlock->pLimit, currentBlock->free, currentBlock->length, currentBlock->lastUse
                     , currentMetadata->mq_cod, currentMetadata->idMessage);
             }
             else
             {
                 currentMetadata = (cache_message*)list_find(metadatas, (void*)_is_the_metadata);
-                printf("Particion %i:  %p - %p    [%c]    Size: %ib    LRU: %llu    COLA: %i   ID: %i\n", 
+                fprintf(fp, "Particion %i:  %p - %p    [%c]    Size: %ib    LRU: %llu    COLA: %i   ID: %i\n", 
                     i+1, currentBlock->pStart, currentBlock->pLimit, currentBlock->free, currentBlock->length, currentBlock->lastUse
                     , currentMetadata->mq_cod, currentMetadata->idMessage);
             }
         }
         else
         {
-            printf("Particion %i:  %p - %p    [%c]    Size: %ib    LRU: -    COLA: -   ID: -\n", 
+            fprintf(fp, "Particion %i:  %p - %p    [%c]    Size: %ib    LRU: -    COLA: -   ID: -\n", 
                 i+1, currentBlock->pStart, currentBlock->pLimit, currentBlock->free, currentBlock->length);
         }
     }
+    fclose(fp);
     pthread_mutex_unlock(&s_metadatas);
     printf("\n");
     log_info(logger, "Se ha solicitado un dump de la memoria cache");
