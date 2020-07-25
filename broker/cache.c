@@ -63,7 +63,6 @@ void memoria_buddySystem(t_message* message)
 
 void memoria_particiones(t_message* message) 
 {
-    //log_info(broker_custom_logger, "Dynamic Partitions Algorithm\n");
     cache_message* administrative = (cache_message*)malloc(sizeof(cache_message));
     t_cache_buffer* addressFromMessageToCopy;
 
@@ -119,7 +118,7 @@ void memoria_particiones(t_message* message)
             t_catch_pokemon* catchPoke = (t_catch_pokemon*)message->mensaje;
             cache_catch_pokemon cache_catch;
 
-            cache_catch.nameLength = catchPoke->sizeNombre;            
+            cache_catch.nameLength = catchPoke->sizeNombre - 1;            
             cache_catch.pokeName = malloc(cache_catch.nameLength);
             cache_catch.posX = catchPoke->posicion->posicion_x;
             cache_catch.posY = catchPoke->posicion->posicion_y;
@@ -159,7 +158,7 @@ void memoria_particiones(t_message* message)
             t_get_pokemon* getPoke = (t_get_pokemon*)message->mensaje;
             cache_get_pokemon cache_getPoke;
 
-            cache_getPoke.nameLength = getPoke->sizeNombre;
+            cache_getPoke.nameLength = getPoke->sizeNombre - 1;
             cache_getPoke.pokeName = malloc(cache_getPoke.nameLength);
             memcpy(cache_getPoke.pokeName, string_substring(getPoke->nombre, 0, cache_getPoke.nameLength), cache_getPoke.nameLength);
             
@@ -700,7 +699,6 @@ t_holes* particionLibre_ff(uint32_t bytes)
     else
         bytesToAlloc = TAMANO_MINIMO_PARTICION;
 
-    log_debug(broker_custom_logger, "Bytes to alloc: %i", bytesToAlloc);
     t_holes* result = NULL;
     t_holes* currentHole = NULL;
     pthread_mutex_lock(&s_holes);
