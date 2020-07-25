@@ -51,7 +51,7 @@ t_cache_buffer* serializar_cacheAppearedPokemon(cache_appeared_pokemon* appeared
     appearedPokemon_buffer->size = (sizeof(uint32_t) * 3 + (appearedPokemon->nameLength));
 
     void* stream = malloc(appearedPokemon_buffer->size);
-    uint32_t offset = 0;
+    uint32_t offset = 0; 
 
     memcpy(stream + offset, &appearedPokemon->nameLength, sizeof(uint32_t));
     offset += sizeof(uint32_t);
@@ -246,5 +246,6 @@ t_caught_pokemon* caughtPokemon_cacheToMessage(cache_caught_pokemon* cacheCaught
 t_get_pokemon* getPokemon_cacheToMessage(cache_get_pokemon* cacheGetPokemon, cache_message* metadata)
 {
     t_get_pokemon* getPokemon = crearGetPokemon(metadata->idMessage, cacheGetPokemon->pokeName);
+    return getPokemon;
 }
 //t_localized_pokemon* localizedPokemon_cacheToMessage(cache_localized_pokemon* cacheLocalizedPokemon, cache_message* metadata);

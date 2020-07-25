@@ -2,6 +2,7 @@
 #ifndef SOCKETS_H_
 #define SOCKETS_H_
 
+#include <errno.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<signal.h>
@@ -19,6 +20,7 @@
 
 t_log* logger;
 t_config* config;
+t_suscribe_gameboy* suscribe;
 
 bool terminaConexion;
 

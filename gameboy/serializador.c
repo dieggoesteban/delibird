@@ -575,11 +575,13 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 		t_posicion* posicion = crearPosicion((uint32_t)atoi(arrayArgumentos[1]),(uint32_t)atoi(arrayArgumentos[2]));
 		t_catch_pokemon* catchPokemon;
 
-		if(arraySize((void*)arrayArgumentos) == 4){
-			catchPokemon = crearCatchPokemon((uint32_t)atoi(arrayArgumentos[3]), arrayArgumentos[0], posicion);
-		}else{
-			catchPokemon = crearCatchPokemon(0, arrayArgumentos[0], posicion);
-		}
+		// if(arraySize((void*)arrayArgumentos) == 4){
+		// 	catchPokemon = crearCatchPokemon((uint32_t)atoi(arrayArgumentos[3]), arrayArgumentos[0], posicion);
+		// }else{
+		// 	catchPokemon = crearCatchPokemon(0, arrayArgumentos[0], posicion);
+		// }
+
+		catchPokemon = crearCatchPokemon(0, arrayArgumentos[0], posicion);
 
 		paquete = serializar_catchPokemon(catchPokemon);
 

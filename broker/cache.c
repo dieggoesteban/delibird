@@ -104,8 +104,7 @@ void startCache()
 
 void memoria_buddySystem(t_message* message) 
 {
-    log_info(broker_custom_logger, "I'm using Buddy System Algorithm\n");
-
+    log_warning(broker_custom_logger, "Buddy system no implementado para el grupo Socketes por disposición de la cátedra");    
     //not implemented
 }
 
@@ -248,29 +247,54 @@ void memoria_particiones(t_message* message)
     }
 
     //Etapa 1: Buscar partición libre
+    uint32_t partitionsSize;
+    uint32_t acumFreeSpace = 0;
     t_holes* targetHole = algoritmo_particion_libre(addressFromMessageToCopy->size); //Me asegura que de ese hole puedo sacar la particion minima por config
-    while(targetHole == NULL)
+    
+    if(targetHole != NULL)
+        acumFreeSpace += targetHole->length;
+    while(targetHole == NULL || acumFreeSpace < addressFromMessageToCopy->size)
     {
-        pthread_mutex_lock(&s_counterToCompactacion);
-        if(counterToCompactacion < FRECUENCIA_COMPACTACION)
+        if(FRECUENCIA_COMPACTACION == -1)
         {
-            counterToCompactacion++;
+            pthread_mutex_lock(&s_partitions);
+                partitionsSize = list_size(partitions);
+            pthread_mutex_unlock(&s_partitions);
+            if(partitionsSize == 0) 
+            { 
+                compactar(); 
+                targetHole = algoritmo_particion_libre(addressFromMessageToCopy->size);
+                continue;
+            }
         }
         else
-        {           
-            compactar();
-            counterToCompactacion = 0;
-            targetHole = algoritmo_particion_libre(addressFromMessageToCopy->size);
+        {
+            pthread_mutex_lock(&s_counterToCompactacion);
+            if(counterToCompactacion < FRECUENCIA_COMPACTACION)
+            {
+                counterToCompactacion++;
+            }
+            else
+            {           
+                compactar();
+                counterToCompactacion = 0;
+                targetHole = algoritmo_particion_libre(addressFromMessageToCopy->size);
+                pthread_mutex_unlock(&s_counterToCompactacion);
+                continue;
+            }
             pthread_mutex_unlock(&s_counterToCompactacion);
-            continue;
         }
-        pthread_mutex_unlock(&s_counterToCompactacion);
-        
+
         //Etapa 3: Reemplazo y Consolidacion
         targetHole = algoritmo_reemplazo(addressFromMessageToCopy->size);
-        pthread_mutex_lock(&s_holes);
-            consolidar();
-        pthread_mutex_unlock(&s_holes);
+        consolidar();
+
+        if(targetHole != NULL)
+            acumFreeSpace += targetHole->length;
+
+
+        if(acumFreeSpace >= addressFromMessageToCopy->size)
+            targetHole = algoritmo_particion_libre(addressFromMessageToCopy->size);
     }
     
     administrative->startAddress = targetHole->pStart;
@@ -311,18 +335,80 @@ t_holes* reemplazo_fifo(uint32_t bytes)
     }
     list_sort(tempPartitionsList, (void*)_fifo_menor_a_mayor);
 
-    while (targetFifoPartition == NULL || targetFifoPartition->length < bytes)
+    //Se toma el numero de fifo de la primera particion despues del orden
+    targetFifoPartition = (t_partition*)list_get(tempPartitionsList, 0);
+    uint32_t fifoToDelete = targetFifoPartition->fifoPosition;
+
+    free(targetFifoPartition);
+
+    //Se ubica a la victima en la lista original y se crea el nuevo hueco con sus datos
+    uint32_t _is_the_one_with_fifo_number(t_partition* partition) {
+        return partition->fifoPosition == fifoToDelete;
+    }
+
+    pthread_mutex_lock(&s_partitions);
+        t_partition* victim = (t_partition*)list_find(partitions, (void*)_is_the_one_with_fifo_number);
+    pthread_mutex_unlock(&s_partitions);
+
+    if(victim == NULL) {
+        log_error(broker_custom_logger, "No se encontro particion victima");
+        exit(1);
+    }
+    t_holes* newFreeSpace = createHole(victim->pStart, victim->length);
+    
+    //Se elimina de la lista de particiones
+    t_partition* currentPartition;
+    pthread_mutex_lock(&s_partitions);
+    for(uint32_t i = 0; i < list_size(partitions); i++)
+        {
+            currentPartition = list_get(partitions, i);
+            if(currentPartition->fifoPosition == victim->fifoPosition)
+            {
+                list_remove(partitions, i);
+                break;
+            }
+        }
+    list_destroy(tempPartitionsList);
+    pthread_mutex_unlock(&s_partitions);
+    pthread_mutex_lock(&s_holes);
+        list_add(holes, (void*)newFreeSpace);
+    pthread_mutex_unlock(&s_holes);
+    return newFreeSpace;
+}
+
+t_holes* reemplazo_lru(uint32_t bytes)
+{ 
+    uint32_t bytesToAlloc = 0;
+    if(bytes > TAMANO_MINIMO_PARTICION)
+        bytesToAlloc = bytes;
+    else
+        bytesToAlloc = TAMANO_MINIMO_PARTICION;
+
+    t_partition* targetLRU_Partition = NULL;
+
+    t_list* tempPartitionsList = list_duplicate(partitions);
+    uint32_t _lastUse_menor_a_mayor (t_partition* partition1, t_partition* partition2) {
+        return partition1->lastUse < partition2->lastUse;
+    }
+    list_sort(tempPartitionsList, (void*)_lastUse_menor_a_mayor);
+
+    while (targetLRU_Partition == NULL || targetLRU_Partition->length < bytesToAlloc)
     {
+        if(list_size(tempPartitionsList) == 0)
+        {
+            log_warning(broker_custom_logger, "No hay particiones para reemplazar que satisfagan %d bytes", bytesToAlloc);
+            return NULL;
+        }
+
         //Se toma el numero de fifo de la primera particion despues del orden
-        t_partition* targetFifoPartition = (t_partition*)list_get(tempPartitionsList, 0);
-        if(targetFifoPartition->length < bytes)
+        t_partition* targetLRU_Partition = (t_partition*)list_get(tempPartitionsList, 0);
+        if(targetLRU_Partition->length < bytesToAlloc)
         {
             list_remove(tempPartitionsList, 0);
             continue;
         }
-        uint32_t fifoToDelete = targetFifoPartition->fifoPosition;
-
-        free(targetFifoPartition);
+        uint32_t fifoToDelete = targetLRU_Partition->fifoPosition; //Podemos usar su valor de fifo para ubicarlo
+        free(targetLRU_Partition);
 
         //Se ubica a la victima en la lista original y se crea el nuevo hueco con sus datos
         uint32_t _is_the_one_with_fifo_number(t_partition* partition) {
@@ -352,13 +438,10 @@ t_holes* reemplazo_fifo(uint32_t bytes)
                 }
             }
         pthread_mutex_unlock(&s_partitions);
-
         return newFreeSpace;
     }
     return NULL;
 }
-
-t_holes* reemplazo_lru(uint32_t bytes){ return createHole(0, 0); }
 
 void dispatchCachedMessages(t_cache_dispatch_info* dispatchInfo)
 {
@@ -381,12 +464,15 @@ void dispatchCachedMessages(t_cache_dispatch_info* dispatchInfo)
     tempMetadatas = list_filter(metadatas, (void*)_belongs_to_queue);
 
     cache_message* currentMetadata;
-    for(uint32_t i = 0; i < list_size(metadatas); i++)
+    for(uint32_t i = 0; i < list_size(tempMetadatas); i++)
     {
         currentMetadata = list_get(tempMetadatas, i);
 
-        if(list_any_satisfy(currentMetadata->suscriptoresEnviados, (void*)_he_gots_the_message))
-            continue;
+        if(list_size(currentMetadata->suscriptoresEnviados) > 0)
+        {
+            if(list_any_satisfy(currentMetadata->suscriptoresEnviados, (void*)_he_gots_the_message))
+                continue;
+        }
 
         pthread_mutex_lock(&s_cache);
             t_cache_buffer* buffer = malloc(sizeof(t_cache_buffer));
@@ -455,6 +541,7 @@ void dispatchCachedMessages(t_cache_dispatch_info* dispatchInfo)
     pthread_mutex_unlock(&s_metadatas);
     pthread_mutex_unlock(&s_holes);
     pthread_mutex_unlock(&s_partitions);
+    list_destroy(tempMetadatas);
 }
 
 void dump()
@@ -505,11 +592,13 @@ void dump()
 
 void consolidar()
 {
+    pthread_mutex_lock(&s_holes);
     if(list_size(holes) == 0 || list_size(holes) == 1)
     {
-        log_info(broker_custom_logger, "Hay un solo uno o ningun hueco, no es necesario consolidar");
+        pthread_mutex_unlock(&s_holes);
+        return;
     }
-
+    list_sort(holes, (void*) mem_address_menor_a_mayor);
     t_holes* lowerHole;
     t_holes* upperHole;
 
@@ -525,18 +614,18 @@ void consolidar()
             t_holes* consolidado = createHole(lowerHole->pStart, lowerHole->length + upperHole->length);
 
             //Se elimina la posición i dos veces porque el espacio contiguo se desplaza un lugar
-            pthread_mutex_lock(&s_holes);
-                list_remove(holes, i);
-                list_remove(holes, i);
-                list_add(holes, consolidado);
-                //Ordenamos para siempre comparar los primeros 2 holes
-                list_sort(holes, (void*) mem_address_menor_a_mayor);
-            pthread_mutex_unlock(&s_holes);
+            list_remove(holes, i);
+            list_remove(holes, i);
+            list_add(holes, consolidado);
+
+            //Ordenamos para siempre comparar los primeros 2 holes
+            list_sort(holes, (void*) mem_address_menor_a_mayor);
             i = 0;
             continue;
         }
         i++;
     }
+    pthread_mutex_unlock(&s_holes);
 }
 
 void compactar()

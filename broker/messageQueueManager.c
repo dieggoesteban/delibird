@@ -443,7 +443,7 @@ void deleteFromQueue(t_message* message)
 		if(targetIndex >= 0)
 		{
 			list_remove(messageQueue->mensajes, targetIndex);			
-			log_warning(broker_custom_logger, "Mensaje eliminado de la cola");
+			//log_debug(broker_custom_logger, "Mensaje eliminado de la cola");
 			free(current);
 		}
 	pthread_mutex_unlock(&messageQueue->s_mensajes);
@@ -463,7 +463,7 @@ void cacheMessage(t_message* message)
 {
 	algoritmo_memoria(message);
 	sem_post(&message->s_puedeEliminarse);
-	//log_info(logger, "Mensaje id %i agregado a la cache", message->id);
+	//log_debug(logger, "Mensaje id %i agregado a la cache", message->id);
 }
 
 void inicializarCounterMessageId()
