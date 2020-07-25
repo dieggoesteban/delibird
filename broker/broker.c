@@ -27,6 +27,8 @@ int main()
     IP = config_get_string_value(config, "IP_BROKER");
     PUERTO = config_get_string_value(config, "PUERTO_BROKER");
 
+    log_debug(broker_custom_logger, "PID de Broker %i", getpid());
+
     inicializarCounterMessageId();
 
     //Instanciación de las colas de mensajes

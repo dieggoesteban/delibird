@@ -348,8 +348,8 @@ void unsubscribeModule(uint32_t idNewModule, uint32_t socket_cliente, uint32_t m
 		targetSuscription = (t_suscripcion*)list_get(messageQueue->subscribers, i);
 		if(targetSuscription->idModule == foundSuscripcion->idModule)
 		{
-			log_debug(broker_custom_logger, "Se ha desuscripto el modulo id %i con el socket %i de la cola %s", 
-				targetSuscription->idModule, targetSuscription->socket, messageQueue->name);
+			//log_debug(broker_custom_logger, "Se ha desuscripto el modulo id %i con el socket %i de la cola %s", 
+				//targetSuscription->idModule, targetSuscription->socket, messageQueue->name);
 			shutdown(targetSuscription->socket, 2);
 			close(targetSuscription->socket);
 			list_remove(messageQueue->subscribers, i);

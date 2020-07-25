@@ -329,8 +329,8 @@ t_holes* reemplazo_fifo(uint32_t bytes)
     //Se elimina de la lista de particiones
     t_partition* currentPartition;
     pthread_mutex_lock(&s_partitions);
-    void* addressToFindItsMetadata;
-    for(uint32_t i = 0; i < list_size(partitions); i++)
+        void* addressToFindItsMetadata;
+        for(uint32_t i = 0; i < list_size(partitions); i++)
         {
             currentPartition = list_get(partitions, i);
             if(currentPartition->fifoPosition == victim->fifoPosition)
@@ -340,8 +340,22 @@ t_holes* reemplazo_fifo(uint32_t bytes)
                 break;
             }
         }
-    list_destroy(tempPartitionsList);
+        list_destroy(tempPartitionsList);
     pthread_mutex_unlock(&s_partitions);
+
+    //Se elimina la metadata
+    pthread_mutex_lock(&s_metadatas);
+        cache_message* metadata;
+        for(uint32_t i = 0; i < list_size(metadatas); i++)
+        {
+            metadata = (cache_message*)list_get(metadatas, i);
+            if(metadata->startAddress == addressToFindItsMetadata)
+            {
+                list_remove(metadatas, i);
+                break;
+            }
+        }
+    pthread_mutex_unlock(&s_metadatas);
     pthread_mutex_lock(&s_holes);
         list_add(holes, (void*)newFreeSpace);
     pthread_mutex_unlock(&s_holes);
@@ -391,17 +405,33 @@ t_holes* reemplazo_lru(uint32_t bytes)
     //Se elimina de la lista de particiones
     t_partition* currentPartition;
     pthread_mutex_lock(&s_partitions);
-    for(uint32_t i = 0; i < list_size(partitions); i++)
+        void* addressToFindItsMetadata;
+        for(uint32_t i = 0; i < list_size(partitions); i++)
         {
             currentPartition = list_get(partitions, i);
             if(currentPartition->fifoPosition == victim->fifoPosition)
             {
+                addressToFindItsMetadata = currentPartition->pStart;
                 list_remove(partitions, i);
                 break;
             }
         }
-    list_destroy(tempPartitionsList);
+        list_destroy(tempPartitionsList);
     pthread_mutex_unlock(&s_partitions);
+
+    //Se elimina la metadata
+    pthread_mutex_lock(&s_metadatas);
+        cache_message* metadata;
+        for(uint32_t i = 0; i < list_size(metadatas); i++)
+        {
+            metadata = (cache_message*)list_get(metadatas, i);
+            if(metadata->startAddress == addressToFindItsMetadata)
+            {
+                list_remove(metadatas, i);
+                break;
+            }
+        }
+    pthread_mutex_unlock(&s_metadatas);
     pthread_mutex_lock(&s_holes);
         list_add(holes, (void*)newFreeSpace);
     pthread_mutex_unlock(&s_holes);
