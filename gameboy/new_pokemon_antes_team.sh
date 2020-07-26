@@ -1,3 +1,4 @@
+#!/bin/sh
 ./gameboy BROKER NEW_POKEMON Pikachu 9 9 1
 ./gameboy BROKER NEW_POKEMON Squirtle 5 2 1
 

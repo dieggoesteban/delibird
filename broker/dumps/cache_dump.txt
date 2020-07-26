@@ -1,7 +1,0 @@
-
-Dump: 25/07/2020 15:32:56
-Particion 1:  0xb2c004a0 - 0xb2c004b2    [X]    Size: 19b    LRU: 1363679315    COLA: 3   ID: 30
-Particion 2:  0xb2c004b3 - 0xb2c004b6    [L]    Size: 4b    LRU: -    COLA: -   ID: -
-Particion 3:  0xb2c004b7 - 0xb2c004ca    [X]    Size: 20b    LRU: 1354318911    COLA: 3   ID: 28
-Particion 4:  0xb2c004cb - 0xb2c004ce    [X]    Size: 4b     LRU: 1359323472    COLA: 4   ID: 29
-Particion 5:  0xb2c004cf - 0xb2c004df    [L]    Size: 17b    LRU: -    COLA: -   ID: -
