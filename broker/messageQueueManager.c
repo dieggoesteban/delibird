@@ -30,6 +30,8 @@ t_message_queue* crearMessageQueue(uint32_t mq_cod)
     newMessageQueue->mensajes = list_create();
     newMessageQueue->subscribers = list_create();
 
+	// sem_init(&newMessageQueue->s_mensajes, 0, 1);
+	// sem_init(&newMessageQueue->s_subscribers, 0, 1);
 	if(pthread_mutex_init(&newMessageQueue->s_mensajes, NULL) != 0)
 		log_error(broker_custom_logger, "Error mutex init (s_mensajes) in crearMessageQueue");
 	if(pthread_mutex_init(&newMessageQueue->s_subscribers, NULL) != 0)
@@ -46,10 +48,14 @@ t_message* crearMessage()
     mensajeStruct->suscriptoresConfirmados = list_create();
 	mensajeStruct->suscriptoresEnviados = list_create();
 
-	if(pthread_mutex_init(&mensajeStruct->s_suscriptoresEnviados, NULL) != 0)
+	pthread_mutexattr_t attr;
+	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
+	pthread_mutexattr_init(&attr);
+
+	if(pthread_mutex_init(&mensajeStruct->s_suscriptoresEnviados, &attr) != 0)
 		log_error(broker_custom_logger, "Error mutex init (s_suscriptoresEnviados) in crearMessage");
 
-	if(pthread_mutex_init(&mensajeStruct->s_suscriptoresConfirmados, NULL) != 0)
+	if(pthread_mutex_init(&mensajeStruct->s_suscriptoresConfirmados, &attr) != 0)
 		log_error(broker_custom_logger, "Error mutex init (s_suscriptoresConfirmados) in crearMessage");	
 	
 	sem_init(&mensajeStruct->s_puedeEliminarse, 0, 0);
@@ -107,7 +113,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 			log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
 			t_register_module* registerModule = deserializar_registerModule(buffer);
 			subscribeNewModule(registerModule->moduleId, socket_cliente, registerModule->messageQueue);
-			free(registerModule);
+			// free(registerModule);
 			break;
 		}
 		case ACKNOWLEDGEMENT:
@@ -121,7 +127,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 		{
 			t_register_module* unregisterModule = deserializar_registerModule(buffer);
 			unsubscribeModule(unregisterModule->moduleId, socket_cliente, unregisterModule->messageQueue);
-			free(unregisterModule);
+			// free(unregisterModule);
 			break;
 		}
 		case NEW_POKEMON:
@@ -500,7 +506,7 @@ void deleteFromQueue(t_message* message)
 		{
 			list_remove(messageQueue->mensajes, targetIndex);			
 			//log_debug(broker_custom_logger, "Mensaje eliminado de la cola");
-			free(current);
+			// free(current);
 		}
 	pthread_mutex_unlock(&messageQueue->s_mensajes);
 }
@@ -511,7 +517,7 @@ void notifySender(t_message* message, uint32_t socket_cliente)
 	t_id_mensaje_recibido* idAsignado = crearIdMensajeRecibido(message->id);		
 	t_paquete* paquete = serializar_idMensajeRecibido(idAsignado);
 	enviarMensaje(paquete, socket_cliente);
-	free(idAsignado);
+	// free(idAsignado);
 	//log_info(broker_custom_logger, "Respuesta de id (%i) enviada al cliente %i", message->id, socket_cliente);		
 }
 
@@ -542,8 +548,8 @@ void freeMessage(t_message* message)
 {
 	list_destroy(message->suscriptoresEnviados);
 	list_destroy(message->suscriptoresConfirmados);
-	free(message->mensaje);
-	free(message);
+	// free(message->mensaje);
+	// free(message);
 }
 
 void freeMessageQueue(t_message_queue* messageQueue)
@@ -551,5 +557,5 @@ void freeMessageQueue(t_message_queue* messageQueue)
 	list_destroy(messageQueue->mensajes);
 	// list_destroy_and_destroy_elements(messageQueue->mensajes, (void*)freeMessage);
 	list_destroy(messageQueue->subscribers);
-	free(messageQueue);
+	// free(messageQueue);
 }

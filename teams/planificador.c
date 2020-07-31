@@ -241,16 +241,29 @@ void realizarIntercambio(t_entrenador* tr) {
     } else {
         log_info(logger, "Hubo un error en el intercambio\n");
     }
+    mostrarPokesTrainer(tr);
+    mostrarPokesTrainer(tr2);
+    tr->entrenadorPlanificado = NULL;
     tr->enEspera = false;
     tr2->enEspera = false;
     tr->deadlock = entrenadorEnDeadlock(tr);
+    if(tr->deadlock) {
+        log_info(logger, "El entrenador %i quedo en deadlock\n", tr->id);
+        sem_post(&mutexDetector);
+    }
     tr2->deadlock = entrenadorEnDeadlock(tr2);
+    if(tr2->deadlock) {
+        log_info(logger, "El entrenador %i quedo en deadlock\n", tr2->id);
+        sem_post(&mutexDetector);
+    }
+
     sem_wait(&mutexBLOCKED);
     moverEntrenadorDeCola(colaBLOCKED, colaBLOCKED, tr2);
     sem_post(&mutexBLOCKED);
     moverEntrenadorDeCola(colaEXEC, colaBLOCKED, tr);
     sem_post(&mutexEXIT);
 }
+
 
 void modoDesconectado() {
     sem_wait(&mutexBLOCKED);

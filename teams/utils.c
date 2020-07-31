@@ -287,8 +287,20 @@ bool entrenadorEnDeadlock(t_entrenador* entrenador){
 	return false;
 }
 
+bool ordenarListaAlfabeticamente(char* A, char* B){
+	return strcmp(A,B) > 0;
+}
+
+
 bool entrenadorCumplioObjetivo(t_entrenador* entrenador) {
-	if(list_equals(entrenador->pokemonObjetivo,entrenador->pokemonCapturados)) {
+	t_list* pokeCapTemp = list_duplicate(entrenador->pokemonCapturados);
+	t_list* pokeObjTemp = list_duplicate(entrenador->pokemonObjetivo);
+	list_sort(pokeCapTemp, (void*)ordenarListaAlfabeticamente); 
+	list_sort(pokeObjTemp, (void*)ordenarListaAlfabeticamente);
+	// if(list_size(pokesQueNoQuiere(entrenador)) == 0){
+	// 	return true;
+	// }
+	if(list_equals(pokeObjTemp,pokeCapTemp)) {
 		return true;
 	}
 	return false;
@@ -502,6 +514,7 @@ void procesarMensajeCaught(t_caught_pokemon* caughtPoke) {
 				log_info(logger, "El entrenador %i quedo en deadlock\n", tr->id);
 				sem_post(&mutexDetector);
 			}
+			mostrarPokesTrainer(tr);
 		} else {
 			actualizarObjetivoGlobal(poke, false);
 			log_info(logger, "El entrenador %i no pudo capturar a %s\n", tr->id, poke);
@@ -577,5 +590,16 @@ void defaultCaptura(uint32_t index) {
 		}
 		tr->pokemonPlanificado = NULL;
 		list_add(colaBLOCKED,tr);
+	}
+}
+
+void mostrarPokesTrainer(t_entrenador* tr){
+	printf("POKEMONES DE ENTRENADOR %i\n", tr->id);
+	for(uint32_t i = 0; i < list_size(tr->pokemonCapturados); i++){
+		printf("-%s\n", (char*)list_get(tr->pokemonCapturados, i));
+	}
+	printf("POKEMONES OBJETIVO DE %i\n", tr->id);
+	for(uint32_t i = 0; i < list_size(tr->pokemonObjetivo); i++){
+		printf("-%s\n", (char*)list_get(tr->pokemonObjetivo, i));
 	}
 }

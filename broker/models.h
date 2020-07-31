@@ -35,6 +35,9 @@ typedef struct {
 	pthread_mutex_t s_subscribers;
 	sem_t s_hayMensajes;
 
+	// sem_t s_mensajes;
+	// sem_t s_subscribers;
+
 	//Threads
 	pthread_t dispatchMessagesThread;
 } t_message_queue;

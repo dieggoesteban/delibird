@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
         printf("Error RECONEXION\n");
 
     pthread_detach(finalizarPrograma);
-    //pthread_detach(threadMODO_DEFAULT);
+    pthread_join(threadEXIT, NULL);
     pthread_join(threadREADY, NULL);
     pthread_join(threadEXEC, NULL);
     pthread_join(threadDETECT_DEADLOCK, NULL);

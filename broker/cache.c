@@ -36,6 +36,14 @@ void startCache()
     holes = list_create();
     metadatas = list_create();
 
+    // sem_init(&s_cache, 0, 1);
+    // sem_init(&s_partitionCounter, 0, 1);
+    // sem_init(&s_counterToCompactacion, 0, 1);
+    // sem_init(&s_partitions, 0, 1);
+    // sem_init(&s_holes, 0, 1);
+    // sem_init(&s_metadatas, 0, 1);
+
+
     if(pthread_mutex_init(&s_cache, NULL) != 0)
         log_error(broker_custom_logger, "Error mutex init (s_cache) in cache initialization");
     if(pthread_mutex_init(&s_partitionCounter, NULL) != 0)

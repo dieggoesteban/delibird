@@ -6,6 +6,14 @@
 
 uint32_t globalMessageCounterId;
 
+// sem_t s_counterMessageId;
+// sem_t s_listaSuscriptores_newPokemon;
+// sem_t s_listaSuscriptores_getPokemon;
+// sem_t s_listaSuscriptores_appearedPokemon;
+// sem_t s_listaSuscriptores_catchPokemon;
+// sem_t s_listaSuscriptores_caughtPokemon;
+// sem_t s_listaSuscriptores_localizedPokemon;
+
 pthread_mutex_t s_counterMessageId;
 pthread_mutex_t s_listaSuscriptores_newPokemon;
 pthread_mutex_t s_listaSuscriptores_getPokemon;
