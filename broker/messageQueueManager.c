@@ -481,7 +481,6 @@ void dispatchMessagesFromQueue(t_message_queue* messageQueue)
 			if(pthread_join(message->deleteFromQueue, NULL) != 0)
 				log_error(broker_custom_logger, "Error in pthread_detach deleteFromQueue");
 		}
-		pthread_mutex_unlock(&messageQueue->s_mensajes);
 	}
 }
 

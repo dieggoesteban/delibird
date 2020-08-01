@@ -717,10 +717,12 @@ void consolidar()
         return;
     }
     list_sort(holes, (void*) mem_address_menor_a_mayor);
+    pthread_mutex_unlock(&s_holes);
     t_holes* lowerHole;
     t_holes* upperHole;
 
     uint32_t i = 0;
+    pthread_mutex_lock(&s_holes);
     while (list_size(holes) >= 2 && i < list_size(holes) - 1)
     {        
         lowerHole = list_get(holes, i);
@@ -748,12 +750,15 @@ void consolidar()
 
 void compactar()
 {
+    pthread_mutex_lock(&s_holes);
+    pthread_mutex_lock(&s_partitions);
     if(list_size(partitions) == 0 || list_size(holes) == 0)
     {
         log_info(broker_custom_logger, "No hay particiones o no hay huecos -> No es necesario compactar");
-        pthread_mutex_unlock(&s_counterToCompactacion);
         return;
     }
+    pthread_mutex_unlock(&s_holes);
+    pthread_mutex_unlock(&s_partitions);
 
     //Ordenar ambas listas
     list_sort(partitions, (void*) mem_address_menor_a_mayor);
@@ -762,14 +767,14 @@ void compactar()
     t_partition* targetPartition;
 
     consolidar(); //El algoritmo requiere que los huecos esten consolidados antes de compactar
-    pthread_mutex_lock(&s_holes);
-    pthread_mutex_lock(&s_partitions);
     while (existHolesBetweenPartitions())
     {
-        t_holes* hole = (t_holes*)list_get(holes, 0);
-
+        pthread_mutex_lock(&s_holes);
+            t_holes* hole = (t_holes*)list_get(holes, 0);
+        pthread_mutex_unlock(&s_holes);
         //Busco la particion contigua al hueco
         targetPartitionIndex = -1;
+        pthread_mutex_lock(&s_partitions);
         for(uint32_t i = 0; i < list_size(partitions); i++)
         {
             targetPartition = list_get(partitions, i);
@@ -779,7 +784,8 @@ void compactar()
                 break;
             }
         }
-        
+        pthread_mutex_unlock(&s_partitions);
+
         if(targetPartitionIndex == -1)
             log_error(broker_custom_logger, "No hay particiones contiguas al ultimo hueco");
 
@@ -790,26 +796,22 @@ void compactar()
         //Hay que actualizar las nuevas direcciones de la particion
         reallocPartition(targetPartition, relocatedPartition);
 
-        list_remove(holes, 0);
-        list_remove(partitions, targetPartitionIndex);
-        list_add(holes, relocatedHole);
-        list_add(partitions, relocatedPartition);
-        list_sort(partitions, (void*) mem_address_menor_a_mayor);
-        list_sort(holes, (void*) mem_address_menor_a_mayor);
+        pthread_mutex_lock(&s_holes);
+            list_remove(holes, 0);
+            list_add(holes, relocatedHole);
+            list_sort(holes, (void*) mem_address_menor_a_mayor);
         pthread_mutex_unlock(&s_holes);
+        pthread_mutex_lock(&s_partitions);
+            list_remove(partitions, targetPartitionIndex);
+            list_add(partitions, relocatedPartition);
+            list_sort(partitions, (void*) mem_address_menor_a_mayor);
         pthread_mutex_unlock(&s_partitions);
 
         targetPartition = NULL;
 
         consolidar(); //El algoritmo requiere que los huecos se vayan consolidando a medida que se mueven las particiones
-
-        pthread_mutex_lock(&s_holes);
-        pthread_mutex_lock(&s_partitions);
     }
-    pthread_mutex_unlock(&s_holes);
-    pthread_mutex_unlock(&s_partitions);
     consolidar(); //Consolidacion post compactacion
-    //dumpConsole("DUMP POST COMPACTACION");
     log_info(logger, "Se ha realizado una compactacion");
 }
 
@@ -843,9 +845,12 @@ t_holes* particionLibre_ff(uint32_t bytes)
                 break;
             }
         }
-        list_sort(holes, (void*)mem_address_menor_a_mayor);
     pthread_mutex_unlock(&s_holes);
     
+    pthread_mutex_lock(&s_holes);
+        list_sort(holes, (void*)mem_address_menor_a_mayor);
+    pthread_mutex_unlock(&s_holes);
+
     return result;
 }
 
@@ -862,42 +867,45 @@ t_holes* particionLibre_bf(uint32_t bytes)
     t_holes* bestHole = NULL;
     uint32_t indexOfBestHole = -1;
     pthread_mutex_lock(&s_holes);
-        for(int i = 0; i < list_size(holes); i++)
+    for(int i = 0; i < list_size(holes); i++)
+    {
+        currentHole = list_get(holes, i);
+        if(bestHole == NULL && currentHole->length >= bytesToAlloc)
         {
-            currentHole = list_get(holes, i);
-            if(bestHole == NULL && currentHole->length >= bytesToAlloc)
-            {
-                bestHole = currentHole;
-                indexOfBestHole = i;
-            }
-            else if (currentHole->length >= bytesToAlloc && currentHole->length < bestHole->length)
-            {
-                bestHole = currentHole;
-                indexOfBestHole = i;
-                if(bestHole->length == bytesToAlloc) //Si justo tiene el tamaño justo no hay que buscar mas
-                    break;
-            } 
+            bestHole = currentHole;
+            indexOfBestHole = i;
         }
-
-        if(bestHole == NULL)
-            return NULL;
-
-        if(bestHole->length == bytesToAlloc) //No hace falta dividir el hueco
+        else if (currentHole->length >= bytesToAlloc && currentHole->length < bestHole->length)
         {
-            result = createHole(currentHole->pStart, bytesToAlloc);
+            bestHole = currentHole;
+            indexOfBestHole = i;
+            if(bestHole->length == bytesToAlloc) //Si justo tiene el tamaño justo no hay que buscar mas
+                break;
+        } 
+    }
+    pthread_mutex_unlock(&s_holes);
+
+    if(bestHole == NULL)
+        return NULL;
+
+    if(bestHole->length == bytesToAlloc) //No hace falta dividir el hueco
+    {
+        result = createHole(currentHole->pStart, bytesToAlloc);
+        pthread_mutex_lock(&s_holes);
             list_remove(holes, indexOfBestHole);
-        }
-        else
-        {
-            //Hacer el split
-            t_holes* splittedHole = createHole(currentHole->pStart + bytesToAlloc, (currentHole->length - bytesToAlloc));
+        pthread_mutex_unlock(&s_holes);
+    }
+    else
+    {
+        //Hacer el split
+        t_holes* splittedHole = createHole(currentHole->pStart + bytesToAlloc, (currentHole->length - bytesToAlloc));
+        pthread_mutex_lock(&s_holes);
             list_add(holes, (void*)splittedHole);
-            result = createHole(currentHole->pStart, bytesToAlloc);
             list_remove(holes, indexOfBestHole);
             list_sort(holes, (void*)mem_address_menor_a_mayor);
-        }
-    pthread_mutex_unlock(&s_holes);
-    
+        pthread_mutex_unlock(&s_holes);
+        result = createHole(currentHole->pStart, bytesToAlloc);
+    }    
     return result;
 }
 
@@ -975,9 +983,12 @@ uint32_t mem_address_menor_a_mayor(t_holes* block, t_holes* block2)
 
 uint32_t existHolesBetweenPartitions()
 {
-    t_holes* firstHole = list_get(holes, 0); //El primer hueco
-    t_partition* lastPartition = list_get(partitions, list_size(partitions) - 1); //La ultima particion
-
+    pthread_mutex_lock(&s_holes);
+    pthread_mutex_lock(&s_partitions);
+        t_holes* firstHole = list_get(holes, 0); //El primer hueco
+        t_partition* lastPartition = list_get(partitions, list_size(partitions) - 1); //La ultima particion
+    pthread_mutex_unlock(&s_holes);
+    pthread_mutex_unlock(&s_partitions);
     return firstHole->pStart < lastPartition->pLimit;
 }
 

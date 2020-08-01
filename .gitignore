@@ -103,3 +103,6 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+teams/team
+gamecard/gamecard
+broker/broker
