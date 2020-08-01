@@ -123,7 +123,7 @@ void escribirNewPokemon(char *textoNewPoke, char* pathMetadataPoke){
     dictionary_destroy_and_destroy_elements(dicPoke,free);
 }
 
-void escribirCatchPokemon(char *textoCatchPokemon, char* pathMetadataPoke ){
+uint32_t escribirCatchPokemon(char *textoCatchPokemon, char* pathMetadataPoke ){
     char** keyAndValue = string_n_split(textoCatchPokemon, 2, "=");
     char* textoCompleto = leerArchivo(pathMetadataPoke);
     uint32_t bytesBorrados;
@@ -141,12 +141,18 @@ void escribirCatchPokemon(char *textoCatchPokemon, char* pathMetadataPoke ){
         modificarBloquesCatchPoke(textoDic, pathMetadataPoke, bytesBorrados);
     }else{
         log_warning(logger,"No existe la posicion %s", keyAndValue[0]);
+        free(keyAndValue[0]);
+        free(keyAndValue[1]);
+        free(keyAndValue);
+        dictionary_destroy_and_destroy_elements(dicPoke,free);
+        return 0;
         //log error
     }
     free(keyAndValue[0]);
     free(keyAndValue[1]);
     free(keyAndValue);
     dictionary_destroy_and_destroy_elements(dicPoke,free);
+    return 1;
 }
 
 t_localized_pokemon* escribirLocalizedPokemon(t_get_pokemon* getPoke, char* pathMetadataPoke){
@@ -560,7 +566,6 @@ void atenderCatchPokemon(void* catchPoke){
     char* pathFilesPokemon = string_duplicate(pathFiles);
     string_append(&pathFilesPokemon,catchPokemonSem->catchPokemon->nombre);
     char* pathMetadataPoke = agregarAPath(pathFilesPokemon,"/Metadata.txt");
-    uint32_t indexSemaforo = 0;
     t_caught_pokemon* caughtPoke = crearCaughtPokemon(0,catchPokemonSem->catchPokemon->ID_mensaje_recibido,1);
 
     if(existeDirectorio(pathFilesPokemon)){
@@ -568,9 +573,9 @@ void atenderCatchPokemon(void* catchPoke){
             reintentandoOperacion(catchPokemonSem->catchPokemon->nombre);
         }
         waitSemYModificacionOpen(catchPokemonSem->indexSemaforo, pathMetadataPoke);
-        escribirCatchPokemon(catchPokemonATexto(catchPokemonSem->catchPokemon), pathMetadataPoke);
+        caughtPoke->catchStatus = escribirCatchPokemon(catchPokemonATexto(catchPokemonSem->catchPokemon), pathMetadataPoke);
         sleep(tiempoOperacion);
-        log_info(logger,"termino la operacion de CATCH_POKEMON de %s\n", catchPokemonATexto(catchPokemonSem->catchPokemon));
+        log_info(logger,"termino la operacion de CATCH_POKEMON de %s con CATCH STATUS DE %i\n", catchPokemonATexto(catchPokemonSem->catchPokemon), caughtPoke->catchStatus);
         signalSemYModificacionOpen(catchPokemonSem->indexSemaforo, pathMetadataPoke);
 
         mandarCAUGHT(caughtPoke);
