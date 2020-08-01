@@ -241,8 +241,6 @@ void realizarIntercambio(t_entrenador* tr) {
     } else {
         log_info(logger, "Hubo un error en el intercambio\n");
     }
-    mostrarPokesTrainer(tr);
-    mostrarPokesTrainer(tr2);
     tr->entrenadorPlanificado = NULL;
     tr->enEspera = false;
     tr2->enEspera = false;
@@ -263,7 +261,6 @@ void realizarIntercambio(t_entrenador* tr) {
     moverEntrenadorDeCola(colaEXEC, colaBLOCKED, tr);
     sem_post(&mutexEXIT);
 }
-
 
 void modoDesconectado() {
     sem_wait(&mutexBLOCKED);

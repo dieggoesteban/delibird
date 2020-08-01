@@ -110,10 +110,4 @@ void actualizarPosicion(t_entrenador* entrenador);
 void defaultCaptura(uint32_t index);
 uint32_t getEstimacion(uint32_t estReal, uint32_t estAnterior);
 uint32_t getTiempoReal(t_entrenador* tr);
-
-
-
-
-void mostrarPokesTrainer(t_entrenador* tr);
-
 #endif /* UTILS_H_ */

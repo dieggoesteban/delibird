@@ -350,7 +350,7 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 		{
 			t_get_pokemon *getPoke = deserializar_getPokemon(buffer);
 			
-			log_info(logger, "CATCH_POKEMON ingresado: %s", getPoke->nombre);			
+			log_info(logger, "GET_POKEMON ingresado: %s", getPoke->nombre);			
 
 			t_acknowledgement* ack = crearAcknowledgement(idModule ,getPoke->ID_mensaje_recibido, GET_POKEMON);
 

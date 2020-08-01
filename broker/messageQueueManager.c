@@ -48,14 +48,14 @@ t_message* crearMessage()
     mensajeStruct->suscriptoresConfirmados = list_create();
 	mensajeStruct->suscriptoresEnviados = list_create();
 
-	pthread_mutexattr_t attr;
-	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
-	pthread_mutexattr_init(&attr);
+	// pthread_mutexattr_t attr;
+	// pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
+	// pthread_mutexattr_init(&attr);
 
-	if(pthread_mutex_init(&mensajeStruct->s_suscriptoresEnviados, &attr) != 0)
+	if(pthread_mutex_init(&mensajeStruct->s_suscriptoresEnviados, NULL) != 0)
 		log_error(broker_custom_logger, "Error mutex init (s_suscriptoresEnviados) in crearMessage");
 
-	if(pthread_mutex_init(&mensajeStruct->s_suscriptoresConfirmados, &attr) != 0)
+	if(pthread_mutex_init(&mensajeStruct->s_suscriptoresConfirmados, NULL) != 0)
 		log_error(broker_custom_logger, "Error mutex init (s_suscriptoresConfirmados) in crearMessage");	
 	
 	sem_init(&mensajeStruct->s_puedeEliminarse, 0, 0);
