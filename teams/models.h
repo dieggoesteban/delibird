@@ -137,6 +137,7 @@ typedef struct
     char* nombre;
     t_posicion* posicion;
 	uint32_t tiempoEjecucion;
+	uint32_t tiempoCaptura;
 } t_pokemon_posicion;
 
 typedef struct {

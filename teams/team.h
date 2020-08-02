@@ -26,6 +26,9 @@ char* ALGORITMO;
 //GLOBALES
 uint32_t idModule;
 uint32_t cantEntrenadores;
+uint32_t cantCambiosCtx;
+uint32_t cantDeadlocks;
+uint32_t cantIntercambios;
 
 t_list* objetivoGlobal;
 t_list* pokemonesEnMapa;

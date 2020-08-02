@@ -63,9 +63,9 @@ t_entrenador_posicion* getIntercambio(t_entrenador* tr1, t_entrenador* tr2);
 
 void* planificadorREADY();
 void* planificadorEXEC(void*);
-void* detectorDeIntercambio();
+void detectorDeIntercambio();
 void realizarIntercambio(t_entrenador* tr);
 void modoDesconectado();
-void* planificadorEXIT();
+void planificadorEXIT(t_entrenador* tr);
 
 #endif /* PLANIFICADOR_H_ */

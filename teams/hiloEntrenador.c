@@ -19,7 +19,11 @@ void hiloEntrenador(uint32_t trId) {
                 moverEntrenador(entrenador);
             }
         } else {
-            moverEntrenador(entrenador);
+            if(turnosHastaPokemon(entrenador->pokemonPlanificado,entrenador) == 0) {
+                pasosParaCaptura(entrenador);
+            } else {
+                moverEntrenador(entrenador);
+            }
         }
         sem_wait(&mutexEXEC);
         entrenador = (t_entrenador*)list_get(colaEXEC, 0);

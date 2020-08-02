@@ -18,6 +18,7 @@
 #include "models.h"
 #include "serializador.h"
 #include "sockets.h"
+#include "planificador.h"
 
 //GLOBAL
 t_log* logger;
@@ -106,6 +107,7 @@ uint32_t turnosHastaEntrenador(t_entrenador_posicion* tr, t_entrenador* entrenad
 t_entrenador* cambiarPosicionEntrenador(t_entrenador* entrenador, uint32_t posX, uint32_t posY);
 void moverEntrenador(t_entrenador* entrenador);
 void pasosParaIntercambio(t_entrenador* entrenador);
+void pasosParaCaptura(t_entrenador* entrenador);
 void actualizarPosicion(t_entrenador* entrenador);
 void defaultCaptura(uint32_t index);
 uint32_t getEstimacion(uint32_t estReal, uint32_t estAnterior);
