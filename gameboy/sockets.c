@@ -17,7 +17,7 @@ int crear_conexion(char *ip, char* puerto) {
 
 	if (connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen)
 			== -1)
-		printf("error");
+		log_error(gameboy_custom_logger, "Connect error");
 
 	freeaddrinfo(server_info);
 
@@ -33,7 +33,7 @@ void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente) {
 	void* stream = serializar_paquete(paquete, sizePaquete);
 	if(send(socket_cliente,stream,sizePaquete,MSG_CONFIRM) == -1)
 	{
-		log_error(logger, "Send error");
+		log_error(gameboy_custom_logger, "Send error");
 		//Desuscribir a ese gil
 		liberar_conexion(socket_cliente);
 		exit(1);
@@ -49,6 +49,8 @@ void modoSuscriptor(void* arg) {
 
 	free(registerModule);
     enviarMensaje(paquete, suscribe->conexion);
+	
+	log_info(logger, "Se ha suscrito a la cola %s", getNombreColaDeMensajes(suscribe->messageQueue));
 	while(1) 
 	{
 		serve_client(&suscribe->conexion);
@@ -91,7 +93,7 @@ void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_c
 			t_new_pokemon* newPoke = deserializar_newPokemon(buffer);
 			ack = crearAcknowledgement(ID_MODULE, newPoke->ID_mensaje_recibido, NEW_POKEMON);
 	
-			log_info(logger, "Recibido new_pokemon de nombre %s", newPoke->nombre);
+			log_info(logger, "Se ha recibido un mensaje del BROKER por la cola NEW_POKEMON");
 
 			break;
 		}
@@ -101,7 +103,6 @@ void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_c
 			ack = crearAcknowledgement(ID_MODULE, appearedPoke->ID_mensaje_recibido, APPEARED_POKEMON);
 
 			log_info(logger, "Se ha recibido un mensaje del BROKER por la cola APPEARED_POKEMON");
-			log_info(logger, "Recibido appeared_pokemon de nombre %s", appearedPoke->nombre);
 
 			break;
 		}
@@ -111,7 +112,6 @@ void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_c
 			ack = crearAcknowledgement(ID_MODULE, getPoke->ID_mensaje_recibido, GET_POKEMON);
 
 			log_info(logger, "Se ha recibido un mensaje del BROKER por la cola GET_POKEMON");
-			log_info(logger, "Recibido get_pokemon de nombre %s", getPoke->nombre);
 
 			break;
 		}
@@ -121,7 +121,6 @@ void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_c
 			ack = crearAcknowledgement(ID_MODULE, caughtPoke->ID_mensaje_recibido, CAUGHT_POKEMON);
 
 			log_info(logger, "Se ha recibido un mensaje del BROKER por la cola CAUGHT_POKEMON");
-			log_info(logger, "Recibido caught_pokemon ID: %i e ID_MensajeCorrelativo %i", caughtPoke->ID_mensaje_recibido, caughtPoke->ID_mensaje_original);
 
 			break;
 		}
@@ -131,7 +130,6 @@ void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_c
 			ack = crearAcknowledgement(ID_MODULE, localizedPoke->ID_mensaje_recibido, LOCALIZED_POKEMON);
 
 			log_info(logger, "Se ha recibido un mensaje del BROKER por la cola LOCALIZED_POKEMON");
-			log_info(logger, "Recibido localized_pokemon de nombre %s", localizedPoke->nombre);
 
 			break;
 		}
@@ -141,7 +139,6 @@ void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_c
 			ack = crearAcknowledgement(ID_MODULE, catchPoke->ID_mensaje_recibido, CATCH_POKEMON);
 
 			log_info(logger, "Se ha recibido un mensaje del BROKER por la cola CATCH_POKEMON");
-			log_info(logger, "Recibido catch_pokemon de nombre %s", catchPoke->nombre);
 
 			break;
 		}
@@ -149,19 +146,19 @@ void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_c
 		{
 			t_id_mensaje_recibido* idMensajeEnviado = deserializar_idMensajeRecibido(buffer);
 
-			log_info(logger, "Se ha recibido el id del mensaje enviado: %i", idMensajeEnviado->id_mensajeEnviado);
+			log_info(gameboy_custom_logger, "Se ha recibido el id del mensaje enviado: %i", idMensajeEnviado->id_mensajeEnviado);
 			liberar_conexion(socket_cliente);
 			break;
 		}
 		case SUBSCRIBE:
 		{
 			t_suscripcion* suscripcion = deserializar_suscripcion(buffer);
-			log_info(logger, "Id asignado en la suscripcion: %i", suscripcion->idModule);
+			log_info(gameboy_custom_logger, "Id asignado en la suscripcion: %i", suscripcion->idModule);
 			break;
 		}
 		default:
 		{
-			printf("Se corto la conexion\n");
+			log_warning(gameboy_custom_logger, "Se corto la conexion con BROKER");
 			pthread_exit(&hiloSuscriptor);
 			break;
 		}

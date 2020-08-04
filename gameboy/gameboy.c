@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     config = config_create("./assets/gameboy.config");
     ID_MODULE = (uint32_t)atoi(config_get_string_value(config, "ID_MODULO"));
     logger = log_create("./assets/gameboy.log", "gameboy", true, LOG_LEVEL_INFO);
-    gameboy_custom_logger = log_create("./assets/gameboy_custom.log", "gameboy", true, LOG_LEVEL_INFO);
+    gameboy_custom_logger = log_create("./assets/gameboy_custom.log", "gameboy", false, LOG_LEVEL_DEBUG);
 
     ipBroker = config_get_string_value(config, "IP_BROKER");
     puertoBroker = config_get_string_value(config, "PUERTO_BROKER");
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
                 enviarMensaje(paquete, crear_conexion(ipBroker, puertoBroker));
                 close(suscribe->conexion);
                 close(conexion);
-                log_info(logger, "Conexion con broker finalizada");
+                log_info(gameboy_custom_logger, "Conexion con broker finalizada");
             }
             else
             {
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
                 
                 //serve_client(&conexion);
             }
-            printf("Liberamos conexion\n");
+            log_info(gameboy_custom_logger, "Conexion con broker liberada");
             liberar_conexion(conexion);
         }
         else
@@ -87,7 +87,7 @@ void terminarPrograma()
     free(unsubscribe);
     enviarMensaje(paquete, crear_conexion(ipBroker, puertoBroker));
     close(suscribe->conexion);
-    log_info(logger, "Conexion con broker finalizada");
+    log_info(gameboy_custom_logger, "Conexion con broker finalizada");
 
     exit(0);
 }

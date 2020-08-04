@@ -652,7 +652,7 @@ void dump()
     }
     fclose(fp);
     pthread_mutex_unlock(&s_metadatas);
-    printf("\n");
+    fprintf(fp, "\n");
     log_info(logger, "Se ha solicitado un dump de la memoria cache");
 }
 

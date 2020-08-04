@@ -18,6 +18,7 @@
 #include "models.h"
 
 t_log* logger;
+t_log *gameboy_custom_logger;
 t_config* config;
 t_suscribe_gameboy* suscribe;
 
