@@ -69,7 +69,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/gameboy/gameboy",
-            "args": ["SUSCRIPTOR", "NEW_POKEMON"],
+            "args": ["SUSCRIPTOR", "CATCH_POKEMON"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/gameboy",
             "environment": [],

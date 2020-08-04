@@ -45,7 +45,7 @@ void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente) {
 void modoSuscriptor(void* arg) {
 	t_suscribe_gameboy* suscribe = (t_suscribe_gameboy*) arg;
 	t_register_module* registerModule = crearSuscribe(suscribe->messageQueue, ID_MODULE); //TODO: Tomar del config
-	t_paquete *paquete = serializar_registerModule(registerModule);
+	t_paquete *paquete = serializar_registerModule(registerModule, SUBSCRIBE);
 
 	free(registerModule);
     enviarMensaje(paquete, suscribe->conexion);
@@ -81,26 +81,25 @@ void enviarAck(t_acknowledgement* ack) {
 }
 
 void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cliente) {
+	t_acknowledgement* ack = NULL;
+	pthread_t sendAck;
+	
 	switch (operation_cod)
 	{
 		case NEW_POKEMON:
 		{
 			t_new_pokemon* newPoke = deserializar_newPokemon(buffer);
+			ack = crearAcknowledgement(ID_MODULE, newPoke->ID_mensaje_recibido, NEW_POKEMON);
 	
 			log_info(logger, "Recibido new_pokemon de nombre %s", newPoke->nombre);
-
-			t_acknowledgement* ack = crearAcknowledgement(ID_MODULE, newPoke->ID_mensaje_recibido, NEW_POKEMON);
-			
-			pthread_t sendAck;
-			pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
-			pthread_detach(sendAck);
 
 			break;
 		}
 		case APPEARED_POKEMON:
 		{
 			t_appeared_pokemon* appearedPoke = deserializar_appearedPokemon(buffer);
-	
+			ack = crearAcknowledgement(ID_MODULE, appearedPoke->ID_mensaje_recibido, APPEARED_POKEMON);
+
 			log_info(logger, "Se ha recibido un mensaje del BROKER por la cola APPEARED_POKEMON");
 			log_info(logger, "Recibido appeared_pokemon de nombre %s", appearedPoke->nombre);
 
@@ -109,7 +108,8 @@ void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_c
 		case GET_POKEMON:
 		{
 			t_get_pokemon* getPoke = deserializar_getPokemon(buffer);
-		
+			ack = crearAcknowledgement(ID_MODULE, getPoke->ID_mensaje_recibido, GET_POKEMON);
+
 			log_info(logger, "Se ha recibido un mensaje del BROKER por la cola GET_POKEMON");
 			log_info(logger, "Recibido get_pokemon de nombre %s", getPoke->nombre);
 
@@ -118,6 +118,7 @@ void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_c
 		case CAUGHT_POKEMON:
 		{
 			t_caught_pokemon* caughtPoke = deserializar_caughtPokemon(buffer);
+			ack = crearAcknowledgement(ID_MODULE, caughtPoke->ID_mensaje_recibido, CAUGHT_POKEMON);
 
 			log_info(logger, "Se ha recibido un mensaje del BROKER por la cola CAUGHT_POKEMON");
 			log_info(logger, "Recibido caught_pokemon ID: %i e ID_MensajeCorrelativo %i", caughtPoke->ID_mensaje_recibido, caughtPoke->ID_mensaje_original);
@@ -127,7 +128,8 @@ void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_c
 		case LOCALIZED_POKEMON:
 		{
 			t_localized_pokemon* localizedPoke = deserializar_localizedPokemon(buffer);
-	
+			ack = crearAcknowledgement(ID_MODULE, localizedPoke->ID_mensaje_recibido, LOCALIZED_POKEMON);
+
 			log_info(logger, "Se ha recibido un mensaje del BROKER por la cola LOCALIZED_POKEMON");
 			log_info(logger, "Recibido localized_pokemon de nombre %s", localizedPoke->nombre);
 
@@ -136,6 +138,7 @@ void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_c
 		case CATCH_POKEMON:
 		{
 			t_catch_pokemon* catchPoke = deserializar_catchPokemon(buffer);
+			ack = crearAcknowledgement(ID_MODULE, catchPoke->ID_mensaje_recibido, CATCH_POKEMON);
 
 			log_info(logger, "Se ha recibido un mensaje del BROKER por la cola CATCH_POKEMON");
 			log_info(logger, "Recibido catch_pokemon de nombre %s", catchPoke->nombre);
@@ -162,6 +165,11 @@ void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_c
 			pthread_exit(&hiloSuscriptor);
 			break;
 		}
+	}
+	if(ack != NULL)
+	{
+		pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
+		pthread_detach(sendAck);
 	}
 }
 

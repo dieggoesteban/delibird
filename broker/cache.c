@@ -97,6 +97,7 @@ void memoria_particiones(t_message* message)
             t_cache_buffer* buffer = serializar_cacheNewPokemon(&cache_newPoke);
             addressFromMessageToCopy = buffer;
             administrative->length = buffer->size;
+            free(cache_newPoke.pokeName);
             break;
         }
         case APPEARED_POKEMON:
@@ -119,6 +120,7 @@ void memoria_particiones(t_message* message)
             t_cache_buffer* buffer = serializar_cacheAppearedPokemon(&cache_appeared);
             addressFromMessageToCopy = buffer;
             administrative->length = buffer->size;
+            free(cache_appeared.pokeName);
             break;
         }
         case CATCH_POKEMON:
@@ -141,6 +143,7 @@ void memoria_particiones(t_message* message)
             t_cache_buffer* buffer = serializar_cacheCatchPokemon(&cache_catch);
             addressFromMessageToCopy = buffer;
             administrative->length = buffer->size;
+            free(cache_catch.pokeName);
             break;
         }
         case CAUGHT_POKEMON:
@@ -179,6 +182,7 @@ void memoria_particiones(t_message* message)
             t_cache_buffer* buffer = serializar_cacheGetPokemon(&cache_getPoke);
             addressFromMessageToCopy = buffer;
             administrative->length = buffer->size;
+            free(cache_getPoke.pokeName);
             break;
         }
         case LOCALIZED_POKEMON: 
@@ -200,6 +204,8 @@ void memoria_particiones(t_message* message)
             t_cache_buffer* buffer = serializar_cacheLocalizedPokemon(&cache_localizedPoke, localizedPoke->posiciones);
             addressFromMessageToCopy = buffer;
             administrative->length = buffer->size;
+            free(cache_localizedPoke.pokeName);
+            free(cache_localizedPoke.posiciones);
             break;
         }
         default:
@@ -273,7 +279,6 @@ void memoria_particiones(t_message* message)
 
     //Cuando el targetPartition ya esté ubicado se meten los datos donde corresponda
     writeData(administrative, targetHole, addressFromMessageToCopy);
-    //dumpConsole();
 }
 
 void writeData(cache_message* administrative, t_holes* targetHole, t_cache_buffer* bufferMessage)
@@ -505,8 +510,16 @@ void dispatchCachedMessages(t_cache_dispatch_info* dispatchInfo)
 
         if(list_size(currentMetadata->suscriptoresEnviados) > 0)
         {
-            if(list_any_satisfy(currentMetadata->suscriptoresEnviados, (void*)_he_gots_the_message))
-                continue;
+            bool heGotTheMessage = list_any_satisfy(currentMetadata->suscriptoresEnviados, (void*)_he_gots_the_message);
+            bool heAlreadyConfirmed = list_any_satisfy(currentMetadata->suscriptoresConfirmados, (void*)_he_gots_the_message);
+            log_warning(broker_custom_logger, "%i : %i", heGotTheMessage, heAlreadyConfirmed);
+            if(heGotTheMessage)
+            {
+                if(heAlreadyConfirmed)
+                {
+                    continue;
+                }
+            }
         }
 
         pthread_mutex_lock(&s_cache);
@@ -562,12 +575,6 @@ void dispatchCachedMessages(t_cache_dispatch_info* dispatchInfo)
                 {
                     cache_localized_pokemon* cache_localizedPokemon = deserializar_cacheLocalizedPokemon(buffer);
                     t_localized_pokemon* localizedPoke = localizedPokemon_cacheToMessage(cache_localizedPokemon, currentMetadata);
-                    log_debug(broker_custom_logger, "Nombre LOCALIZED: %s", localizedPoke->nombre);
-                    for (uint32_t i = 0; i < localizedPoke->cantidadPosiciones; i++)
-                    {
-                        log_debug(broker_custom_logger, "Pos X: %i", ((t_posicion*)list_get(localizedPoke->posiciones, i))->posicion_x);
-                        log_debug(broker_custom_logger, "Pos Y: %i", ((t_posicion*)list_get(localizedPoke->posiciones, i))->posicion_y);
-                    }
                     message->mensaje = localizedPoke;
                     break;
                 }
@@ -577,7 +584,7 @@ void dispatchCachedMessages(t_cache_dispatch_info* dispatchInfo)
 
         pthread_mutex_unlock(&s_cache);
         updatePartitionLRU_byDataAddress(currentMetadata->startAddress);
-        sendMessageFromQueue(message, dispatchInfo->suscripcion);
+        sendMessageFromQueue(message, dispatchInfo->suscripcion, currentMetadata);
     }
     pthread_mutex_unlock(&s_metadatas);
     pthread_mutex_unlock(&s_holes);
@@ -835,13 +842,15 @@ t_holes* particionLibre_ff(uint32_t bytes)
                 t_holes* splittedHole = createHole(currentHole->pStart + bytesToAlloc, (currentHole->length - bytesToAlloc));
                 list_add(holes, (void*)splittedHole);
                 result = createHole(currentHole->pStart, bytesToAlloc);
-                list_remove(holes, i);
+                t_holes* removedHole = list_remove(holes, i);
+                freeHole(removedHole);
                 break;
             }
             else if (currentHole->length == bytesToAlloc)
             {
                 result = createHole(currentHole->pStart, bytesToAlloc);
-                list_remove(holes, i);
+                t_holes* removedHole = list_remove(holes, i);
+                freeHole(removedHole);
                 break;
             }
         }
@@ -1007,11 +1016,20 @@ void freeCacheMessage(cache_message* cacheMessage)
     free(cacheMessage);
 }
 
+void freeHole(t_holes* hole)
+{
+    free(hole);
+}
+
+void freePartition(t_partition* partition)
+{
+    free(partition);
+}
+
 void freeCacheSystem()
 {
-    list_destroy(partitions);
-    list_destroy(holes);
-    list_destroy(metadatas);
-    // list_destroy_and_destroy_elements(metadatas, (void*)freeCacheMessage);
+    list_destroy_and_destroy_elements(partitions, free);
+    list_destroy_and_destroy_elements(holes, (void*)freeHole);
+    list_destroy_and_destroy_elements(metadatas, (void*)freeCacheMessage);
     free(cache);
 }
