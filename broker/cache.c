@@ -36,6 +36,14 @@ void startCache()
     holes = list_create();
     metadatas = list_create();
 
+    // sem_init(&s_cache, 0, 1);
+    // sem_init(&s_partitionCounter, 0, 1);
+    // sem_init(&s_counterToCompactacion, 0, 1);
+    // sem_init(&s_partitions, 0, 1);
+    // sem_init(&s_holes, 0, 1);
+    // sem_init(&s_metadatas, 0, 1);
+
+
     if(pthread_mutex_init(&s_cache, NULL) != 0)
         log_error(broker_custom_logger, "Error mutex init (s_cache) in cache initialization");
     if(pthread_mutex_init(&s_partitionCounter, NULL) != 0)
@@ -89,6 +97,7 @@ void memoria_particiones(t_message* message)
             t_cache_buffer* buffer = serializar_cacheNewPokemon(&cache_newPoke);
             addressFromMessageToCopy = buffer;
             administrative->length = buffer->size;
+            free(cache_newPoke.pokeName);
             break;
         }
         case APPEARED_POKEMON:
@@ -111,6 +120,7 @@ void memoria_particiones(t_message* message)
             t_cache_buffer* buffer = serializar_cacheAppearedPokemon(&cache_appeared);
             addressFromMessageToCopy = buffer;
             administrative->length = buffer->size;
+            free(cache_appeared.pokeName);
             break;
         }
         case CATCH_POKEMON:
@@ -133,6 +143,7 @@ void memoria_particiones(t_message* message)
             t_cache_buffer* buffer = serializar_cacheCatchPokemon(&cache_catch);
             addressFromMessageToCopy = buffer;
             administrative->length = buffer->size;
+            free(cache_catch.pokeName);
             break;
         }
         case CAUGHT_POKEMON:
@@ -171,6 +182,7 @@ void memoria_particiones(t_message* message)
             t_cache_buffer* buffer = serializar_cacheGetPokemon(&cache_getPoke);
             addressFromMessageToCopy = buffer;
             administrative->length = buffer->size;
+            free(cache_getPoke.pokeName);
             break;
         }
         case LOCALIZED_POKEMON: 
@@ -192,6 +204,8 @@ void memoria_particiones(t_message* message)
             t_cache_buffer* buffer = serializar_cacheLocalizedPokemon(&cache_localizedPoke, localizedPoke->posiciones);
             addressFromMessageToCopy = buffer;
             administrative->length = buffer->size;
+            free(cache_localizedPoke.pokeName);
+            free(cache_localizedPoke.posiciones);
             break;
         }
         default:
@@ -265,7 +279,6 @@ void memoria_particiones(t_message* message)
 
     //Cuando el targetPartition ya esté ubicado se meten los datos donde corresponda
     writeData(administrative, targetHole, addressFromMessageToCopy);
-    //dumpConsole();
 }
 
 void writeData(cache_message* administrative, t_holes* targetHole, t_cache_buffer* bufferMessage)
@@ -280,7 +293,7 @@ void writeData(cache_message* administrative, t_holes* targetHole, t_cache_buffe
     
     pthread_mutex_lock(&s_cache);
         memcpy(administrative->startAddress, bufferMessage->stream, bufferMessage->size);
-        free(bufferMessage);
+        // free(bufferMessage);
     pthread_mutex_unlock(&s_cache);
     log_info(logger, "Se ha guardado el mensaje id %i en la cache. Posicion de inicio: %p", administrative->idMessage, administrative->startAddress);
 }
@@ -308,7 +321,7 @@ t_holes* reemplazo_fifo(uint32_t bytes)
 
     uint32_t fifoToDelete = targetFifoPartition->fifoPosition;
 
-    free(targetFifoPartition);
+    // free(targetFifoPartition);
 
     //Se ubica a la victima en la lista original y se crea el nuevo hueco con sus datos
     uint32_t _is_the_one_with_fifo_number(t_partition* partition) {
@@ -385,7 +398,7 @@ t_holes* reemplazo_lru(uint32_t bytes)
 
     uint32_t fifoToDelete = targetLruPartition->fifoPosition;
 
-    free(targetLruPartition);
+    // free(targetLruPartition);
 
     //Se ubica a la victima en la lista original y se crea el nuevo hueco con sus datos
     uint32_t _is_the_one_with_fifo_number(t_partition* partition) {
@@ -497,8 +510,16 @@ void dispatchCachedMessages(t_cache_dispatch_info* dispatchInfo)
 
         if(list_size(currentMetadata->suscriptoresEnviados) > 0)
         {
-            if(list_any_satisfy(currentMetadata->suscriptoresEnviados, (void*)_he_gots_the_message))
-                continue;
+            bool heGotTheMessage = list_any_satisfy(currentMetadata->suscriptoresEnviados, (void*)_he_gots_the_message);
+            bool heAlreadyConfirmed = list_any_satisfy(currentMetadata->suscriptoresConfirmados, (void*)_he_gots_the_message);
+            log_warning(broker_custom_logger, "%i : %i", heGotTheMessage, heAlreadyConfirmed);
+            if(heGotTheMessage)
+            {
+                if(heAlreadyConfirmed)
+                {
+                    continue;
+                }
+            }
         }
 
         pthread_mutex_lock(&s_cache);
@@ -554,12 +575,6 @@ void dispatchCachedMessages(t_cache_dispatch_info* dispatchInfo)
                 {
                     cache_localized_pokemon* cache_localizedPokemon = deserializar_cacheLocalizedPokemon(buffer);
                     t_localized_pokemon* localizedPoke = localizedPokemon_cacheToMessage(cache_localizedPokemon, currentMetadata);
-                    log_debug(broker_custom_logger, "Nombre LOCALIZED: %s", localizedPoke->nombre);
-                    for (uint32_t i = 0; i < localizedPoke->cantidadPosiciones; i++)
-                    {
-                        log_debug(broker_custom_logger, "Pos X: %i", ((t_posicion*)list_get(localizedPoke->posiciones, i))->posicion_x);
-                        log_debug(broker_custom_logger, "Pos Y: %i", ((t_posicion*)list_get(localizedPoke->posiciones, i))->posicion_y);
-                    }
                     message->mensaje = localizedPoke;
                     break;
                 }
@@ -569,7 +584,7 @@ void dispatchCachedMessages(t_cache_dispatch_info* dispatchInfo)
 
         pthread_mutex_unlock(&s_cache);
         updatePartitionLRU_byDataAddress(currentMetadata->startAddress);
-        sendMessageFromQueue(message, dispatchInfo->suscripcion);
+        sendMessageFromQueue(message, dispatchInfo->suscripcion, currentMetadata);
     }
     pthread_mutex_unlock(&s_metadatas);
     pthread_mutex_unlock(&s_holes);
@@ -617,31 +632,31 @@ void dump()
             if(currentBlock->length < 10)
             {
                 currentMetadata = (cache_message*)list_find(metadatas, (void*)_is_the_metadata);
-                fprintf(fp, "Particion %i:  %p - %p    [%c]    Size: %ib     LRU: %llu    COLA: %i   ID: %i\n", 
-                    i+1, currentBlock->pStart, currentBlock->pLimit, currentBlock->free, currentBlock->length, currentBlock->lastUse
+                fprintf(fp, "Particion %i:  %lu - %lu    [%c]    Size: %ib     LRU: %llu    COLA: %i   ID: %i\n", 
+                    i+1, (unsigned long)currentBlock->pStart, (unsigned long)currentBlock->pLimit, currentBlock->free, currentBlock->length, currentBlock->lastUse
                     , currentMetadata->mq_cod, currentMetadata->idMessage);
             }
             else
             {
                 currentMetadata = (cache_message*)list_find(metadatas, (void*)_is_the_metadata);
-                fprintf(fp, "Particion %i:  %p - %p    [%c]    Size: %ib    LRU: %llu    COLA: %i   ID: %i\n", 
-                    i+1, currentBlock->pStart, currentBlock->pLimit, currentBlock->free, currentBlock->length, currentBlock->lastUse
+                fprintf(fp, "Particion %i:  %lu - %lu    [%c]    Size: %ib    LRU: %llu    COLA: %i   ID: %i\n", 
+                    i+1, (unsigned long)currentBlock->pStart, (unsigned long)currentBlock->pLimit, currentBlock->free, currentBlock->length, currentBlock->lastUse
                     , currentMetadata->mq_cod, currentMetadata->idMessage);
             }
         }
         else
         {
-            fprintf(fp, "Particion %i:  %p - %p    [%c]    Size: %ib    LRU: -    COLA: -   ID: -\n", 
-                i+1, currentBlock->pStart, currentBlock->pLimit, currentBlock->free, currentBlock->length);
+            fprintf(fp, "Particion %i:  %lu - %lu    [%c]    Size: %ib    LRU: -    COLA: -   ID: -\n", 
+                i+1, (unsigned long)currentBlock->pStart, (unsigned long)currentBlock->pLimit, currentBlock->free, currentBlock->length);
         }
     }
     fclose(fp);
     pthread_mutex_unlock(&s_metadatas);
-    printf("\n");
+    fprintf(fp, "\n");
     log_info(logger, "Se ha solicitado un dump de la memoria cache");
 }
 
-void dumpConsole()
+void dumpConsole(char* titulo)
 {
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
@@ -658,7 +673,7 @@ void dumpConsole()
 
     list_sort(allMemory, (void*)mem_address_menor_a_mayor);
 
-    printf("\nDump: %02d/%02d/%d %02d:%02d:%02d\n",
+    printf("\n%s - \nDump: %02d/%02d/%d %02d:%02d:%02d\n", titulo,
         tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);
     t_partition* currentBlock;
     cache_message* currentMetadata;
@@ -709,10 +724,12 @@ void consolidar()
         return;
     }
     list_sort(holes, (void*) mem_address_menor_a_mayor);
+    pthread_mutex_unlock(&s_holes);
     t_holes* lowerHole;
     t_holes* upperHole;
 
     uint32_t i = 0;
+    pthread_mutex_lock(&s_holes);
     while (list_size(holes) >= 2 && i < list_size(holes) - 1)
     {        
         lowerHole = list_get(holes, i);
@@ -740,12 +757,15 @@ void consolidar()
 
 void compactar()
 {
+    pthread_mutex_lock(&s_holes);
+    pthread_mutex_lock(&s_partitions);
     if(list_size(partitions) == 0 || list_size(holes) == 0)
     {
         log_info(broker_custom_logger, "No hay particiones o no hay huecos -> No es necesario compactar");
-        pthread_mutex_unlock(&s_counterToCompactacion);
         return;
     }
+    pthread_mutex_unlock(&s_holes);
+    pthread_mutex_unlock(&s_partitions);
 
     //Ordenar ambas listas
     list_sort(partitions, (void*) mem_address_menor_a_mayor);
@@ -753,14 +773,15 @@ void compactar()
     uint32_t targetPartitionIndex;
     t_partition* targetPartition;
 
-    pthread_mutex_lock(&s_holes);
-    pthread_mutex_lock(&s_partitions);
+    consolidar(); //El algoritmo requiere que los huecos esten consolidados antes de compactar
     while (existHolesBetweenPartitions())
     {
-        t_holes* hole = (t_holes*)list_get(holes, 0);
-
+        pthread_mutex_lock(&s_holes);
+            t_holes* hole = (t_holes*)list_get(holes, 0);
+        pthread_mutex_unlock(&s_holes);
         //Busco la particion contigua al hueco
         targetPartitionIndex = -1;
+        pthread_mutex_lock(&s_partitions);
         for(uint32_t i = 0; i < list_size(partitions); i++)
         {
             targetPartition = list_get(partitions, i);
@@ -770,12 +791,10 @@ void compactar()
                 break;
             }
         }
+        pthread_mutex_unlock(&s_partitions);
 
-        if(targetPartition == NULL) //No hay particiones continuas a ese hueco
-            return;
-        
-        if(targetPartitionIndex < 0)
-            log_error(broker_custom_logger, "targetPartitionIndex < 0");
+        if(targetPartitionIndex == -1)
+            log_error(broker_custom_logger, "No hay particiones contiguas al ultimo hueco");
 
         //Se hace un swap entre la particion y el hueco
         t_partition* relocatedPartition = createPartition(hole->pStart, targetPartition->length);
@@ -784,18 +803,22 @@ void compactar()
         //Hay que actualizar las nuevas direcciones de la particion
         reallocPartition(targetPartition, relocatedPartition);
 
-        list_remove(holes, 0);
-        list_remove(partitions, targetPartitionIndex);
-        list_add(holes, relocatedHole);
-        list_add(partitions, relocatedPartition);
-        list_sort(partitions, (void*) mem_address_menor_a_mayor);
-        list_sort(holes, (void*) mem_address_menor_a_mayor);
+        pthread_mutex_lock(&s_holes);
+            list_remove(holes, 0);
+            list_add(holes, relocatedHole);
+            list_sort(holes, (void*) mem_address_menor_a_mayor);
+        pthread_mutex_unlock(&s_holes);
+        pthread_mutex_lock(&s_partitions);
+            list_remove(partitions, targetPartitionIndex);
+            list_add(partitions, relocatedPartition);
+            list_sort(partitions, (void*) mem_address_menor_a_mayor);
+        pthread_mutex_unlock(&s_partitions);
 
         targetPartition = NULL;
+
+        consolidar(); //El algoritmo requiere que los huecos se vayan consolidando a medida que se mueven las particiones
     }
-    pthread_mutex_unlock(&s_holes);
-    pthread_mutex_unlock(&s_partitions);
-    consolidar();
+    consolidar(); //Consolidacion post compactacion
     log_info(logger, "Se ha realizado una compactacion");
 }
 
@@ -819,21 +842,24 @@ t_holes* particionLibre_ff(uint32_t bytes)
                 t_holes* splittedHole = createHole(currentHole->pStart + bytesToAlloc, (currentHole->length - bytesToAlloc));
                 list_add(holes, (void*)splittedHole);
                 result = createHole(currentHole->pStart, bytesToAlloc);
-                t_holes* holeToDelete = list_remove(holes, i);
-                free(holeToDelete);
+                t_holes* removedHole = list_remove(holes, i);
+                freeHole(removedHole);
                 break;
             }
             else if (currentHole->length == bytesToAlloc)
             {
                 result = createHole(currentHole->pStart, bytesToAlloc);
-                t_holes* holeToDelete = list_remove(holes, i);
-                free(holeToDelete);
+                t_holes* removedHole = list_remove(holes, i);
+                freeHole(removedHole);
                 break;
             }
         }
-        list_sort(holes, (void*)mem_address_menor_a_mayor);
     pthread_mutex_unlock(&s_holes);
     
+    pthread_mutex_lock(&s_holes);
+        list_sort(holes, (void*)mem_address_menor_a_mayor);
+    pthread_mutex_unlock(&s_holes);
+
     return result;
 }
 
@@ -850,44 +876,45 @@ t_holes* particionLibre_bf(uint32_t bytes)
     t_holes* bestHole = NULL;
     uint32_t indexOfBestHole = -1;
     pthread_mutex_lock(&s_holes);
-        for(int i = 0; i < list_size(holes); i++)
+    for(int i = 0; i < list_size(holes); i++)
+    {
+        currentHole = list_get(holes, i);
+        if(bestHole == NULL && currentHole->length >= bytesToAlloc)
         {
-            currentHole = list_get(holes, i);
-            if(bestHole == NULL && currentHole->length >= bytesToAlloc)
-            {
-                bestHole = currentHole;
-                indexOfBestHole = i;
-            }
-            else if (currentHole->length >= bytesToAlloc && currentHole->length < bestHole->length)
-            {
-                bestHole = currentHole;
-                indexOfBestHole = i;
-                if(bestHole->length == bytesToAlloc) //Si justo tiene el tamaño justo no hay que buscar mas
-                    break;
-            } 
+            bestHole = currentHole;
+            indexOfBestHole = i;
         }
-
-        if(bestHole == NULL)
-            return NULL;
-
-        if(bestHole->length == bytesToAlloc) //No hace falta dividir el hueco
+        else if (currentHole->length >= bytesToAlloc && currentHole->length < bestHole->length)
         {
-            result = createHole(currentHole->pStart, bytesToAlloc);
-            t_holes* holeToDelete = list_remove(holes, indexOfBestHole);
-            free(holeToDelete);
-        }
-        else
-        {
-            //Hacer el split
-            t_holes* splittedHole = createHole(currentHole->pStart + bytesToAlloc, (currentHole->length - bytesToAlloc));
-            list_add(holes, (void*)splittedHole);
-            result = createHole(currentHole->pStart, bytesToAlloc);
-            t_holes* holeToDelete = list_remove(holes, indexOfBestHole);
-            free(holeToDelete);
-            list_sort(holes, (void*)mem_address_menor_a_mayor);
-        }
+            bestHole = currentHole;
+            indexOfBestHole = i;
+            if(bestHole->length == bytesToAlloc) //Si justo tiene el tamaño justo no hay que buscar mas
+                break;
+        } 
+    }
     pthread_mutex_unlock(&s_holes);
-    
+
+    if(bestHole == NULL)
+        return NULL;
+
+    if(bestHole->length == bytesToAlloc) //No hace falta dividir el hueco
+    {
+        result = createHole(currentHole->pStart, bytesToAlloc);
+        pthread_mutex_lock(&s_holes);
+            list_remove(holes, indexOfBestHole);
+        pthread_mutex_unlock(&s_holes);
+    }
+    else
+    {
+        //Hacer el split
+        t_holes* splittedHole = createHole(currentHole->pStart + bytesToAlloc, (currentHole->length - bytesToAlloc));
+        pthread_mutex_lock(&s_holes);
+            list_add(holes, (void*)splittedHole);
+            list_remove(holes, indexOfBestHole);
+            list_sort(holes, (void*)mem_address_menor_a_mayor);
+        pthread_mutex_unlock(&s_holes);
+        result = createHole(currentHole->pStart, bytesToAlloc);
+    }    
     return result;
 }
 
@@ -965,9 +992,12 @@ uint32_t mem_address_menor_a_mayor(t_holes* block, t_holes* block2)
 
 uint32_t existHolesBetweenPartitions()
 {
-    t_holes* firstHole = list_get(holes, 0); //El primer hueco
-    t_partition* lastPartition = list_get(partitions, list_size(partitions) - 1); //La ultima particion
-
+    pthread_mutex_lock(&s_holes);
+    pthread_mutex_lock(&s_partitions);
+        t_holes* firstHole = list_get(holes, 0); //El primer hueco
+        t_partition* lastPartition = list_get(partitions, list_size(partitions) - 1); //La ultima particion
+    pthread_mutex_unlock(&s_holes);
+    pthread_mutex_unlock(&s_partitions);
     return firstHole->pStart < lastPartition->pLimit;
 }
 
@@ -986,10 +1016,20 @@ void freeCacheMessage(cache_message* cacheMessage)
     free(cacheMessage);
 }
 
+void freeHole(t_holes* hole)
+{
+    free(hole);
+}
+
+void freePartition(t_partition* partition)
+{
+    free(partition);
+}
+
 void freeCacheSystem()
 {
-    list_destroy(partitions);
-    list_destroy(holes);
+    list_destroy_and_destroy_elements(partitions, free);
+    list_destroy_and_destroy_elements(holes, (void*)freeHole);
     list_destroy_and_destroy_elements(metadatas, (void*)freeCacheMessage);
     free(cache);
 }

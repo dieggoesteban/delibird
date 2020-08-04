@@ -4,8 +4,8 @@
     // Para más información, visite: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
         {
+
             "name": "Broker",
             "type": "cppdbg",
             "request": "launch",
@@ -14,7 +14,47 @@
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/broker",
             "environment": [],
-            "externalConsole": true,
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+
+            "name": "Team",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/teams/team",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/teams",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+
+            "name": "Gamecard",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/gamecard/gamecard",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/gamecard",
+            "environment": [],
+            "externalConsole": false,
             "MIMode": "gdb",
             "setupCommands": [
                 {
@@ -29,7 +69,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/gameboy/gameboy",
-            "args": ["SUSCRIPTOR", "NEW_POKEMON", "15"],
+            "args": ["SUSCRIPTOR", "CATCH_POKEMON"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/gameboy",
             "environment": [],
@@ -49,25 +89,6 @@
             "request": "launch",
             "program": "${workspaceFolder}/gameboy/gameboy",
             "args": ["BROKER", "NEW_POKEMON", "PIKACHU", "5", "25", "10"],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/gameboy",
-            "environment": [],
-            "externalConsole": true,
-            "MIMode": "gdb",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                }
-            ]
-        },
-        {
-            "name": "Gameboy/CatchPokemon",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/gameboy/gameboy",
-            "args": ["BROKER", "CATCH_POKEMON", "CHARMANDER", "1", "2"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/gameboy",
             "environment": [],

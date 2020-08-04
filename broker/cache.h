@@ -7,6 +7,7 @@
 #include "messageQueueManager.h"
 #include <signal.h>
 #include <sys/time.h>
+#include <semaphore.h>
 
 void* cache;
 
@@ -20,6 +21,13 @@ pthread_mutex_t s_partitionCounter;
 pthread_mutex_t s_partitions;
 pthread_mutex_t s_holes;
 pthread_mutex_t s_metadatas;
+
+// sem_t s_cache;
+// sem_t s_counterToCompactacion;
+// sem_t s_partitionCounter;
+// sem_t s_partitions;
+// sem_t s_holes;
+// sem_t s_metadatas;
 
 uint32_t partitionCounter;
 uint32_t counterToCompactacion;
@@ -75,7 +83,7 @@ void cacheMessage(t_message* message);
 void reallocPartition(t_partition* previousPartition, t_partition* newAllocatedPartition);
 void dispatchCachedMessages(t_cache_dispatch_info* dispatchInfo);
 void dump();
-void dumpConsole();
+void dumpConsole(char* titulo);
 void writeData(cache_message* administrative, t_holes* targetHole, t_cache_buffer* bufferMessage);
 
 t_holes* createHole(void* startAddress, uint32_t length);

@@ -1,15 +1,14 @@
 
 #include "utils.h"
 
-void cortarArgumentos(int lengthArray, char *argumentos[], char *arrayTemp[])
-{
-	uint32_t j = 0;
+t_list* cortarArgumentos(int lengthArray, char *argumentos[])
+{	t_list* lista = list_create();
 
 	for (uint32_t i = 3; i < lengthArray; i++)
 	{
-		arrayTemp[j] = argumentos[i];
-		j++;
+		list_add(lista,argumentos[i]);
 	}
+	return lista;
 }
 
 uint32_t getColaDeMensajes(char* queue) {
@@ -36,8 +35,8 @@ uint32_t getColaDeMensajes(char* queue) {
 
 uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_mensaje) {
 	uint32_t isValid = 0;
-	char *brokerCommands[] = {"NEW_POKEMON", "APPEARED_POKEMON", "CATCH_POKEMON", "CAUGHT_POKEMON", "GET_POKEMON", "LOCALIZED_POKEMON"};
-	char *teamCommands[] = {"APPEARED_POKEMON"};
+	char *brokerCommands[] = {"NEW_POKEMON", "APPEARED_POKEMON", "CATCH_POKEMON", "CAUGHT_POKEMON", "GET_POKEMON"};
+	char *teamCommands[] = {"APPEARED_POKEMON", "CAUGHT_POKEMON"};
 	char *gamecardCommands[] = {"NEW_POKEMON", "CATCH_POKEMON", "GET_POKEMON"};
 	char *ipAux, *puertoAux;
 
@@ -45,7 +44,7 @@ uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_men
 	{
 		ipAux = config_get_string_value(config, "IP_BROKER");
 		puertoAux = config_get_string_value(config, "PUERTO_BROKER");
-		if (perteneceAlArray(tipo_mensaje, brokerCommands, 6) == 1)
+		if (perteneceAlArray(tipo_mensaje, brokerCommands, 5) == 1)
 		{
 			isValid = 1;
 		}
@@ -102,6 +101,14 @@ uint32_t arraySize(void* arr[]) {
 	return size;
 }
 
+uint32_t arraySizeChar(char* arr[]) {
+	uint32_t size = 0;
+	while(arr[size] != NULL) {
+		size++;
+	}
+	return size;
+}
+
 t_suscribe_gameboy* crearSuscribeGameboy(uint32_t con, uint32_t mq) {
 	t_suscribe_gameboy* suscribe = malloc(sizeof(t_suscribe_gameboy));
 
@@ -109,4 +116,25 @@ t_suscribe_gameboy* crearSuscribeGameboy(uint32_t con, uint32_t mq) {
 	suscribe->messageQueue = mq;
 
 	return suscribe;
+}
+
+char* getNombreColaDeMensajes(uint32_t mq)
+{
+	switch (mq)
+	{
+		case NEW_POKEMON:
+			return "NEW_POKEMON";
+		case APPEARED_POKEMON:
+			return "APPEARED_POKEMON";
+		case CATCH_POKEMON:
+			return "CATCH_POKEMON";
+		case CAUGHT_POKEMON:
+			return "CAUGHT_POKEMON";
+		case GET_POKEMON:
+			return "GET_POKEMON";
+		case LOCALIZED_POKEMON:
+			return "LOCALIZED_POKEMON";
+		default:
+			return "CODIGO DESCONOCIDO";
+	}
 }

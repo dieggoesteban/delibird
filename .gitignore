@@ -97,6 +97,14 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
+# Kernel Module Compile Results
+*.mod*
+*.cmd
+.tmp_versions/
+modules.order
+Module.symvers
+Mkfile.old
+dkms.conf
+teams/team
+gamecard/gamecard
 broker/broker
-broker/core
-broker/dumps/cache_dump.txt

@@ -193,9 +193,12 @@ t_get_pokemon* deserializar_getPokemon(t_buffer* buffer) {
     return pokemon;
 }
 
-t_paquete* serializar_appearedPokemon(t_appeared_pokemon* pokemon) {
+t_paquete* serializar_appearedPokemon(t_appeared_pokemon* pokemon)
+{
+	
+	t_paquete* paquete;
     t_buffer* pokemon_buffer = malloc(sizeof(t_buffer));
-    pokemon_buffer->size = sizeof(uint32_t)*2
+    pokemon_buffer->size = sizeof(uint32_t)*3
                             + strlen(pokemon->nombre) + 1
                             + sizeof(t_posicion);
 
@@ -204,6 +207,8 @@ t_paquete* serializar_appearedPokemon(t_appeared_pokemon* pokemon) {
 
     memcpy(stream + offset, &pokemon->ID_mensaje_recibido, sizeof(uint32_t));
     offset += sizeof(uint32_t);
+	memcpy(stream + offset, &pokemon->ID_mensaje_original, sizeof(uint32_t));
+	offset += sizeof(uint32_t);
     memcpy(stream + offset, &pokemon->sizeNombre, sizeof(uint32_t));
     offset += sizeof(uint32_t);
     memcpy(stream + offset, pokemon->nombre, strlen(pokemon->nombre)+1);
@@ -214,17 +219,21 @@ t_paquete* serializar_appearedPokemon(t_appeared_pokemon* pokemon) {
 
     pokemon_buffer->stream = stream;
 
-	t_paquete* paquete = crear_paquete(APPEARED_POKEMON, pokemon_buffer->size, pokemon_buffer->stream);
+	paquete = crear_paquete(APPEARED_POKEMON, pokemon_buffer->size, pokemon_buffer->stream);
 
     return paquete;
 }
-t_appeared_pokemon* deserializar_appearedPokemon(t_buffer* buffer) {
+
+t_appeared_pokemon* deserializar_appearedPokemon(t_buffer* buffer)
+{
 	t_appeared_pokemon* pokemon = malloc(sizeof(t_appeared_pokemon));
 	pokemon->posicion = malloc(sizeof(t_posicion));
 	
 	void* stream = buffer->stream;
 
 	memcpy(&(pokemon->ID_mensaje_recibido), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
+	memcpy(&(pokemon->ID_mensaje_original), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
 	memcpy(&(pokemon->sizeNombre), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
@@ -446,15 +455,16 @@ t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre) {
     return getPokemon;
 }
 
-t_appeared_pokemon* crearAppearedPokemon(uint32_t IDMensajeRecibido, char* nombre, t_posicion* posicion) {
-    t_appeared_pokemon* appearedPokemon = malloc(sizeof(t_appeared_pokemon));
+t_appeared_pokemon* crearAppearedPokemon(uint32_t IDMensajeRecibido, uint32_t IDMensajeOriginal, char* nombre, t_posicion* posicion){
+	t_appeared_pokemon* appearedPokemon = malloc(sizeof(t_appeared_pokemon));
 
-    appearedPokemon->ID_mensaje_recibido = IDMensajeRecibido;
-    appearedPokemon->sizeNombre = strlen(nombre)+1;
-    appearedPokemon->nombre = nombre;
-    appearedPokemon->posicion = posicion;
+	appearedPokemon->ID_mensaje_recibido = IDMensajeRecibido;
+	appearedPokemon->ID_mensaje_original = IDMensajeOriginal;
+	appearedPokemon->sizeNombre = strlen(nombre)+1;
+	appearedPokemon->nombre = nombre;
+	appearedPokemon->posicion = posicion;
 
-    return appearedPokemon;
+	return appearedPokemon;
 }
 
 t_catch_pokemon* crearCatchPokemon(uint32_t ID_mensaje_recibido, char* nombre, t_posicion* posicion) {

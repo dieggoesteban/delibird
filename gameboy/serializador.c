@@ -87,7 +87,7 @@ t_new_pokemon* deserializar_newPokemon(t_buffer* buffer)
 
 t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon){
 	t_buffer* buffer = malloc(sizeof(t_buffer));
-	uint32_t sizeListaPos = sizeof(uint32_t) * localizedPokemon->cantidadPosiciones * 2;
+	uint32_t sizeListaPos = sizeof(uint32_t)* localizedPokemon->cantidadPosiciones * 2;
 
 	buffer->size = sizeof(uint32_t)*4 //ID_mensaje_recibido + ID_mensaje_original + sizePokemon
 				+ strlen(localizedPokemon->nombre)+1 //nombre pokemon
@@ -150,8 +150,10 @@ t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer){
 		list_add(localizedPokemon->posiciones, posicion);
 		
 	}
+
 	return localizedPokemon;
 }
+
 
 t_paquete* serializar_appearedPokemon(t_appeared_pokemon* pokemon)
 {
@@ -544,22 +546,19 @@ t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre)
 	return getPokemon;
 }
 
-t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
+t_paquete* getPaquete(t_list* listaArgumentos, char* tipo_mensaje)
 {
 	t_paquete *paquete;
 	if (strcmp(tipo_mensaje, "NEW_POKEMON") == 0)
 	{
-
-		t_posicion_cantidad *posCant = crearPosicionCantidad((uint32_t)atoi(arrayArgumentos[1]),(uint32_t)atoi(arrayArgumentos[2]),(uint32_t)atoi(arrayArgumentos[3]));
+		t_posicion_cantidad *posCant = crearPosicionCantidad((uint32_t)atoi((char*)list_get(listaArgumentos,1)),(uint32_t)atoi((char*)list_get(listaArgumentos,2)),(uint32_t)atoi((char*)list_get(listaArgumentos,3)));
 		t_new_pokemon *newPokemon;
-		
-		if(arraySize((void*)arrayArgumentos) == 5){
-			newPokemon = crearNewPokemon(atoi(arrayArgumentos[4]),arrayArgumentos[0], posCant);
-		}else{
-			newPokemon = crearNewPokemon(0,arrayArgumentos[0], posCant);
-		}
 
-	
+		if(list_size(listaArgumentos) == 5){
+			newPokemon = crearNewPokemon(atoi((char*)list_get(listaArgumentos,4)),(char*)list_get(listaArgumentos,0), posCant);
+		}else{
+			newPokemon = crearNewPokemon(0,(char*)list_get(listaArgumentos,0), posCant);
+		}
 
 		paquete = serializar_newPokemon(newPokemon);
 
@@ -570,13 +569,12 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 	{
 		log_info(logger, "entro a appeared_pokemon");
 		t_appeared_pokemon* appearedPokemon;
-		t_posicion* posicion = crearPosicion((uint32_t)atoi(arrayArgumentos[1]),(uint32_t)atoi(arrayArgumentos[2]));
-		printf("\nCANTIDAD DE ARGUMENTOS %i\n\n", arraySize((void*)arrayArgumentos));
-		//if(arraySize((void*)arrayArgumentos) == 4){
-		appearedPokemon = crearAppearedPokemon(0,0, arrayArgumentos[0], posicion); //para cuando no lo manden con el id correlativo
-		// }else{
-		// 	appearedPokemon = crearAppearedPokemon(0,atoi(arrayArgumentos[3]), arrayArgumentos[0], posicion); //para cuando se les cante mandarlo con el id correlativo
-		// }
+		t_posicion* posicion = crearPosicion((uint32_t)atoi((char*)list_get(listaArgumentos,1)),(uint32_t)atoi((char*)list_get(listaArgumentos,2)));
+		if(list_size(listaArgumentos) == 3){
+			appearedPokemon = crearAppearedPokemon(0,0, (char*)list_get(listaArgumentos,0), posicion); //para cuando no lo manden con el id correlativo
+		}else{
+			appearedPokemon = crearAppearedPokemon(0,atoi((char*)list_get(listaArgumentos,3)), (char*)list_get(listaArgumentos,0), posicion); //para cuando se les cante mandarlo con el id correlativo
+		}
 
 		paquete = serializar_appearedPokemon(appearedPokemon);
 
@@ -585,16 +583,14 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 	}
 	else if (strcmp(tipo_mensaje, "CATCH_POKEMON") == 0)
 	{
-		t_posicion* posicion = crearPosicion((uint32_t)atoi(arrayArgumentos[1]),(uint32_t)atoi(arrayArgumentos[2]));
+		t_posicion* posicion = crearPosicion((uint32_t)atoi((char*)list_get(listaArgumentos,1)),(uint32_t)atoi((char*)list_get(listaArgumentos,2)));
 		t_catch_pokemon* catchPokemon;
 
-		// if(arraySize((void*)arrayArgumentos) == 4){
-		// 	catchPokemon = crearCatchPokemon((uint32_t)atoi(arrayArgumentos[3]), arrayArgumentos[0], posicion);
-		// }else{
-		// 	catchPokemon = crearCatchPokemon(0, arrayArgumentos[0], posicion);
-		// }
-
-		catchPokemon = crearCatchPokemon(0, arrayArgumentos[0], posicion);
+		if(list_size(listaArgumentos) == 3){
+			catchPokemon = crearCatchPokemon(0, (char*)list_get(listaArgumentos,0), posicion);
+		}else{
+			catchPokemon = crearCatchPokemon((uint32_t)atoi((char*)list_get(listaArgumentos,3)), (char*)list_get(listaArgumentos,0), posicion);
+		}
 
 		paquete = serializar_catchPokemon(catchPokemon);
 
@@ -603,11 +599,15 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 	}
 	else if (strcmp(tipo_mensaje, "CAUGHT_POKEMON") == 0)
 	{
-		t_caught_pokemon* pokemon = malloc(sizeof(t_caught_pokemon));
+		t_caught_pokemon* pokemon;
 
-		pokemon->ID_mensaje_recibido = 0;
-		pokemon->ID_mensaje_original = (uint32_t)atoi(arrayArgumentos[0]);
-		pokemon->catchStatus = (uint32_t)atoi(arrayArgumentos[1]);
+		if(string_equals_ignore_case((char*)list_get(listaArgumentos,1), "OK")){
+			pokemon = crearCaughtPokemon(0, (uint32_t)atoi((char*)list_get(listaArgumentos,0)), 1);
+		}else{
+			pokemon = crearCaughtPokemon(0, (uint32_t)atoi((char*)list_get(listaArgumentos,0)), 0);
+		}
+
+		
 
 		paquete = serializar_caughtPokemon(pokemon);
 
@@ -617,10 +617,11 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 	{
 		t_get_pokemon* getPokemon;
 		log_info(logger, "entro a get_pokemon");
-		if(arraySize((void*)arrayArgumentos)){
-			getPokemon = crearGetPokemon(atoi(arrayArgumentos[1]), arrayArgumentos[0]);
+
+		if(list_size(listaArgumentos) == 1){
+			getPokemon = crearGetPokemon(0, (char*)list_get(listaArgumentos,0));
 		}else{
-			getPokemon = crearGetPokemon(0, arrayArgumentos[0]);
+			getPokemon = crearGetPokemon(atoi((char*)list_get(listaArgumentos,1)), (char*)list_get(listaArgumentos,0));
 		}
 
 		paquete = serializar_getPokemon(getPokemon);
@@ -628,24 +629,21 @@ t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 	}
 	else if (strcmp(tipo_mensaje, "LOCALIZED_POKEMON") == 0)
 	{ //ESTE AL FINAL NO LO HACE GAMEBOY, PARECE SER LA UNICA MQ QUE NO -> PERO LO DEJO IGUAL ASI PRUEBO LA SERIALIZACION Y LA DESERIALIZACION (DESPUES SACAR THO)
-		log_info(logger, "entro a localized_pokemon");
+			log_info(logger, "entro a localized_pokemon");
 
-		t_posicion *pos1 = crearPosicion(4, 5);
-		t_posicion *pos2 = crearPosicion(1, 5);
-		t_posicion *pos3 = crearPosicion(9, 3);
+		t_posicion *pos1 = crearPosicion(5, 10);
+		t_posicion *pos2 = crearPosicion(8, 11);
 
 		t_list *listPos = list_create();
 		list_add(listPos, pos1);
 		list_add(listPos, pos2);
-		list_add(listPos, pos3);
 
-		t_localized_pokemon *localizedPokemon = crearLocalizedPokemon(0,0,"Pikachu", 3, listPos);
+		t_localized_pokemon *localizedPokemon = crearLocalizedPokemon(0,0,"lucario", 2, listPos);
 		
 		paquete = serializar_localizedPokemon(localizedPokemon); 		
 
 		free(pos1);
 		free(pos2);
-		free(pos3);
 		free(listPos);
 		free(localizedPokemon);
 	}

@@ -3,6 +3,6 @@
         "${workspaceFolder}"
     ],
     "files.associations": {
-        "typeinfo": "c"
+        "gameboy.h": "c"
     }
 }

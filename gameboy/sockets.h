@@ -2,7 +2,6 @@
 #ifndef SOCKETS_H_
 #define SOCKETS_H_
 
-#include <errno.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<signal.h>
@@ -19,6 +18,7 @@
 #include "models.h"
 
 t_log* logger;
+t_log *gameboy_custom_logger;
 t_config* config;
 t_suscribe_gameboy* suscribe;
 

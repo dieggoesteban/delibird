@@ -11,5 +11,6 @@ void terminarPrograma();
 
 sem_t waitForFinish;
 pthread_t t_finishProgram;
+char* LOG;
 
 #endif /* BROKER_H_ */

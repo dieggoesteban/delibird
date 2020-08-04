@@ -13,6 +13,9 @@
 #include<sys/socket.h>
 #include<netdb.h>
 #include<string.h>
+#include "models.h"
+
+#include "models.h"
 
 #include "models.h"
 
@@ -21,10 +24,12 @@ t_config* config;
 
 
 uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_mensaje);
-void cortarArgumentos(int lengthArray, char *argumentos[], char *arrayTemp[]);
+t_list* cortarArgumentos(int lengthArray, char *argumentos[]);
 uint32_t perteneceAlArray(char* val, char* arr[], uint32_t size);
 uint32_t arraySize(void* arr[]);
+uint32_t arraySizeChar(char* arr[]) ;
 uint32_t getColaDeMensajes(char* queue);
+char* getNombreColaDeMensajes(uint32_t mq);
 t_suscribe_gameboy* crearSuscribeGameboy(uint32_t con, uint32_t mq);
 
 #endif /* UTILS_H_ */

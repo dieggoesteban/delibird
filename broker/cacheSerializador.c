@@ -265,7 +265,7 @@ t_new_pokemon* newPokemon_cacheToMessage(cache_new_pokemon* cacheNewPokemon, cac
 t_appeared_pokemon* appearedPokemon_cacheToMessage(cache_appeared_pokemon* cacheAppearedPokemon, cache_message* metadata)
 {
     t_posicion* pos = crearPosicion(cacheAppearedPokemon->posX, cacheAppearedPokemon->posY);
-    t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(metadata->idMessage, cacheAppearedPokemon->pokeName, pos);
+    t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(metadata->idMessage, metadata->idCorrelational, cacheAppearedPokemon->pokeName, pos);
     return appearedPokemon;
 }
 t_catch_pokemon* catchPokemon_cacheToMessage(cache_catch_pokemon* cacheCatchPokemon, cache_message* metadata)

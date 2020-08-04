@@ -8,85 +8,11 @@
 #include<sys/socket.h>
 #include<netdb.h>
 #include<string.h>
+#include "semaphore.h"
 #include "utils.h"
+#include "models.h"
+#include "utilsGenerales.h"
 
-typedef enum
-{
-	NEW_POKEMON = 1,
-	APPEARED_POKEMON = 2,
-	CATCH_POKEMON = 3,
-	CAUGHT_POKEMON = 4,
-	GET_POKEMON = 5,
-	LOCALIZED_POKEMON = 6
-} mq_cod;
-
-typedef struct
-{
-	int size;
-	void* stream;
-} t_buffer;
-
-typedef struct
-{
-	mq_cod codigo_mensaje;
-	t_buffer* buffer;
-} t_paquete;
-
-typedef struct
-{
-	uint32_t posicion_x;
-	uint32_t posicion_y;
-	uint32_t cantidad;
-} t_posicion_cantidad;
-
-typedef struct
-{
-	uint32_t posicion_x;
-	uint32_t posicion_y;
-} t_posicion;
-
-typedef struct
-{
-	uint32_t ID_mensaje_recibido;
-	uint32_t sizeNombre;
-	char* nombre;
-	t_posicion_cantidad* posicionCantidad;
-} t_new_pokemon;
-
-typedef struct{
-	uint32_t ID_mensaje_recibido;
-	uint32_t ID_mensaje_original;
-	uint32_t sizeNombre;
-	char* nombre;
-	uint32_t sizePosicion; 
-	t_list* posicion; //una lista de t_posicion
-}t_localized_pokemon;
-
-typedef struct{
-	uint32_t ID_mensaje_recibido;
-	uint32_t sizeNombre;
-	char* nombre;
-	t_posicion* posicion;
-} t_appeared_pokemon;
-
-typedef struct{
-	uint32_t ID_mensaje_recibido;
-	uint32_t sizeNombre;
-	char* nombre;
-	t_posicion* posicion;
-}t_catch_pokemon;
-
-typedef struct{
-	uint32_t ID_mensaje_recibido;
-	uint32_t ID_mensaje_original;
-	uint32_t catchStatus; 
-}t_caught_pokemon;
-
-typedef struct{
-	uint32_t ID_mensaje_recibido;
-	uint32_t sizeNombre;
-	char* nombre;
-} t_get_pokemon;
 
 //METODOS DE CONEXION
 // int crear_conexion(char* ip, char* puerto);
@@ -97,6 +23,7 @@ typedef struct{
 //PAQUETES
 t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje);
 void liberarPaquete(t_paquete* paquete);
+void* serializar_paquete(t_paquete* paquete, int bytes);
 
 //SERIALIZACION Y DESERIALIZACION
 // void deserializar_newPokemon(t_buffer* buffer);
@@ -113,15 +40,35 @@ t_get_pokemon* deserializar_getPokemon(t_buffer* buffer);
 t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon);
 t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer);
 
+t_paquete* serializar_registerModule(t_register_module* registerModule);
+t_register_module* deserializar_registerModule(t_buffer* buffer);
+
+t_paquete* serializar_acknowledgement(t_acknowledgement* akc);
+t_acknowledgement* deserializar_acknowledgement(t_buffer* buffer);
+
+t_paquete* serializar_idMensajeRecibido(t_id_mensaje_recibido* idMensajeRecibido);
+t_id_mensaje_recibido* deserializar_idMensajeRecibido(t_buffer* buffer);
+
+t_paquete* serializar_desconexion(t_register_module* registerModule);
+
 //CREACION DE LOS STRUCTS
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant);
 t_posicion* crearPosicion(uint32_t x, uint32_t y);
 t_new_pokemon* crearNewPokemon(uint32_t IDMensajeRecibido, char* nombre, t_posicion_cantidad* posicionCantidad);
-t_localized_pokemon* crearLocalizedPokemon(uint32_t IDMensajeRecibido,uint32_t IDMensajeOriginal, char* nombre, uint32_t sizePosicionCantidad, t_list* posicion);
-t_appeared_pokemon* crearAppearedPokemon(uint32_t IDMensajeRecibido, char* nombre, t_posicion* posicion);
+t_localized_pokemon* crearLocalizedPokemon(uint32_t IDMensajeRecibido,uint32_t IDMensajeOriginal, char* nombre, uint32_t cantPosiciones, t_list* posicion);
+t_appeared_pokemon* crearAppearedPokemon(uint32_t IDMensajeRecibido, uint32_t IDMensajeOriginal, char* nombre, t_posicion* posicion);
 t_catch_pokemon* crearCatchPokemon(uint32_t ID_mensaje_recibido, char* nombre, t_posicion* posicion);
 t_caught_pokemon* crearCaughtPokemon(uint32_t IDMensajeRecibido, uint32_t IDMensajeOriginal, uint32_t catchStatus);
 t_get_pokemon* crearGetPokemon(uint32_t ID_mensaje_recibido, char* nombre);
+t_message* crearMessage(void* mensajeRecibido);
+t_confirmacion_mensaje* crearConfirmacionMensaje(uint32_t ID_mensaje, uint32_t colaMensajes, bool meLlego);
+t_register_module* crearSuscribe(uint32_t ID_message_queue, uint32_t moduleID);
+t_semaforo_pokemon* crearSemaforoPokemon(char* nombrePoke);
+t_newPokemon_indexSem* crearNewPokemonIndexSem(uint32_t indexSem, t_new_pokemon* newPoke);
+t_catchPokemon_indexSem* crearCatchPokemonIndexSem(uint32_t indexSem, t_catch_pokemon* catchPoke);
+t_getPokemon_indexSem* crearGetPokemonIndexSem(uint32_t indexSem, t_get_pokemon* newPoke);
+t_acknowledgement* crearAcknowledgement(uint32_t idModulo,uint32_t ID_mensaje_recibido, uint32_t mq_cod);
+
 
 
 #endif /* CONNECTION_H_ */

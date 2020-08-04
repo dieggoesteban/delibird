@@ -6,6 +6,14 @@
 
 uint32_t globalMessageCounterId;
 
+// sem_t s_counterMessageId;
+// sem_t s_listaSuscriptores_newPokemon;
+// sem_t s_listaSuscriptores_getPokemon;
+// sem_t s_listaSuscriptores_appearedPokemon;
+// sem_t s_listaSuscriptores_catchPokemon;
+// sem_t s_listaSuscriptores_caughtPokemon;
+// sem_t s_listaSuscriptores_localizedPokemon;
+
 pthread_mutex_t s_counterMessageId;
 pthread_mutex_t s_listaSuscriptores_newPokemon;
 pthread_mutex_t s_listaSuscriptores_getPokemon;
@@ -32,7 +40,7 @@ void receiveAcknowledgement(t_acknowledgement* ack, uint32_t socket_cliente);
 void subscribeNewModule(uint32_t idNewModule, uint32_t socket_cliente, uint32_t mq_cod);
 void unsubscribeModule(uint32_t idNewModule, uint32_t socket_cliente, uint32_t mq_cod);
 void addMessageToQueue(t_message* message, t_message_queue* messageQueue);
-void sendMessageFromQueue(t_message* message, t_suscripcion* suscriptor);
+void sendMessageFromQueue(t_message* message, t_suscripcion* suscriptor, cache_message* optionalCacheMetadata);
 void dispatchMessagesFromQueue(t_message_queue* messageQueue);
 void deleteFromQueue(t_message* message);
 void cacheMessage(t_message* message);

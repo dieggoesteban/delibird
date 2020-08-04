@@ -14,7 +14,7 @@
 #include "sockets.h"
 #include "models.h"
 
-void terminar_programa(int, t_log*, t_config*);
+void terminarPrograma();
 
 bool terminaConexion;
 char* ipBroker;
@@ -24,6 +24,8 @@ uint32_t ID_MODULE;
 
 pthread_t hiloSuscriptor;
 pthread_t hiloTemporizador; //Para la suscripcion
+sem_t waitForFinish;
+pthread_t t_finishProgram;
 
 uint32_t temp;
 
