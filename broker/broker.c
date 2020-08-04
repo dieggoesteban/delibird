@@ -58,7 +58,7 @@ int main()
     pthread_create(&localizedPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromQueue, localizedPokemonMessageQueue);
     
 
-    log_info(broker_custom_logger, "Broker inicializado correctamente...");
+    log_info(logger, "Broker inicializado correctamente...");
 
     //Cierre de threads
     pthread_join(serverThread, NULL);

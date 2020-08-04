@@ -632,22 +632,22 @@ void dump()
             if(currentBlock->length < 10)
             {
                 currentMetadata = (cache_message*)list_find(metadatas, (void*)_is_the_metadata);
-                fprintf(fp, "Particion %i:  %p - %p    [%c]    Size: %ib     LRU: %llu    COLA: %i   ID: %i\n", 
-                    i+1, currentBlock->pStart, currentBlock->pLimit, currentBlock->free, currentBlock->length, currentBlock->lastUse
+                fprintf(fp, "Particion %i:  %lu - %lu    [%c]    Size: %ib     LRU: %llu    COLA: %i   ID: %i\n", 
+                    i+1, (unsigned long)currentBlock->pStart, (unsigned long)currentBlock->pLimit, currentBlock->free, currentBlock->length, currentBlock->lastUse
                     , currentMetadata->mq_cod, currentMetadata->idMessage);
             }
             else
             {
                 currentMetadata = (cache_message*)list_find(metadatas, (void*)_is_the_metadata);
-                fprintf(fp, "Particion %i:  %p - %p    [%c]    Size: %ib    LRU: %llu    COLA: %i   ID: %i\n", 
-                    i+1, currentBlock->pStart, currentBlock->pLimit, currentBlock->free, currentBlock->length, currentBlock->lastUse
+                fprintf(fp, "Particion %i:  %lu - %lu    [%c]    Size: %ib    LRU: %llu    COLA: %i   ID: %i\n", 
+                    i+1, (unsigned long)currentBlock->pStart, (unsigned long)currentBlock->pLimit, currentBlock->free, currentBlock->length, currentBlock->lastUse
                     , currentMetadata->mq_cod, currentMetadata->idMessage);
             }
         }
         else
         {
-            fprintf(fp, "Particion %i:  %p - %p    [%c]    Size: %ib    LRU: -    COLA: -   ID: -\n", 
-                i+1, currentBlock->pStart, currentBlock->pLimit, currentBlock->free, currentBlock->length);
+            fprintf(fp, "Particion %i:  %lu - %lu    [%c]    Size: %ib    LRU: -    COLA: -   ID: -\n", 
+                i+1, (unsigned long)currentBlock->pStart, (unsigned long)currentBlock->pLimit, currentBlock->free, currentBlock->length);
         }
     }
     fclose(fp);
