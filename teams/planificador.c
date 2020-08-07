@@ -116,12 +116,14 @@ void* planificadorREADY() {
 }
 
 void resultadosFinales() {
+    uint32_t cantCiclosCPU = 0;
     for(uint32_t i = 0; i < list_size(colaEXIT); i++) {
         t_entrenador* tr = (t_entrenador*)list_get(colaEXIT,i);
         log_info(logger, "El entrenador %i capturo:", tr->id);
         for(uint32_t j = 0; j < list_size(tr->pokemonCapturados); j++) {
             log_info(logger, " - %s", list_get(tr->pokemonCapturados, j));
         }
+        cantCiclosCPU += tr->cantCiclosCPU;
         log_info(logger, "Cantidad de ciclos de CPU del entrenador %i: %i", tr->id, tr->cantCiclosCPU);
     }
     uint32_t cantIntercambios = 0;
@@ -133,7 +135,7 @@ void resultadosFinales() {
         // }
         cantIntercambios += dl->cantIntercambios;
     }
-    log_info(logger, "Cantidad de ciclos de CPU Totales: %i", cantCiclosTotales);
+    log_info(logger, "Cantidad de ciclos de CPU Totales: %i", cantCiclosCPU);
     log_info(logger, "Cantidad de Cambios de Contexto: %i", cantCambiosCtx);
     log_info(logger, "Cantidad total de deadlocks: %i", list_size(listaDeadlocks));
     log_info(logger, "Cantidad total de intercambios: %i", cantIntercambios);
