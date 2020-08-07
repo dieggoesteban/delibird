@@ -51,6 +51,7 @@ int main(int argc, char *argv[])
     sem_init(&mutexREADY, 0, 1);
     sem_init(&mutexBLOCKED, 0, 1);
     sem_init(&mutexEXEC, 0, 1);
+    sem_init(&mutexPlanificadorEXEC, 0, 0);
     sem_init(&mutexEXIT, 0, 0);
     sem_init(&mutexPokesEnMapa, 0, 1);
     sem_init(&mutexReporteDeadlock, 0, 1);

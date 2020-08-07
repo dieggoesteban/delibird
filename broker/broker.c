@@ -24,7 +24,7 @@ int main()
     config = config_create("./assets/broker.config");
     LOG = config_get_string_value(config,"LOG_FILE");
 	logger = log_create(LOG, "broker", true, LOG_LEVEL_INFO);
-    broker_custom_logger = log_create("./assets/broker_custom.log", "broker", false, LOG_LEVEL_DEBUG);
+    broker_custom_logger = log_create("./assets/broker_custom.log", "broker", true, LOG_LEVEL_DEBUG);
     IP = config_get_string_value(config, "IP_BROKER");
     PUERTO = config_get_string_value(config, "PUERTO_BROKER");
 

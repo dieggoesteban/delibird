@@ -310,13 +310,13 @@ t_entrenador* cambiarPosicionEntrenador(t_entrenador* entrenador, uint32_t posX,
 
 uint32_t getTiempoReal(t_entrenador* tr) {
 	if(tr->entrenadorPlanificado != NULL) {
-		if(tr->entrenadorPlanificado->tiempoEjecucion != 0) {
-			return tr->entrenadorPlanificado->tiempoEjecucion;
-		} else {
-			return tr->entrenadorPlanificado->tiempoIntercambio;
-		}
+		// if(tr->entrenadorPlanificado->tiempoEjecucion != 0) {
+			return tr->entrenadorPlanificado->tiempoEjecucion + tr->entrenadorPlanificado->tiempoIntercambio;
+		// } else {
+		// 	return tr->entrenadorPlanificado->tiempoIntercambio;
+		// }
 	} else if(tr->pokemonPlanificado != NULL) {
-		return tr->pokemonPlanificado->tiempoEjecucion;
+		return tr->pokemonPlanificado->tiempoEjecucion + tr->pokemonPlanificado->tiempoCaptura;
 	}
 	return ERROR;
 }

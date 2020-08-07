@@ -481,6 +481,7 @@ void dispatchMessagesFromQueue(t_message_queue* messageQueue)
 				{
 					sem_post(&message->s_puedeEliminarse); //Es lo que vendría a ser el post del ack
 				}
+				
 				message->countSuscriptoresObjetivo = subscribersCount;
 				for(uint32_t i = 0; i < subscribersCount; i++) {
 					currentSubscriber = (t_suscripcion*)list_get(messageQueue->subscribers, i);
@@ -503,6 +504,7 @@ void dispatchMessagesFromQueue(t_message_queue* messageQueue)
 			if(pthread_join(message->deleteFromQueue, NULL) != 0)
 				log_error(broker_custom_logger, "Error in pthread_detach deleteFromQueue");
 		}
+		pthread_mutex_unlock(&messageQueue->s_mensajes);
 	}
 }
 
