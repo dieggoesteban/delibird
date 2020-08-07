@@ -104,6 +104,14 @@ void* planificadorREADY() {
         actualizarObjetivoGlobal(poke->nombre, true);
         sem_post(&pokesObjetivoGlobal);
         log_info(logger, "Asignado %s al entrenador %i que esta en %i:%i. Pasa a READY", poke->nombre, (uint32_t)entrenador->id, (uint32_t)entrenador->posicion->posicion_x, (uint32_t)entrenador->posicion->posicion_y);
+        int valorSem;
+		if (sem_getvalue(&mutexPlanificadorEXEC, &valorSem) == 0)
+		{
+			if (valorSem == 0)
+			{
+				sem_post(&mutexPlanificadorEXEC);
+			}
+		}
     }
 }
 
@@ -186,6 +194,7 @@ void detectorDeIntercambio() {
             }
             if(tr1->entrenadorPlanificado != NULL) {
                 moverEntrenadorDeCola(colaBLOCKED, colaREADY, tr1);
+                sem_post(&mutexPlanificadorEXEC);
                 break;
             }
         }
@@ -332,6 +341,7 @@ void modoDesconectado() {
 void* planificadorEXEC(void* arg) {
     AlgoritmoFunc* alg = (AlgoritmoFunc*) arg;
     while(1) {
+        sem_wait(&mutexPlanificadorEXEC);
         if(list_size(colaREADY) > 0 || list_size(colaEXEC) > 0) {
             sleep(cicloCPU);
             cantCiclosTotales += 1;
@@ -389,6 +399,7 @@ void* planificadorEXEC(void* arg) {
                     sem_post(&entrenador->mutex);
                 }
             }
+            sem_post(&mutexPlanificadorEXEC);
         }
     }
 }

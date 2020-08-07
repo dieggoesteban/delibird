@@ -64,6 +64,7 @@ sem_t mutexREADY;
 sem_t mutexEXEC;
 sem_t mutexBLOCKED;
 sem_t mutexEXIT;
+sem_t mutexPlanificadorEXEC;
 sem_t mutexPokesEnMapa;
 sem_t counterPokesEnMapa;
 sem_t counterEntrenadoresCatch;
