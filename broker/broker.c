@@ -78,13 +78,14 @@ void terminarPrograma()
     sem_wait(&waitForFinish);
     
     log_info(broker_custom_logger, "Finalizando broker...");
-
-    // freeMessageQueue(newPokemonMessageQueue);
-    // freeMessageQueue(appearedPokemonMessageQueue);
-    // freeMessageQueue(catchPokemonMessageQueue);
-    // freeMessageQueue(caughtPokemonMessageQueue);
-    // freeMessageQueue(getPokemonMessageQueue);
-    // freeMessageQueue(localizedPokemonMessageQueue);
+    close(socket_servidor);
+    socket_servidor = -1;
+    freeMessageQueue(newPokemonMessageQueue);
+    freeMessageQueue(appearedPokemonMessageQueue);
+    freeMessageQueue(catchPokemonMessageQueue);
+    freeMessageQueue(caughtPokemonMessageQueue);
+    freeMessageQueue(getPokemonMessageQueue);
+    freeMessageQueue(localizedPokemonMessageQueue);
     //dumpConsole("LIBERANDO RECURSOS");
     freeCacheSystem();
 

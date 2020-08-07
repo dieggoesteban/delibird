@@ -25,7 +25,7 @@ t_config* config;
 
 char* IP;
 char* PUERTO;
-
+bool primeraConexion;
 
 t_list* objetivoGlobal;
 t_list* pokemonesEnMapa;

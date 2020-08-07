@@ -10,6 +10,7 @@
 char* IP;
 char* PUERTO;
 pthread_t serverThread;
+uint32_t socket_servidor;
 
 //CLIENTE
 int crear_conexion(char* ip, char* puerto);

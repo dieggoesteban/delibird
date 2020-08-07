@@ -45,7 +45,6 @@ void liberarPaquete(t_paquete* paquete){
 #pragma region Funciones de Servidor
 void iniciar_servidor(void)
 {
-	uint32_t socket_servidor;
 	struct addrinfo hints, *servinfo, *p;
 
 	memset(&hints, 0, sizeof(hints));
@@ -60,9 +59,16 @@ void iniciar_servidor(void)
 		if ((socket_servidor = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1)
 			continue;
 
+		uint32_t flag = 1;
+		if (setsockopt(socket_servidor, SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(flag)) == -1)
+		{
+			log_error(broker_custom_logger, "Setsockopt fails");
+		}
+
 		if (bind(socket_servidor, p->ai_addr, p->ai_addrlen) == -1)
 		{
 			close(socket_servidor);
+			log_error(broker_custom_logger, "Error on binding: %s", strerror(errno));
 			continue;
 		}
 		break;
@@ -89,6 +95,7 @@ void esperar_cliente(uint32_t socket_servidor)
 	else
 	{
 		log_error(broker_custom_logger, "Accept error: %s\n", strerror(errno));
+		perror("accept");
 		exit(1);
 	}
 }

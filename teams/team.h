@@ -21,6 +21,7 @@ char* IP;
 char* PUERTO;
 char* LOG;
 char* ALGORITMO;
+bool primeraConexion;
 
 
 //GLOBALES
