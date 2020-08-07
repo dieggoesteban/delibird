@@ -650,9 +650,9 @@ void dump()
                 i+1, (unsigned long)currentBlock->pStart, (unsigned long)currentBlock->pLimit, currentBlock->free, currentBlock->length);
         }
     }
+    fprintf(fp, "\n");
     fclose(fp);
     pthread_mutex_unlock(&s_metadatas);
-    fprintf(fp, "\n");
     log_info(logger, "Se ha solicitado un dump de la memoria cache");
 }
 
