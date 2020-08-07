@@ -35,7 +35,7 @@ t_get_pokemon* deserializar_getPokemon(t_buffer* buffer);
 t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon);
 t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer);
 
-t_paquete* serializar_registerModule(t_register_module* registerModule);
+t_paquete* serializar_registerModule(t_register_module* registerModule, uint32_t operation);
 t_register_module* deserializar_registerModule(t_buffer* buffer);
 
 t_paquete* serializar_suscripcion(t_suscripcion* suscripcion);

@@ -61,7 +61,9 @@ void establecerConexionBroker()
 				sem_wait(&estaDesconectado);
 			}
 		}
+		sem_wait(&pokesObjetivoGlobal);
 		mandarGET();
+		sem_post(&pokesObjetivoGlobal);
 
 		pthread_create(&threadSUSCRIBE_CAUGHT, NULL, (void *)suscribe, (void *)suscribeCaught);
 		pthread_create(&threadSUSCRIBE_APPEARED, NULL, (void *)suscribe, (void *)suscribeAppeared);

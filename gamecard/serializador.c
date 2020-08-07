@@ -548,7 +548,6 @@ t_semaforo_pokemon* crearSemaforoPokemon(char* nombrePoke){
 
 	return semaforoPoke;
 }
-
 t_newPokemon_indexSem* crearNewPokemonIndexSem(uint32_t indexSem, t_new_pokemon* newPoke){
 	t_newPokemon_indexSem* newPokeSem = malloc(sizeof(t_newPokemon_indexSem));
 	newPokeSem->indexSemaforo = indexSem;

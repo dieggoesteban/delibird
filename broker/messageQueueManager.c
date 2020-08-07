@@ -261,7 +261,7 @@ void receiveAcknowledgement(t_acknowledgement* ack, uint32_t socket_cliente)
 	t_message* targetMessage = NULL;
 	t_message* currentMessage = NULL;
 
-	pthread_mutex_lock(&messageQueue->s_mensajes);
+	pthread_mutex_lock(&messageQueue->s_mensajes); //<-- ACA REY
 	for(uint32_t i = 0; i < list_size(messageQueue->mensajes); i++) {
 		currentMessage = (t_message*)list_get(messageQueue->mensajes, i);
 		if (currentMessage->id == ack->idMessageReceived) {
@@ -318,11 +318,12 @@ void subscribeNewModule(uint32_t idNewModule, uint32_t socket_cliente, uint32_t 
 	t_suscripcion* suscripcion = crearSuscripcion(idNewModule, socket_cliente);
 
 	t_suscripcion* foundSuscripcion;
-	pthread_mutex_lock(&messageQueue->s_subscribers);
 	uint32_t _it_was_already_register(t_suscripcion* suscripcion) {
 		return suscripcion->idModule == idNewModule;
 	}
-	foundSuscripcion = (t_suscripcion*)list_find(messageQueue->subscribers, (void*)_it_was_already_register);
+	pthread_mutex_lock(&messageQueue->s_subscribers);
+		foundSuscripcion = (t_suscripcion*)list_find(messageQueue->subscribers, (void*)_it_was_already_register);
+	pthread_mutex_unlock(&messageQueue->s_subscribers);
 	if(foundSuscripcion != NULL)
 	{
 		//Se actualiza su socket de conexion si es necesario
@@ -334,10 +335,11 @@ void subscribeNewModule(uint32_t idNewModule, uint32_t socket_cliente, uint32_t 
 	}
 	else 
 	{
-		list_add(messageQueue->subscribers, (void *)suscripcion);
+		pthread_mutex_lock(&messageQueue->s_subscribers);
+			list_add(messageQueue->subscribers, (void *)suscripcion);
+		pthread_mutex_unlock(&messageQueue->s_subscribers);
 		log_info(logger, "Se ha registrado un nuevo suscriptor id %i a la cola %s", suscripcion->idModule, messageQueue->name);
 	}
-	pthread_mutex_unlock(&messageQueue->s_subscribers);
 
 	//Enviar los mensajes de la cache
 	t_cache_dispatch_info* cache_dispatch_info = (t_cache_dispatch_info*)malloc(sizeof(t_cache_dispatch_info));
@@ -359,14 +361,15 @@ void unsubscribeModule(uint32_t idNewModule, uint32_t socket_cliente, uint32_t m
 		return suscripcion->idModule == idNewModule;
 	}
 	foundSuscripcion = (t_suscripcion*)list_find(messageQueue->subscribers, (void*)_is_the_registration);
+	pthread_mutex_unlock(&messageQueue->s_subscribers);
 
 	if(foundSuscripcion == NULL)
 	{
-		log_warning(broker_custom_logger, "Desuscripcion: Suscriptor no encontrado");
+		log_warning(broker_custom_logger, "Desuscripcion: Suscriptor no encontrado");	
 		return;
 	}
 	
-	pthread_mutex_lock(&messageQueue->s_mensajes);
+	pthread_mutex_lock(&messageQueue->s_subscribers);	
 	t_suscripcion* targetSuscription;
 	for(uint32_t i = 0; i < list_size(messageQueue->subscribers); i++)
 	{
@@ -381,14 +384,16 @@ void unsubscribeModule(uint32_t idNewModule, uint32_t socket_cliente, uint32_t m
 			break;
 		}
 	}
+	pthread_mutex_unlock(&messageQueue->s_subscribers);
+	
 	t_message* currentMessage;
+	pthread_mutex_lock(&messageQueue->s_mensajes);
 	for(uint32_t i = 0; i < list_size(messageQueue->mensajes); i++)
 	{
 		currentMessage = (t_message*)list_get(messageQueue->mensajes, i);
 		currentMessage->countSuscriptoresObjetivo--;
 	}
 	pthread_mutex_unlock(&messageQueue->s_mensajes);
-	pthread_mutex_unlock(&messageQueue->s_subscribers);
 }
 
 void addMessageToQueue(t_message* message, t_message_queue* messageQueue)
@@ -472,6 +477,7 @@ void dispatchMessagesFromQueue(t_message_queue* messageQueue)
 	{
 		sem_wait(&messageQueue->s_hayMensajes);
 		t_message* message;
+		//pthread_mutex_lock(&messageQueue->s_mensajes);
 		for(uint32_t i = 0; i < list_size(messageQueue->mensajes); i++)
 		{
 			message = (t_message*)list_get(messageQueue->mensajes, i);
@@ -488,7 +494,7 @@ void dispatchMessagesFromQueue(t_message_queue* messageQueue)
 					sendMessageFromQueue(message, currentSubscriber, NULL);
 				}
 			pthread_mutex_unlock(&messageQueue->s_subscribers);	
-			log_debug(broker_custom_logger, "Enviado a %i suscriptores", list_size(message->suscriptoresEnviados));
+			log_debug(broker_custom_logger, "Enviado a %i suscriptores", subscribersCount);
 			
 			//Guardarlo en la cache
 			if(pthread_create(&message->caching, NULL, (void*)cacheMessage, message) < 0)
@@ -504,7 +510,7 @@ void dispatchMessagesFromQueue(t_message_queue* messageQueue)
 			if(pthread_join(message->deleteFromQueue, NULL) != 0)
 				log_error(broker_custom_logger, "Error in pthread_detach deleteFromQueue");
 		}
-		pthread_mutex_unlock(&messageQueue->s_mensajes);
+		//pthread_mutex_unlock(&messageQueue->s_mensajes);
 	}
 }
 

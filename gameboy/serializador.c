@@ -118,7 +118,6 @@ t_paquete* serializar_localizedPokemon(t_localized_pokemon* localizedPokemon){
 
 	t_paquete* paquete = crear_paquete(LOCALIZED_POKEMON, buffer->size, buffer->stream);
 
-	printf("codigo de mensaje de serializar poke: %i \n", paquete->codigo_mensaje);
 	return paquete;			
 }
 
@@ -129,13 +128,10 @@ t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer){
 
 	memcpy(&(localizedPokemon->ID_mensaje_recibido), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
-	log_info(logger, "el id del mensaje recibido es: %i", localizedPokemon->ID_mensaje_recibido);
 	memcpy(&(localizedPokemon->ID_mensaje_original), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
-	log_info(logger, "el id del mensaje original es %i", localizedPokemon->ID_mensaje_original);
 	memcpy(&(localizedPokemon->sizeNombre), stream, sizeof(u_int32_t));
 	stream += sizeof(uint32_t);
-	log_info(logger,"size nombre %i", localizedPokemon->sizeNombre);
 	localizedPokemon->nombre = malloc(localizedPokemon->sizeNombre);
 	memcpy(localizedPokemon->nombre, stream, localizedPokemon->sizeNombre);
 	stream += localizedPokemon->sizeNombre;
@@ -154,7 +150,6 @@ t_localized_pokemon* deserializar_localizedPokemon(t_buffer* buffer){
 		list_add(localizedPokemon->posiciones, posicion);
 		
 	}
-	printf("LOCALIZED DEL POKEMON: NOMBRE: %s, CANTIDAD DE POSICIONES: %i, POSX1: %i, POSX2: %i\n", localizedPokemon->nombre, localizedPokemon->cantidadPosiciones, ((t_posicion*)list_get(localizedPokemon->posiciones, 0))->posicion_x, ((t_posicion*)list_get(localizedPokemon->posiciones, 0))->posicion_y);
 
 	return localizedPokemon;
 }
@@ -339,7 +334,7 @@ t_get_pokemon* deserializar_getPokemon(t_buffer* buffer)
     return pokemon;
 }
 
-t_paquete* serializar_registerModule(t_register_module* registerModule) {
+t_paquete* serializar_registerModule(t_register_module* registerModule, uint32_t operation) {
 	t_buffer* registerModuleBuffer = malloc(sizeof(t_buffer));
 	registerModuleBuffer->size = sizeof(uint32_t) * 2;
 	void* stream = malloc(registerModuleBuffer->size);
@@ -351,7 +346,7 @@ t_paquete* serializar_registerModule(t_register_module* registerModule) {
     offset += sizeof(uint32_t);
 
 	registerModuleBuffer->stream = stream;
-	t_paquete* paquete = crear_paquete(SUBSCRIBE, registerModuleBuffer->size, registerModuleBuffer->stream);
+	t_paquete* paquete = crear_paquete(operation, registerModuleBuffer->size, registerModuleBuffer->stream);
 
 	return paquete;
 }
@@ -608,10 +603,8 @@ t_paquete* getPaquete(t_list* listaArgumentos, char* tipo_mensaje)
 
 		if(string_equals_ignore_case((char*)list_get(listaArgumentos,1), "OK")){
 			pokemon = crearCaughtPokemon(0, (uint32_t)atoi((char*)list_get(listaArgumentos,0)), 1);
-			printf("ENTRA EN EL OK CON EL STATUS %i\n", pokemon->catchStatus);
 		}else{
 			pokemon = crearCaughtPokemon(0, (uint32_t)atoi((char*)list_get(listaArgumentos,0)), 0);
-			printf("ENTRA EN EL FAIL CON EL STATUS %i\n", pokemon->catchStatus);
 		}
 
 		
