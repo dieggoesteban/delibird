@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
     cantCambiosCtx = 0;
     cantDeadlocks = 0;
     cantIntercambios = 0;
+    cantCiclosTotales = 0;
     
     if(argv[1]) {
         idModule = atoi(argv[1]);
@@ -42,6 +43,7 @@ int main(int argc, char *argv[])
     pokemonesEnMapa = list_create();
     entrenadoresCatch = list_create();
     trIds = list_create();
+    listaDeadlocks = list_create();
 
     sem_init(&mutexDetector, 0, 0);
     sem_init(&estaDesconectado, 0, 0);
@@ -51,6 +53,7 @@ int main(int argc, char *argv[])
     sem_init(&mutexEXEC, 0, 1);
     sem_init(&mutexEXIT, 0, 0);
     sem_init(&mutexPokesEnMapa, 0, 1);
+    sem_init(&mutexReporteDeadlock, 0, 1);
     sem_init(&counterPokesEnMapa, 0, 0);
     sem_init(&counterEntrenadoresCatch, 0, 0);
     sem_init(&mutexReconnect, 0, 0);

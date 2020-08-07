@@ -234,6 +234,7 @@ t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* p
 	entrenador->enEspera = false;
 	entrenador->deadlock = entrenadorEnDeadlock(entrenador);
 	entrenador->estimacionAnterior = config_get_int_value(config,"ESTIMACION_INICIAL");
+	entrenador->cantCiclosCPU = 0;
 
 	list_add(trIds,(void*)entrenador->id);
 
@@ -617,6 +618,85 @@ t_list* pokesQueSiQuiere(t_entrenador* tr, t_list* pokes) {
 		}
 	}
 	return digimons;
+}
+
+uint32_t perteneceAListaInt(uint32_t n, t_list* list) {
+	if(list_size(list) > 0) {
+		for(uint32_t i=0; i < list_size(list); i++) {
+			uint32_t num = (uint32_t)((t_trDeadlock*)list_get(list,i))->idEntrenador;
+			if(n == num)
+				return i;
+		}
+	}
+	return ERROR;
+}
+
+uint32_t perteneceReporteDeadlock(t_entrenador* tr) {
+	uint32_t result = ERROR;
+	sem_wait(&mutexReporteDeadlock);
+	t_list* auxDeadlock = list_duplicate(listaDeadlocks);
+	sem_post(&mutexReporteDeadlock);
+	if(list_size(auxDeadlock) > 0) {
+		for(uint32_t i=0; i < list_size(auxDeadlock); i++) {
+			t_deadlock* deadlock = list_get(auxDeadlock,i);
+			if(!deadlock->estaResuelto) {
+				if(perteneceAListaInt(tr->id, deadlock->entrenadores) != ERROR) {
+					result = i;
+					break;
+				}
+			}
+		}
+	}
+	list_destroy(auxDeadlock);
+	return result;
+}
+
+bool sigueEnDeadlock(t_deadlock* dl) {
+	if(list_size(dl->entrenadores) > 0) {
+		for(uint32_t i = 0; i < list_size(dl->entrenadores); i++) {
+			t_trDeadlock* tr = (t_trDeadlock*)list_get(dl->entrenadores, i);
+			if(tr->deadlock) {
+				return true;
+			} 
+		}
+	}
+	return false;
+}
+
+t_trDeadlock* crearTrDeadlock(uint32_t idTr, bool deadlock) {
+	t_trDeadlock* tr = malloc(sizeof(t_trDeadlock));
+
+	tr->idEntrenador = idTr;
+	tr->deadlock = deadlock;
+
+	return tr;
+}
+
+t_trDeadlock* actualizarTrDeadlock(t_entrenador* tr, t_deadlock* dl) {
+	uint32_t index = perteneceAListaInt(tr->id, dl->entrenadores);
+	t_trDeadlock* trainer = (t_trDeadlock*)list_remove(dl->entrenadores, index);
+	trainer->deadlock = entrenadorEnDeadlock(tr);
+	return trainer;
+}
+
+t_deadlock* getReporteDeadlock(t_entrenador* tr) {
+	uint32_t index = perteneceReporteDeadlock(tr);
+	if(index != ERROR) {
+		sem_wait(&mutexReporteDeadlock);
+		t_deadlock* dl = (t_deadlock*)list_remove(listaDeadlocks,index);
+		sem_post(&mutexReporteDeadlock);
+		return dl;
+	} else return NULL;
+}
+
+t_deadlock* crearReporteDeadlock() {
+	t_deadlock* deadlock = malloc(sizeof(t_deadlock));
+
+	deadlock->entrenadores = list_create();
+	deadlock->cantIntercambios = 0;
+	deadlock->estaResuelto = false;
+
+	return deadlock;
 }
 
 void defaultCaptura(uint32_t index) {

@@ -41,6 +41,17 @@ typedef struct {
 } t_akc;
 
 typedef struct {
+	uint32_t idEntrenador;
+	bool deadlock;
+} t_trDeadlock;
+
+typedef struct {
+	t_list* entrenadores;
+	uint32_t cantIntercambios;
+	bool estaResuelto;
+} t_deadlock;
+
+typedef struct {
 	uint32_t messageQueue;
 	uint32_t moduleId;
 } t_register_module;
@@ -160,6 +171,7 @@ typedef struct
 	bool enEspera;
     bool deadlock;
 	sem_t mutex;
+	uint32_t cantCiclosCPU;
 } t_entrenador;
 
 typedef struct

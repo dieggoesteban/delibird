@@ -12,6 +12,7 @@ void hiloEntrenador(uint32_t trId) {
         sem_wait(&mutexEXEC);
         entrenador = (t_entrenador*)list_get(colaEXEC, 0);
         sem_post(&mutexEXEC);
+        entrenador->cantCiclosCPU += 1;
         if(entrenador->entrenadorPlanificado != NULL) {
             if(entrenador->entrenadorPlanificado->tiempoEjecucion == 0) {
                 pasosParaIntercambio(entrenador);

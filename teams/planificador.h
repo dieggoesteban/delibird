@@ -38,15 +38,21 @@ sem_t mutexDetector;
 sem_t mutexEXIT;
 sem_t estaDesconectado;
 sem_t waitForFinish;
+sem_t mutexReporteDeadlock;
 
 t_list* objetivoGlobal;
 t_list* pokemonesEnMapa; // lucario pikachu pikachu pikachu squirtle
 t_list* objetivoGlobal; //3 lucario 1 pikachu 2 squirtle
 t_list* entrenadoresCatch;
+t_list* listaDeadlocks;
 
 uint32_t cicloCPU;
 uint32_t idModule;
 uint32_t cantEntrenadores;
+uint32_t cantCambiosCtx;
+uint32_t cantDeadlocks;
+uint32_t cantIntercambios;
+uint32_t cantCiclosTotales;
 bool desalojo;
 
 //INICIALIZACION HILOS
