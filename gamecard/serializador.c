@@ -576,6 +576,13 @@ t_acknowledgement* crearAcknowledgement(uint32_t idModulo,uint32_t ID_mensaje_re
 	return ack;
 }
 
+t_hilo_poke* crearHiloPoke(pthread_t hiloID, bool ejecutando){
+	t_hilo_poke* hiloPoke = malloc(sizeof(t_hilo_poke));
+	hiloPoke->idHilo = hiloID;
+	hiloPoke->ejecutando = ejecutando;
+	return hiloPoke;
+}
+
 t_paquete* getPaquete(char* arrayArgumentos[], char* tipo_mensaje)
 {
 

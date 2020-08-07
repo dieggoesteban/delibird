@@ -11,6 +11,10 @@ int main(int argc, char *argv[])
 {
     config = config_create("./assets/team.config");
     cantEntrenadores = 0;
+    cantCambiosCtx = 0;
+    cantDeadlocks = 0;
+    cantIntercambios = 0;
+    cantCiclosTotales = 0;
     
     if(argv[1]) {
         idModule = atoi(argv[1]);
@@ -39,6 +43,7 @@ int main(int argc, char *argv[])
     pokemonesEnMapa = list_create();
     entrenadoresCatch = list_create();
     trIds = list_create();
+    listaDeadlocks = list_create();
 
     sem_init(&mutexDetector, 0, 0);
     sem_init(&estaDesconectado, 0, 0);
@@ -46,8 +51,10 @@ int main(int argc, char *argv[])
     sem_init(&mutexREADY, 0, 1);
     sem_init(&mutexBLOCKED, 0, 1);
     sem_init(&mutexEXEC, 0, 1);
+    sem_init(&mutexPlanificadorEXEC, 0, 0);
     sem_init(&mutexEXIT, 0, 0);
     sem_init(&mutexPokesEnMapa, 0, 1);
+    sem_init(&mutexReporteDeadlock, 0, 1);
     sem_init(&counterPokesEnMapa, 0, 0);
     sem_init(&counterEntrenadoresCatch, 0, 0);
     sem_init(&mutexReconnect, 0, 0);
@@ -64,17 +71,11 @@ int main(int argc, char *argv[])
     if (pthread_create(&threadREADY,NULL,(void*)planificadorREADY,NULL) != 0)
         printf("Error READY\n");
 
-    if (pthread_create(&threadDETECT_DEADLOCK,NULL,(void*)detectorDeIntercambio,NULL) != 0)
-        printf("Error DETECTOR DEADLOCK\n");
-
     if (pthread_create(&threadEXEC,NULL,(void*)planificadorEXEC,(void*)getAlgoritmo(ALGORITMO)) != 0)
         printf("Error EXEC\n");
 
     if (pthread_create(&threadSERVER,NULL,(void*)iniciar_servidor,NULL) != 0)
         printf("Error SERVIDOR\n");
-
-    if (pthread_create(&threadEXIT,NULL,(void*)planificadorEXIT,NULL) != 0)
-        printf("Error EXIT\n");
 
     if (pthread_create(&threadDETECT_DISCON,NULL,(void*)detectarDesconexion,NULL) != 0)
         printf("Error DETECTOR DESCONEXION\n");
@@ -98,11 +99,6 @@ int main(int argc, char *argv[])
 void terminar_programa() {
     sem_wait(&waitForFinish);
     printf("\nCERRANDO EL PROGRAMA*********************************\n");
-    // pthread_exit(&threadREADY);
-    // pthread_exit(&threadEXEC);
-    // pthread_exit(&threadSUSCRIBE_CAUGHT);
-    // pthread_exit(&threadSUSCRIBE_APPEARED);
-    // pthread_exit(&threadSUSCRIBE_LOCALIZED);
 
     if(suscribeCaught->conexion != -1) {
         liberar_conexion(suscribeCaught->conexion);
@@ -136,7 +132,6 @@ void terminar_programa() {
     list_destroy_and_destroy_elements(colaEXIT, free);
     list_destroy_and_destroy_elements(pokemonesEnMapa, free);
 
-    log_info(logger,"Liberamos todo");
     config_destroy(config);
     log_destroy(logger);
 

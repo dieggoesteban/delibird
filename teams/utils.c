@@ -234,6 +234,7 @@ t_entrenador* crearEntrenador(t_posicion* posicion, t_list* objetivos, t_list* p
 	entrenador->enEspera = false;
 	entrenador->deadlock = entrenadorEnDeadlock(entrenador);
 	entrenador->estimacionAnterior = config_get_int_value(config,"ESTIMACION_INICIAL");
+	entrenador->cantCiclosCPU = 0;
 
 	list_add(trIds,(void*)entrenador->id);
 
@@ -245,6 +246,7 @@ t_pokemon_posicion* crearPokemonPosicion(char* nombre, t_posicion* posicion){
 
 	pokemon->nombre = nombre;
 	pokemon->posicion = posicion;
+	pokemon->tiempoCaptura = 1;
 
 	return pokemon;
 }
@@ -308,13 +310,13 @@ t_entrenador* cambiarPosicionEntrenador(t_entrenador* entrenador, uint32_t posX,
 
 uint32_t getTiempoReal(t_entrenador* tr) {
 	if(tr->entrenadorPlanificado != NULL) {
-		if(tr->entrenadorPlanificado->tiempoEjecucion != 0) {
-			return tr->entrenadorPlanificado->tiempoEjecucion;
-		} else {
-			return tr->entrenadorPlanificado->tiempoIntercambio;
-		}
+		// if(tr->entrenadorPlanificado->tiempoEjecucion != 0) {
+			return tr->entrenadorPlanificado->tiempoEjecucion + tr->entrenadorPlanificado->tiempoIntercambio;
+		// } else {
+		// 	return tr->entrenadorPlanificado->tiempoIntercambio;
+		// }
 	} else if(tr->pokemonPlanificado != NULL) {
-		return tr->pokemonPlanificado->tiempoEjecucion;
+		return tr->pokemonPlanificado->tiempoEjecucion + tr->pokemonPlanificado->tiempoCaptura;
 	}
 	return ERROR;
 }
@@ -333,7 +335,7 @@ bool entrenadorLlegoASuDestino(void* entrenador) {
 	bool llegoAEntrenador = false;
 
 	if(trainer->pokemonPlanificado != NULL) {
-		llegoAPoke = turnosHastaPokemon(trainer->pokemonPlanificado,trainer) == 0;
+		llegoAPoke = trainer->pokemonPlanificado->tiempoCaptura == 0;
 	} else {
 		llegoAEntrenador = trainer->entrenadorPlanificado->tiempoIntercambio == 0;
 	}
@@ -380,6 +382,12 @@ void pasosParaIntercambio(t_entrenador* entrenador) {
 	actualizarPosicion(entrenador);
 }
 
+void pasosParaCaptura(t_entrenador* entrenador) {
+	entrenador->pokemonPlanificado->tiempoCaptura -= 1;
+	log_info(logger, "El entrenador %i esta intentando capturar a %s\n", (uint32_t)entrenador->id, (uint32_t)entrenador->pokemonPlanificado->nombre);
+	actualizarPosicion(entrenador);
+}
+
 void actualizarPosicion(t_entrenador* entrenador) {
 	sem_wait(&mutexEXEC);
 	list_remove(colaEXEC,0);
@@ -412,8 +420,39 @@ bool pokemonEnObjetivoGlobal(t_pokemon_posicion* pokemon) {
     return false;
 }
 
+bool esElMismoPoke(t_pokemon_posicion* poke, t_pokemon_posicion* poke2) {
+	bool mismoNombre = strcmp(poke->nombre, poke2->nombre) == 0;
+	bool mismaPosicionX = poke->posicion->posicion_x == poke2->posicion->posicion_x;
+	bool mismaPosicionY = poke->posicion->posicion_y == poke2->posicion->posicion_y;
+
+	return mismoNombre && mismaPosicionX && mismaPosicionY;
+}
+
+bool perteneceAEntrenador(t_list* list, t_pokemon_posicion* poke) {
+	for(uint32_t i = 0; i < list_size(list); i++) {
+		t_entrenador* tr = (t_entrenador*)list_get(list,i);
+		if(tr->pokemonPlanificado != NULL) {
+			if(esElMismoPoke(tr->pokemonPlanificado, poke)) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool yaEstaAsignado(t_pokemon_posicion* poke) {
+	sem_wait(&mutexBLOCKED);
+	sem_wait(&mutexEXEC);
+	bool perteneceABLOCKED = perteneceAEntrenador(colaBLOCKED, poke);
+	bool perteneceAEXEC = perteneceAEntrenador(colaEXEC, poke);
+	sem_post(&mutexEXEC);
+	sem_post(&mutexBLOCKED);
+
+	return perteneceABLOCKED || perteneceAEXEC;
+}
+
 void insertPokeEnMapa(t_pokemon_posicion* poke) {
-	if(pokemonEnObjetivoGlobal(poke)) {
+	if(pokemonEnObjetivoGlobal(poke) && !yaEstaAsignado(poke)) {
 		sem_wait(&mutexPokesEnMapa);
         list_add(pokemonesEnMapa, poke);
         sem_post(&mutexPokesEnMapa);
@@ -483,6 +522,20 @@ uint32_t getEntrenadorByID(uint32_t id, t_list* lista) {
 	return ERROR;
 }
 
+void resultadoParcial(t_list* lista) {
+    for(uint32_t i = 0; i < list_size(lista); i++) {
+        t_entrenador* tr = (t_entrenador*)list_get(lista,i);
+        log_info(logger, "El entrenador %i capturo:", tr->id);
+        for(uint32_t j = 0; j < list_size(tr->pokemonCapturados); j++) {
+            log_info(logger, " - %s", list_get(tr->pokemonCapturados, j));
+        }
+		log_info(logger, "El entrenador %i necesita:", tr->id);
+        for(uint32_t j = 0; j < list_size(tr->pokemonObjetivo); j++) {
+            log_info(logger, " - %s", list_get(tr->pokemonObjetivo, j));
+        }
+    }
+}
+
 void procesarMensajeCaught(t_caught_pokemon* caughtPoke) {
 	t_entrenador_catch* entrenador = getEntrenadorCatch(caughtPoke);
 	if(entrenador && entrenador != NULL) {
@@ -493,6 +546,7 @@ void procesarMensajeCaught(t_caught_pokemon* caughtPoke) {
 		tr->enEspera = false;
 		char* poke = malloc(strlen(tr->pokemonPlanificado->nombre)+1);
 		memcpy(poke, tr->pokemonPlanificado->nombre, strlen(tr->pokemonPlanificado->nombre)+1);
+		tr->pokemonPlanificado = NULL;
 		if(caughtPoke->catchStatus == 1) {
 			log_info(logger, "El entrenador %i pudo capturar a %s\n", tr->id, poke);
 			list_add(tr->pokemonCapturados, poke);
@@ -500,17 +554,24 @@ void procesarMensajeCaught(t_caught_pokemon* caughtPoke) {
 			tr->deadlock = entrenadorEnDeadlock(tr);
 			if(tr->deadlock) {
 				log_info(logger, "El entrenador %i quedo en deadlock\n", tr->id);
-				sem_post(&mutexDetector);
+				//sem_wait(&mutexBLOCKED);
+				list_add(colaBLOCKED,tr);
+				//sem_post(&mutexBLOCKED);
+				detectorDeIntercambio();
+			} else if(entrenadorCumplioObjetivo(tr)) {
+				planificadorEXIT(tr);
+			} else {
+				//sem_wait(&mutexBLOCKED);
+				list_add(colaBLOCKED,tr);
+				//sem_post(&mutexBLOCKED);
 			}
 		} else {
 			actualizarObjetivoGlobal(poke, false);
 			log_info(logger, "El entrenador %i no pudo capturar a %s\n", tr->id, poke);
+			//sem_wait(&mutexBLOCKED);
+			list_add(colaBLOCKED,tr);
+			//sem_post(&mutexBLOCKED);
 		}
-		tr->pokemonPlanificado = NULL;
-		sem_wait(&mutexBLOCKED);
-		list_add(colaBLOCKED,tr);
-		sem_post(&mutexBLOCKED);
-		sem_post(&mutexEXIT);
 	}
 }
 
@@ -559,11 +620,92 @@ t_list* pokesQueSiQuiere(t_entrenador* tr, t_list* pokes) {
 	return digimons;
 }
 
+uint32_t perteneceAListaInt(uint32_t n, t_list* list) {
+	if(list_size(list) > 0) {
+		for(uint32_t i=0; i < list_size(list); i++) {
+			uint32_t num = (uint32_t)((t_trDeadlock*)list_get(list,i))->idEntrenador;
+			if(n == num)
+				return i;
+		}
+	}
+	return ERROR;
+}
+
+uint32_t perteneceReporteDeadlock(t_entrenador* tr) {
+	uint32_t result = ERROR;
+	sem_wait(&mutexReporteDeadlock);
+	t_list* auxDeadlock = list_duplicate(listaDeadlocks);
+	sem_post(&mutexReporteDeadlock);
+	if(list_size(auxDeadlock) > 0) {
+		for(uint32_t i=0; i < list_size(auxDeadlock); i++) {
+			t_deadlock* deadlock = list_get(auxDeadlock,i);
+			if(!deadlock->estaResuelto) {
+				if(perteneceAListaInt(tr->id, deadlock->entrenadores) != ERROR) {
+					result = i;
+					break;
+				}
+			}
+		}
+	}
+	list_destroy(auxDeadlock);
+	return result;
+}
+
+bool sigueEnDeadlock(t_deadlock* dl) {
+	if(list_size(dl->entrenadores) > 0) {
+		for(uint32_t i = 0; i < list_size(dl->entrenadores); i++) {
+			t_trDeadlock* tr = (t_trDeadlock*)list_get(dl->entrenadores, i);
+			if(tr->deadlock) {
+				return true;
+			} 
+		}
+	}
+	return false;
+}
+
+t_trDeadlock* crearTrDeadlock(uint32_t idTr, bool deadlock) {
+	t_trDeadlock* tr = malloc(sizeof(t_trDeadlock));
+
+	tr->idEntrenador = idTr;
+	tr->deadlock = deadlock;
+
+	return tr;
+}
+
+t_trDeadlock* actualizarTrDeadlock(t_entrenador* tr, t_deadlock* dl) {
+	uint32_t index = perteneceAListaInt(tr->id, dl->entrenadores);
+	t_trDeadlock* trainer = (t_trDeadlock*)list_remove(dl->entrenadores, index);
+	trainer->deadlock = entrenadorEnDeadlock(tr);
+	return trainer;
+}
+
+t_deadlock* getReporteDeadlock(t_entrenador* tr) {
+	uint32_t index = perteneceReporteDeadlock(tr);
+	if(index != ERROR) {
+		sem_wait(&mutexReporteDeadlock);
+		t_deadlock* dl = (t_deadlock*)list_remove(listaDeadlocks,index);
+		sem_post(&mutexReporteDeadlock);
+		return dl;
+	} else return NULL;
+}
+
+t_deadlock* crearReporteDeadlock() {
+	t_deadlock* deadlock = malloc(sizeof(t_deadlock));
+
+	deadlock->entrenadores = list_create();
+	deadlock->cantIntercambios = 0;
+	deadlock->estaResuelto = false;
+
+	return deadlock;
+}
+
 void defaultCaptura(uint32_t index) {
 	t_entrenador* tr = (t_entrenador*)list_get(colaBLOCKED,index);
 
 	if(tr->enEspera && !tr->deadlock) {
+		sem_wait(&mutexBLOCKED);
 		list_remove(colaBLOCKED,index);
+		sem_post(&mutexBLOCKED);
 		tr->enEspera = false;
 		char* poke = malloc(strlen(tr->pokemonPlanificado->nombre)+1);
 		memcpy(poke, tr->pokemonPlanificado->nombre, strlen(tr->pokemonPlanificado->nombre)+1);
@@ -571,11 +713,19 @@ void defaultCaptura(uint32_t index) {
 		list_add(tr->pokemonCapturados, poke);
 		log_info(logger, "Ejecutando algoritmo de deteccion de deadlock");
 		tr->deadlock = entrenadorEnDeadlock(tr);
+		tr->pokemonPlanificado = NULL;
 		if(tr->deadlock) {
 			log_info(logger, "El entrenador %i quedo en deadlock\n", tr->id);
-			sem_post(&mutexDetector);
+			sem_wait(&mutexBLOCKED);
+			list_add(colaBLOCKED,tr);
+			sem_post(&mutexBLOCKED);
+			detectorDeIntercambio();
+		} else if(entrenadorCumplioObjetivo(tr)) {
+			planificadorEXIT(tr);
+		} else {
+			sem_wait(&mutexBLOCKED);
+			list_add(colaBLOCKED,tr);
+			sem_post(&mutexBLOCKED);
 		}
-		tr->pokemonPlanificado = NULL;
-		list_add(colaBLOCKED,tr);
 	}
 }

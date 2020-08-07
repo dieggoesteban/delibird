@@ -179,6 +179,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 			message->mq_cod = GET_POKEMON;
 			getPoke->ID_mensaje_recibido = message->id;
 			message->mensaje = getPoke;
+			log_info(logger,"LLEGO EL POKE EN GET %s", getPoke->nombre);
 
 			log_info(logger, "Se ha recibido un mensaje del cliente %i en la cola %s", socket_cliente, messageQueue->name);
 			addMessageToQueue(message, messageQueue);
@@ -217,6 +218,8 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 			message->mq_cod = LOCALIZED_POKEMON;
 			localizedPoke->ID_mensaje_recibido = message->id;
 			message->mensaje = localizedPoke;
+
+			log_info(logger,"LLEGO EL POKE EN LOCALIZED %s", localizedPoke->nombre);
 
 			log_info(logger, "Se ha recibido un mensaje del cliente %i en la cola %s", socket_cliente, messageQueue->name);
 			addMessageToQueue(message, messageQueue);
@@ -478,6 +481,7 @@ void dispatchMessagesFromQueue(t_message_queue* messageQueue)
 				{
 					sem_post(&message->s_puedeEliminarse); //Es lo que vendría a ser el post del ack
 				}
+				
 				message->countSuscriptoresObjetivo = subscribersCount;
 				for(uint32_t i = 0; i < subscribersCount; i++) {
 					currentSubscriber = (t_suscripcion*)list_get(messageQueue->subscribers, i);
@@ -500,6 +504,7 @@ void dispatchMessagesFromQueue(t_message_queue* messageQueue)
 			if(pthread_join(message->deleteFromQueue, NULL) != 0)
 				log_error(broker_custom_logger, "Error in pthread_detach deleteFromQueue");
 		}
+		pthread_mutex_unlock(&messageQueue->s_mensajes);
 	}
 }
 
