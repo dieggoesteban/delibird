@@ -64,6 +64,9 @@ int main(int argc, char *argv[])
     
     inicializarTeam();
     establecerConexionBroker();
+    sem_wait(&pokesObjetivoGlobal);
+    mandarGET();
+    sem_post(&pokesObjetivoGlobal);
 
     if (pthread_create(&finalizarPrograma,NULL,(void*)terminar_programa,NULL) != 0)
         printf("Error FINALIZAR\n");

@@ -61,10 +61,6 @@ void establecerConexionBroker()
 				sem_wait(&estaDesconectado);
 			}
 		}
-		sem_wait(&pokesObjetivoGlobal);
-		mandarGET();
-		sem_post(&pokesObjetivoGlobal);
-
 		pthread_create(&threadSUSCRIBE_CAUGHT, NULL, (void *)suscribe, (void *)suscribeCaught);
 		pthread_create(&threadSUSCRIBE_APPEARED, NULL, (void *)suscribe, (void *)suscribeAppeared);
 		pthread_create(&threadSUSCRIBE_LOCALIZED, NULL, (void *)suscribe, (void *)suscribeLocalized);
@@ -125,28 +121,48 @@ void enviarMensaje(t_paquete *paquete, uint32_t socket_cliente)
 	free(stream);
 }
 
-void mandarGET()
-{
+void mandarGET() {
+	int valorSem;
+    if (sem_getvalue(&estaDesconectado, &valorSem) == 0){
+        if(valorSem == 0){
+			char *ip = config_get_string_value(config, "IP_BROKER");
+			char *puerto = config_get_string_value(config, "PUERTO_BROKER");
+			//uint32_t conexion = crear_conexion(ip, puerto);
 
-	char *ip = config_get_string_value(config, "IP_BROKER");
-	char *puerto = config_get_string_value(config, "PUERTO_BROKER");
-	//uint32_t conexion = crear_conexion(ip, puerto);
-
-	for (uint32_t i = 0; i < list_size(objetivoGlobal); i++)
-	{
-		uint32_t conexion = crear_conexion(ip, puerto);
-		t_pokemon_cantidad *poke = (t_pokemon_cantidad *)list_get(objetivoGlobal, i);
-		if (poke->cantidad > 0)
-		{
-			//sendGET(poke->nombre);
-			t_get_pokemon *getPokemon = crearGetPokemon(11, poke->nombre);
-			t_paquete *paquete = serializar_getPokemon(getPokemon);
-			log_info(logger, "Mandando GET %s\n", poke->nombre);
-			free(getPokemon);
-			enviarMensaje(paquete, conexion);
-			liberar_conexion(conexion);
-		}
-	}
+			for (uint32_t i = 0; i < list_size(objetivoGlobal); i++)
+			{
+				uint32_t conexion = crear_conexion(ip, puerto);
+				t_pokemon_cantidad *poke = (t_pokemon_cantidad *)list_get(objetivoGlobal, i);
+				if (poke->cantidad > 0)
+				{
+					//sendGET(poke->nombre);
+					t_get_pokemon *getPokemon = crearGetPokemon(11, poke->nombre);
+					t_paquete *paquete = serializar_getPokemon(getPokemon);
+					log_info(logger, "Mandando GET %s\n", poke->nombre);
+					free(getPokemon);
+					enviarMensaje(paquete, conexion);
+					liberar_conexion(conexion);
+				}
+			}
+        } else {
+            for (uint32_t i = 0; i < list_size(objetivoGlobal); i++)
+			{
+				t_pokemon_cantidad *poke = (t_pokemon_cantidad *)list_get(objetivoGlobal, i);
+				if (poke->cantidad > 0)
+				{
+					log_info(logger, "Mandando GET %s\n", poke->nombre);
+				}
+			}
+			for (uint32_t i = 0; i < list_size(objetivoGlobal); i++)
+			{
+				t_pokemon_cantidad *poke = (t_pokemon_cantidad *)list_get(objetivoGlobal, i);
+				if (poke->cantidad > 0)
+				{
+					log_info(logger, "MODO DEFAULT - LOCALIZED: Llego %s sin posiciones", poke->nombre);
+				}
+			}
+        }
+    }
 	//liberar_conexion(conexion);
 }
 
@@ -300,7 +316,6 @@ void serve_suscribe(uint32_t *socket)
 		if (buffer->size > 1000 || buffer->size < 0)
 		{
 			cod_op = -1;
-			free(buffer->stream);
 			free(buffer);
 		}
 	}
@@ -320,7 +335,9 @@ void process_suscribe_request(uint32_t cod_op, t_buffer *buffer, uint32_t client
 		log_info(logger, "APPEARED: Aparecio un %s salvaje en x:%i y:%i", poke->nombre, poke->posicion->posicion_x, poke->posicion->posicion_y);
 		insertPokeEnMapa(poke);
 		t_acknowledgement *ack = crearAcknowledgement(idModule, appearedPoke->ID_mensaje_recibido, APPEARED_POKEMON);
-		enviarAck(ack);
+		pthread_t sendAck;
+		pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
+		pthread_detach(sendAck);
 		free(appearedPoke);
 		free(buffer->stream);
 		free(buffer);
@@ -339,7 +356,9 @@ void process_suscribe_request(uint32_t cod_op, t_buffer *buffer, uint32_t client
 		}
 		procesarMensajeCaught(caughtPoke);
 		t_acknowledgement *ack = crearAcknowledgement(idModule, caughtPoke->ID_mensaje_recibido, CAUGHT_POKEMON);
-		enviarAck(ack);
+		pthread_t sendAck;
+		pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
+		pthread_detach(sendAck);
 		free(buffer->stream);
 		free(buffer);
 		break;
@@ -367,7 +386,11 @@ void process_suscribe_request(uint32_t cod_op, t_buffer *buffer, uint32_t client
 		}
 
 		t_acknowledgement *ack = crearAcknowledgement(idModule, localizedPoke->ID_mensaje_recibido, LOCALIZED_POKEMON);
-		enviarAck(ack);
+		
+		pthread_t sendAck;
+		pthread_create(&sendAck, NULL, (void*)enviarAck, ack);
+		pthread_detach(sendAck);
+		
 		free(localizedPoke);
 		free(buffer->stream);
 		free(buffer);

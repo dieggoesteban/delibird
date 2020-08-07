@@ -683,18 +683,10 @@ void* reintentarOperacion(void* nombrePoke){
         i++;
         log_info(logger, "- Reintento nro %i -", i);
         sleep(tiempoReintentoOperacion);
-<<<<<<< HEAD
-        // pthread_mutex_lock(&mutexEstaOpen);
-=======
->>>>>>> masterV3
         uint32_t indexSemaforo = getIndexSemaforo(nombrePokemon,semaforosPokemon);
         sem_wait(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, indexSemaforo))->mutexOpenPoke)); 
         archivoOpen = estaOpen(nombrePoke);
         sem_post(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, indexSemaforo))->mutexOpenPoke)); 
-<<<<<<< HEAD
-        // pthread_mutex_unlock(&mutexEstaOpen);
-=======
->>>>>>> masterV3
     }
     return false;
 }
