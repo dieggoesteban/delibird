@@ -239,23 +239,30 @@ void memoria_particiones(t_message* message)
         else
         {
             pthread_mutex_lock(&s_counterToCompactacion);
-            if(counterToCompactacion < FRECUENCIA_COMPACTACION)
+                uint32_t counterToCompactacionCopy = counterToCompactacion;
+            pthread_mutex_unlock(&s_counterToCompactacion);
+            if(counterToCompactacionCopy < FRECUENCIA_COMPACTACION)
             {
-                counterToCompactacion++;
+                pthread_mutex_lock(&s_counterToCompactacion);
+                    counterToCompactacion++;
+                pthread_mutex_unlock(&s_counterToCompactacion);
             }
             else
             {          
+                log_trace(broker_custom_logger, "Counter to compactacion: %i/%i", counterToCompactacion, FRECUENCIA_COMPACTACION);
                 compactar();
-                counterToCompactacion = 0;
-                targetHole = algoritmo_particion_libre(addressFromMessageToCopy->size);
+
+                pthread_mutex_lock(&s_counterToCompactacion);
+                    counterToCompactacion = 0;
                 pthread_mutex_unlock(&s_counterToCompactacion);
+
+                targetHole = algoritmo_particion_libre(addressFromMessageToCopy->size);
 
                 if(targetHole != NULL)
                     acumFreeSpace += targetHole->length;
 
                 continue;
             }
-            pthread_mutex_unlock(&s_counterToCompactacion);
         }
 
         //Etapa 3: Reemplazo y Consolidacion
@@ -718,12 +725,14 @@ void dumpConsole(char* titulo)
 void consolidar()
 {
     pthread_mutex_lock(&s_holes);
-    if(list_size(holes) == 0 || list_size(holes) == 1)
+        uint32_t sizeHoles = list_size(holes);
+    pthread_mutex_unlock(&s_holes);
+    if(sizeHoles == 0 || sizeHoles == 1)
     {
-        pthread_mutex_unlock(&s_holes);
         return;
     }
-    list_sort(holes, (void*) mem_address_menor_a_mayor);
+    pthread_mutex_lock(&s_holes);
+        list_sort(holes, (void*) mem_address_menor_a_mayor);
     pthread_mutex_unlock(&s_holes);
     t_holes* lowerHole;
     t_holes* upperHole;
@@ -758,18 +767,24 @@ void consolidar()
 void compactar()
 {
     pthread_mutex_lock(&s_holes);
+        uint32_t sizeHoles = list_size(holes);
+    pthread_mutex_unlock(&s_holes);
     pthread_mutex_lock(&s_partitions);
-    if(list_size(partitions) == 0 || list_size(holes) == 0)
+        uint32_t sizePartitions = list_size(partitions);
+    pthread_mutex_unlock(&s_partitions);
+    if(sizeHoles == 0 || sizePartitions == 0)
     {
         log_info(broker_custom_logger, "No hay particiones o no hay huecos -> No es necesario compactar");
         return;
     }
-    pthread_mutex_unlock(&s_holes);
-    pthread_mutex_unlock(&s_partitions);
 
     //Ordenar ambas listas
-    list_sort(partitions, (void*) mem_address_menor_a_mayor);
-    list_sort(holes, (void*) mem_address_menor_a_mayor);
+    pthread_mutex_lock(&s_partitions);
+        list_sort(partitions, (void*) mem_address_menor_a_mayor);
+    pthread_mutex_unlock(&s_partitions);
+    pthread_mutex_lock(&s_holes);
+        list_sort(holes, (void*) mem_address_menor_a_mayor);
+    pthread_mutex_unlock(&s_holes);
     uint32_t targetPartitionIndex;
     t_partition* targetPartition;
 

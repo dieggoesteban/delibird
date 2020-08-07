@@ -108,3 +108,6 @@ dkms.conf
 teams/team
 gamecard/gamecard
 broker/broker
+teams/team
+gamecard/gamecard
+gameboy/gameboy
