@@ -36,6 +36,7 @@ typedef struct{
 typedef struct{
 	sem_t semPoke;
 	char* nombrePoke;
+	sem_t mutexOpenPoke;
 } t_semaforo_pokemon;
 
 typedef struct {

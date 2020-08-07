@@ -45,6 +45,7 @@ sem_t mutexPokesEnMapa;
 sem_t mutexReconnect;
 sem_t estaDesconectado;
 sem_t detectorDesconexion;
+sem_t pokesObjetivoGlobal;
 
 uint32_t idModule;
 
