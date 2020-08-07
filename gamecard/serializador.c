@@ -539,9 +539,12 @@ t_register_module* crearSuscribe(uint32_t ID_message_queue, uint32_t moduleID) {
 t_semaforo_pokemon* crearSemaforoPokemon(char* nombrePoke){
 	t_semaforo_pokemon* semaforoPoke = malloc(sizeof(t_semaforo_pokemon));
 	sem_t semaforo;
+	sem_t mutexPoke;
 	sem_init(&semaforo,0,1);
+	sem_init(&mutexPoke,0,1);
 	semaforoPoke->nombrePoke = nombrePoke;
 	semaforoPoke->semPoke = semaforo;
+	semaforoPoke->mutexOpenPoke = mutexPoke; 
 
 	return semaforoPoke;
 }
