@@ -24,7 +24,7 @@ int main()
     config = config_create("./assets/broker.config");
     LOG = config_get_string_value(config,"LOG_FILE");
 	logger = log_create(LOG, "broker", true, LOG_LEVEL_INFO);
-    broker_custom_logger = log_create("./assets/broker_custom.log", "broker", true, LOG_LEVEL_DEBUG);
+    broker_custom_logger = log_create("./assets/broker_custom.log", "broker", false, LOG_LEVEL_DEBUG);
     IP = config_get_string_value(config, "IP_BROKER");
     PUERTO = config_get_string_value(config, "PUERTO_BROKER");
 
@@ -58,7 +58,7 @@ int main()
     pthread_create(&localizedPokemonMessageQueue->dispatchMessagesThread, NULL, (void *)dispatchMessagesFromQueue, localizedPokemonMessageQueue);
     
 
-    log_info(broker_custom_logger, "Broker inicializado correctamente...");
+    log_info(logger, "Broker inicializado correctamente...");
 
     //Cierre de threads
     pthread_join(serverThread, NULL);
@@ -85,6 +85,7 @@ void terminarPrograma()
     freeMessageQueue(caughtPokemonMessageQueue);
     freeMessageQueue(getPokemonMessageQueue);
     freeMessageQueue(localizedPokemonMessageQueue);
+    dumpConsole("LIBERANDO RECURSOS");
     freeCacheSystem();
 
     log_info(broker_custom_logger, "Broker finalizado correctamente");

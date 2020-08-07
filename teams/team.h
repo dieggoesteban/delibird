@@ -26,6 +26,10 @@ char* ALGORITMO;
 //GLOBALES
 uint32_t idModule;
 uint32_t cantEntrenadores;
+uint32_t cantCambiosCtx;
+uint32_t cantDeadlocks;
+uint32_t cantIntercambios;
+uint32_t cantCiclosTotales;
 
 t_list* objetivoGlobal;
 t_list* pokemonesEnMapa;
@@ -37,6 +41,7 @@ t_list* colaEXEC;
 t_list* colaBLOCKED;
 t_list* colaEXIT;
 t_list* trIds;
+t_list* listaDeadlocks;
 
 t_suscribe* suscribeCaught;
 t_suscribe* suscribeAppeared;
@@ -68,6 +73,7 @@ sem_t mutexEntrenadoresCatch;
 sem_t pokesObjetivoGlobal;
 sem_t mutexDetector;
 sem_t estaDesconectado;
+sem_t mutexReporteDeadlock;
 
 uint32_t cicloCPU;
 uint32_t quantum;

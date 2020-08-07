@@ -7,8 +7,9 @@ void handler() {
 int main(int argc, char *argv[])
 {
     config = config_create("./assets/gamecard.config");
+    pathLog = config_get_string_value(config,"LOG_FILE");
 
-	logger = log_create("./assets/gamecard.log","gamecard",true,LOG_LEVEL_DEBUG);
+	logger = log_create(pathLog,"gamecard",true,LOG_LEVEL_DEBUG);
 
     if(argv[1]) {
         idModule = atoi(argv[1]);
@@ -126,6 +127,9 @@ void inicializarGamecard(){
     pthread_mutex_init(&mutexListaSemsNew, NULL);
     pthread_mutex_init(&mutexListaSemsCatch, NULL);
     pthread_mutex_init(&mutexListaSemsGet, NULL);
+    pthread_mutex_init(&mutexEstaOpenNew, NULL);
+    pthread_mutex_init(&mutexEstaOpenCatch, NULL);
+    pthread_mutex_init(&mutexEstaOpenGet, NULL);
 
 
 }

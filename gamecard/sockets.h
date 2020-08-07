@@ -17,7 +17,7 @@
 #include "serializador.h"
 #include "models.h"
 #include "tallgrass.h"
-#include "utils.h"
+// #include "utils.h"
 
 t_log* logger;
 t_config* config;
@@ -44,6 +44,10 @@ t_message_queue* caughtPokemonMessageQueue;
 t_suscribe* suscribeNew;
 t_suscribe* suscribeCatch;
 t_suscribe* suscribeGet;
+
+t_list* hilosNew;
+t_list* hilosCatch;
+t_list* hilosGet;
 
 pthread_t threadSUSCRIBE_CATCH;
 pthread_t threadSUSCRIBE_NEW;

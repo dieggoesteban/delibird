@@ -18,6 +18,7 @@
 #include "models.h"
 #include "serializador.h"
 #include "sockets.h"
+#include "planificador.h"
 
 //GLOBAL
 t_log* logger;
@@ -64,6 +65,7 @@ t_list* colaBLOCKED;
 t_list* colaEXIT;
 t_list* entrenadoresCatch;
 t_list* trIds;
+t_list* listaDeadlocks;
 
 //UTILIDADES ARRAYS/LISTS/QUEUE
 uint32_t arraySize(void* arr[]);
@@ -106,8 +108,17 @@ uint32_t turnosHastaEntrenador(t_entrenador_posicion* tr, t_entrenador* entrenad
 t_entrenador* cambiarPosicionEntrenador(t_entrenador* entrenador, uint32_t posX, uint32_t posY);
 void moverEntrenador(t_entrenador* entrenador);
 void pasosParaIntercambio(t_entrenador* entrenador);
+void pasosParaCaptura(t_entrenador* entrenador);
 void actualizarPosicion(t_entrenador* entrenador);
 void defaultCaptura(uint32_t index);
 uint32_t getEstimacion(uint32_t estReal, uint32_t estAnterior);
 uint32_t getTiempoReal(t_entrenador* tr);
+
+//DE REPORTE DEADLOCK
+t_deadlock* crearReporteDeadlock();
+uint32_t perteneceReporteDeadlock(t_entrenador* tr);
+t_deadlock* getReporteDeadlock(t_entrenador* tr);
+t_trDeadlock* crearTrDeadlock(uint32_t idTr, bool deadlock);
+bool sigueEnDeadlock(t_deadlock* dl);
+t_trDeadlock* actualizarTrDeadlock(t_entrenador* tr, t_deadlock* dl);
 #endif /* UTILS_H_ */

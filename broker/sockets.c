@@ -88,7 +88,7 @@ void esperar_cliente(uint32_t socket_servidor)
 	}
 	else
 	{
-		printf("Accept error: %s\n", strerror(errno));
+		log_error(broker_custom_logger, "Accept error: %s\n", strerror(errno));
 		exit(1);
 	}
 }
@@ -99,13 +99,13 @@ void serve_client(uint32_t *socket_cliente)
 	uint32_t recvResult = recv(*socket_cliente, &operation_cod, sizeof(uint32_t), MSG_WAITALL);
 	if (recvResult == -1)
 	{
-		printf("Recv error. Errno: %s\n", strerror(errno));
+		log_error(broker_custom_logger, "Recv error. Errno: %s\n", strerror(errno));
 		liberar_conexion(*socket_cliente);
 		exit(1);
 	}
 	else if (recvResult == 0)
 	{
-		//printf("El cliente %i cerro la conexion\n", *socket_cliente);
+		log_warning(broker_custom_logger, "El cliente %i cerro la conexion\n", *socket_cliente);
 		liberar_conexion(*socket_cliente);
 		return;
 	}

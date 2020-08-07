@@ -12,6 +12,7 @@ void hiloEntrenador(uint32_t trId) {
         sem_wait(&mutexEXEC);
         entrenador = (t_entrenador*)list_get(colaEXEC, 0);
         sem_post(&mutexEXEC);
+        entrenador->cantCiclosCPU += 1;
         if(entrenador->entrenadorPlanificado != NULL) {
             if(entrenador->entrenadorPlanificado->tiempoEjecucion == 0) {
                 pasosParaIntercambio(entrenador);
@@ -19,7 +20,11 @@ void hiloEntrenador(uint32_t trId) {
                 moverEntrenador(entrenador);
             }
         } else {
-            moverEntrenador(entrenador);
+            if(turnosHastaPokemon(entrenador->pokemonPlanificado,entrenador) == 0) {
+                pasosParaCaptura(entrenador);
+            } else {
+                moverEntrenador(entrenador);
+            }
         }
         sem_wait(&mutexEXEC);
         entrenador = (t_entrenador*)list_get(colaEXEC, 0);

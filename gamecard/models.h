@@ -29,6 +29,11 @@ typedef enum
 
 
 typedef struct{
+	pthread_t idHilo;
+	bool ejecutando;
+} t_hilo_poke;
+
+typedef struct{
 	sem_t semPoke;
 	char* nombrePoke;
 } t_semaforo_pokemon;
