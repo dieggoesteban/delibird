@@ -51,6 +51,9 @@ uint32_t tiempoOperacion;
 pthread_mutex_t mutexBitmap;
 pthread_mutex_t yaExistiaDirec;
 pthread_mutex_t mutexEstaOpen;
+pthread_mutex_t mutexEstaOpenNew;
+pthread_mutex_t mutexEstaOpenCatch;
+pthread_mutex_t mutexEstaOpenGet;
 
 //CREAR
 bool crearDirectorio(char* rutaDirectorio);
@@ -75,7 +78,7 @@ void atenderCatchPokemon(void* catchPokemon);
 void escribirBloque(char* texto, char* pathMetadataPoke, uint32_t bloqueAEscribir, char* modoEscritura);
 void escribirMetadata(char* path, char* aEscribir);
 void escribirNewPokemon(char *textoNewPoke, char* pathMetadataPoke);
-void escribirCatchPokemon(char *textoCatchPokemon, char* pathMetadataPoke);
+uint32_t escribirCatchPokemon(char *textoCatchPokemon, char* pathMetadataPoke);
 t_localized_pokemon* escribirLocalizedPokemon(t_get_pokemon* getPoke, char* pathMetadataPoke);
 
 //LEER

@@ -21,7 +21,7 @@ typedef enum
     SUBSCRIBE = 7,
 	MENSAJE_RECIBIDO = 8,
 	ACKNOWLEDGEMENT = 9,
-	CONFIRMACION_MSJ = 10
+	UNSUBSCRIBE = 11
 } operation_cod;
 
 typedef struct {
@@ -34,6 +34,9 @@ typedef struct {
 	pthread_mutex_t s_mensajes;
 	pthread_mutex_t s_subscribers;
 	sem_t s_hayMensajes;
+
+	// sem_t s_mensajes;
+	// sem_t s_subscribers;
 
 	//Threads
 	pthread_t dispatchMessagesThread;
@@ -118,7 +121,7 @@ typedef struct{
 	uint32_t mq;
 } t_acknowledgement;
 
-typedef struct{
+typedef struct {
 	uint32_t idModule;
 	uint32_t socket;
 } t_suscripcion;
@@ -170,12 +173,27 @@ typedef struct{
 } t_get_pokemon;
 #pragma endregion
 
+
+
+
 #pragma region Mensajes_Estructura_Cache
 
 typedef struct {
-	t_message* message;
-	void* cacheStructure;
+	uint32_t idMessage;
+	uint32_t idCorrelational;
+	uint32_t mq_cod;
+	void* startAddress;
+	uint32_t length;
+
+	t_list* suscriptoresConfirmados;
+	t_list* suscriptoresEnviados;
 } cache_message;
+
+typedef struct
+{
+    t_suscripcion* suscripcion;
+    uint32_t mq_cod;
+} t_cache_dispatch_info;
 
 typedef struct {
 	uint32_t nameLength;
@@ -188,8 +206,8 @@ typedef struct {
 typedef struct {
 	uint32_t nameLength;
 	char* pokeName;
-	uint32_t cantidadPos;
-	uint32_t* posiciones;
+	uint32_t cantParesCoords; 
+	void* posiciones;
 } cache_localized_pokemon;
 
 typedef struct {

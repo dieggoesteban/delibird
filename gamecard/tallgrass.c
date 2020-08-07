@@ -123,8 +123,7 @@ void escribirNewPokemon(char *textoNewPoke, char* pathMetadataPoke){
     dictionary_destroy_and_destroy_elements(dicPoke,free);
 }
 
-void escribirCatchPokemon(char *textoCatchPokemon, char* pathMetadataPoke ){
-    printf("path metadata que se le pasa a escribir catch pokemon: %s\n", pathMetadataPoke);
+uint32_t escribirCatchPokemon(char *textoCatchPokemon, char* pathMetadataPoke ){
     char** keyAndValue = string_n_split(textoCatchPokemon, 2, "=");
     char* textoCompleto = leerArchivo(pathMetadataPoke);
     uint32_t bytesBorrados;
@@ -141,13 +140,19 @@ void escribirCatchPokemon(char *textoCatchPokemon, char* pathMetadataPoke ){
         char* textoDic = dictionaryToString(dicPoke);
         modificarBloquesCatchPoke(textoDic, pathMetadataPoke, bytesBorrados);
     }else{
-        printf("no existe la posicion %s\n", keyAndValue[0]);
+        log_warning(logger,"No existe la posicion %s", keyAndValue[0]);
+        free(keyAndValue[0]);
+        free(keyAndValue[1]);
+        free(keyAndValue);
+        dictionary_destroy_and_destroy_elements(dicPoke,free);
+        return 0;
         //log error
     }
     free(keyAndValue[0]);
     free(keyAndValue[1]);
     free(keyAndValue);
     dictionary_destroy_and_destroy_elements(dicPoke,free);
+    return 1;
 }
 
 t_localized_pokemon* escribirLocalizedPokemon(t_get_pokemon* getPoke, char* pathMetadataPoke){
@@ -167,8 +172,8 @@ void separarTextoEnBloques(char *textoArchivo, char* pathMetadataPoke, bool modi
     uint32_t lengthTexto = strlen(textoArchivo);
     int sizeAEscribirPrimerBloque = 0;
     uint32_t bloqueAEscribir = 0;
-    printf("size a escribir: %i\n", sizeAEscribirPrimerBloque);
-    printf("bloque en el que escribir: %i\n", bloqueAEscribir);
+    // printf("size a escribir: %i\n", sizeAEscribirPrimerBloque);
+    // printf("bloque en el que escribir: %i\n", bloqueAEscribir);
     int i = 0;
     int j = 0;
     while (i != lengthTexto)
@@ -176,16 +181,14 @@ void separarTextoEnBloques(char *textoArchivo, char* pathMetadataPoke, bool modi
         bloqueAEscribir = verQueBloqueEscribir(pathMetadataPoke, &sizeAEscribirPrimerBloque, modificarBloques, j);
         char *string;
         if(sizeAEscribirPrimerBloque < 0){
-            printf("entra en primer if\n");
             string = string_substring(textoArchivoTemp,i, abs(sizeAEscribirPrimerBloque));
         }if(sizeAEscribirPrimerBloque > 0 && sizeAEscribirPrimerBloque < lengthTexto && i == 0){
             string = string_substring(textoArchivoTemp,i, sizeAEscribirPrimerBloque);
         }
         else{
-            printf("entra en segundo if\n");
             string = string_substring(textoArchivoTemp, i, sizeBloque);
         }
-        printf("Que estoy escribiendo ahora: %s\n", string);
+        // printf("Que estoy escribiendo ahora: %s\n", string);
         escribirBloque(string, pathMetadataPoke, bloqueAEscribir, modoEscritura);
         i += string_length(string);
         sleep(3);
@@ -204,7 +207,6 @@ uint32_t verQueBloqueEscribir(char* pathMetadataPoke,int* sizeAEscribirPrimerBlo
     }else{
         uint32_t sizeArchivo = config_get_int_value(metadataPoke,"SIZE");
         *sizeAEscribirPrimerBloque = calculoBytesSobrantes(arrBloques, sizeArchivo);
-        printf("size a escribir: %i y cantidad de elementos: %i y el sizeArchivo: %i\n", *sizeAEscribirPrimerBloque, arraySize((void*)arrBloques), sizeArchivo);
         
         if(modificarBloques){
             return atoi(arrBloques[j]);
@@ -233,7 +235,6 @@ void modificarBloquesCatchPoke(char* textoCompleto, char* pathMetadataPoke, uint
     char** arrBloques = config_get_array_value(metadataPoke, "BLOCKS");
     uint32_t sizeArchivo = config_get_int_value(metadataPoke,"SIZE");
     uint32_t bytesSobrantes = calculoBytesSobrantes(arrBloques, sizeArchivo) + bytesBorrados;
-    printf("BYTES SOBRANTES DE MODIFICAR CATCH POKE: %i\n", bytesSobrantes);
 
     if(bytesSobrantes >= sizeBloque){ //si los bytes sobrantes dan mayor a sizeBloque, significa que necesita menos bloques para guardar
         sacarUltimoBloqueDeArchivo(metadataPoke,arrBloques);
@@ -261,7 +262,6 @@ void modificarBloquesNewPoke(char* textoCompleto, char* pathMetadataPoke){
 }
 
 
-
 uint32_t buscarBloqueEInsertarEnArchivo(t_config* metadataPoke){ 
     pthread_mutex_lock(&mutexBitmap);
     uint32_t bloqueLibre = buscarBloqueLibre();
@@ -276,9 +276,12 @@ void sacarUltimoBloqueDeArchivo(t_config* metadataPoke, char** arrBloques){
     t_list* listaBloques = arrayToList((void*)arrBloques);
     remove(agregarADirectorioBlocksChar(list_get(listaBloques,list_size(listaBloques)-1)));
     //mutex
-    bitarray_clean_bit(bitmapArr,list_size(listaBloques)-1);
+    bitarray_clean_bit(bitmapArr,atoi(((char*)list_get(listaBloques,list_size(listaBloques)-1))));
     //mutex
-    list_remove_and_destroy_element(listaBloques,list_size(listaBloques)-1, free);
+    list_remove(listaBloques,list_size(listaBloques)-1);
+    if(list_size(listaBloques) == 0){
+        list_add(listaBloques, "-1");
+    }
     config_set_value(metadataPoke,"BLOCKS", listToString(listaBloques));
     config_save(metadataPoke);
 }
@@ -323,7 +326,7 @@ void escribirBloque(char *texto, char* pathMetadataPoke, uint32_t bloqueAEscribi
 
     if (fp == NULL)
     {
-        // printf("el path %s no se pudo abrir\n", path);
+        log_error(logger,"No se pudo abrir el archivo: %s", path);
     }
     else
     {
@@ -332,13 +335,12 @@ void escribirBloque(char *texto, char* pathMetadataPoke, uint32_t bloqueAEscribi
     if (strlen(texto) > 0)
     {
         fputs(texto, fp);
-        // if(string_contains(modoEscritura, "a")){
         setSizeArchivo(metadataPoke, sizeArchivo + strlen(texto));
-        // }
+     
     }
     fclose(fp);
     config_destroy(metadataPoke);
-    // printf("Se logro escribir en %s el texto %s y se cerro el archivo\n", path, texto);
+
 }
 
 char* leerArchivo(char *pathMetadataPoke)
@@ -346,7 +348,6 @@ char* leerArchivo(char *pathMetadataPoke)
     FILE *fp;
     t_config* metadataPoke = config_create(pathMetadataPoke);
     char **arrBloques = config_get_array_value(metadataPoke,"BLOCKS");
-    // int sizeArchivo = config_get_int_value(metadataPoke,"SIZE");
     char *path = string_duplicate(pathBlocks);
     char* textoCompleto = string_new();
     char textoTemp[sizeBloque+1];
@@ -355,15 +356,13 @@ char* leerArchivo(char *pathMetadataPoke)
         printf("arr size: %i\n", arraySize((void*)arrBloques));
         for (int i = 0; i < arraySize((void*)arrBloques); i++)
         {
-            printf("elemento arr: %s\n", arrBloques[i]);
             path = agregarADirectorioBlocksChar(arrBloques[i]);
-            printf("path: %s\n", path);
 
             fp = fopen(path, "r");
 
             if (fp == NULL)
             {
-                printf("GfgTest.c file failed to open.\n");
+                log_error(logger,"No se pudo abrir el archivo: %s", path);
                 return "";
             }
             else
@@ -380,7 +379,6 @@ char* leerArchivo(char *pathMetadataPoke)
         return "";
     }
     config_destroy(metadataPoke);
-    printf("texto completo desde leer archivo: %s\n", textoCompleto);
     return textoCompleto;
 }
 
@@ -391,19 +389,15 @@ void escribirMetadata(char* path, char* aEscribir)
 
     if (filePointer == NULL)
     {
-        // printf("Pokemon.bin file failed to open.");
+        log_error(logger,"No se pudo abrir el archivo: %s", path);
     }
     else
     {
-        // printf("The file is now opened.\n");
-
         if (strlen(aEscribir) > 0)
         {
             fprintf(filePointer,"%s",aEscribir);
         }
         fclose(filePointer);
-        // printf("Data successfully written in file GfgTest.c\n");
-        // printf("The file is now closed.");
     }
 }
 
@@ -420,11 +414,10 @@ char* leerMetadata(char* path)
 
     if (filePointer == NULL)
     {
-        // printf("GfgTest.c file failed to open.");
+        log_error(logger,"No se pudo abrir el archivo: %s", path);
     }
     else
     {
-        // printf("The file is now opened.\n");
         while (fgets(dataToBeRead, st.st_size, filePointer) != NULL)
         {
             string_append(&textoCompleto, dataToBeRead);
@@ -444,7 +437,7 @@ t_bitarray *copiar_bitmap_en_disco(char* archivo, size_t size){
     int fd = open(archivo, O_CREAT | O_RDWR, 0664);
     if (fd == -1)
     {
-        perror("open file");
+        log_error(logger,"No se pudo abrir el archivo: %s", archivo);
         exit(1);
     }
     ftruncate(fd, size);
@@ -453,12 +446,11 @@ t_bitarray *copiar_bitmap_en_disco(char* archivo, size_t size){
 
     if (bmap == MAP_FAILED)
     {
-        perror("mmap");
         close(fd);
         exit(1);
     }
     t_bitarray *bitmap = bitarray_create_with_mode((char *)bmap, size / 8, LSB_FIRST);
-     // msync(NULL, size, LSB_FIRST);
+
     close(fd);
     // munmap(bmap, size); para finalizar gamecard
     return bitmap;
@@ -469,7 +461,7 @@ t_bitarray *crear_bitmap_en_disco(char *archivo, size_t size)
     int fd = open(archivo, O_CREAT | O_RDWR, 0664);
     if (fd == -1)
     {
-        perror("open file");
+        log_error(logger,"No se pudo abrir el archivo: %s", archivo);
         exit(1);
     }
     ftruncate(fd, size);
@@ -478,7 +470,6 @@ t_bitarray *crear_bitmap_en_disco(char *archivo, size_t size)
 
     if (bmap == MAP_FAILED)
     {
-        perror("mmap");
         close(fd);
         exit(1);
     }
@@ -491,7 +482,6 @@ t_bitarray *crear_bitmap_en_disco(char *archivo, size_t size)
         bitarray_clean_bit(bitmap, i);
     }
 
-    // msync(NULL, size, LSB_FIRST);
     close(fd);
     // munmap(bmap, size); para finalizar gamecard
     return bitmap;
@@ -499,14 +489,12 @@ t_bitarray *crear_bitmap_en_disco(char *archivo, size_t size)
 
 uint32_t buscarBloqueLibre()
 {
-    // t_bitarray *bitmap = bitarray_create_with_mode((char *)bmap, cantBloques / 8, LSB_FIRST);
     uint32_t i = 0;
     while (bitarray_test_bit(bitmapArr, i) && bitarray_test_bit(bitmapArr, i)!= 0)
     {
         i++;
     }
     bitarray_set_bit(bitmapArr,i);
-    printf("el bit %i esta %i\n",i, bitarray_test_bit(bitmapArr,i));
     return i;
 }
 
@@ -546,25 +534,25 @@ void atenderGetPokemon(t_getPokemon_indexSem* getPokemonSem){
     t_localized_pokemon* localizedPokemon;
     char* pathFilesPokemon = string_duplicate(pathFiles);
     string_append(&pathFilesPokemon,getPokemonSem->getPokemon->nombre);
-    printf("EL PATH EN LOCALIZED: %s\n", pathFilesPokemon);
 
     char* pathMetadataPoke = agregarAPath(pathFilesPokemon,"/Metadata.txt");
 
     if(existeDirectorio(pathFilesPokemon)){
         if(estaOpen(getPokemonSem->getPokemon->nombre)){
-            reintentandoOperacion(pathFilesPokemon);
+            reintentandoOperacion(getPokemonSem->getPokemon->nombre);
         }
-        log_info(logger,"el index de la lista de semaforos en el else: %i",getPokemonSem->indexSemaforo);
+        // log_info(logger,"el index de la lista de semaforos en el else: %i",getPokemonSem->indexSemaforo);
         waitSemYModificacionOpen(getPokemonSem->indexSemaforo, pathMetadataPoke);
         localizedPokemon = escribirLocalizedPokemon(getPokemonSem->getPokemon, pathMetadataPoke);
         sleep(tiempoOperacion);
         signalSemYModificacionOpen(getPokemonSem->indexSemaforo, pathMetadataPoke);
-        printf("LOCALIZED DEL POKEMON: NOMBRE: %s, CANTIDAD DE POSICIONES: %i, POSX1: %i, POSX2: %i\n", localizedPokemon->nombre, localizedPokemon->cantidadPosiciones, ((t_posicion*)list_get(localizedPokemon->posiciones, 0))->posicion_x, ((t_posicion*)list_get(localizedPokemon->posiciones, 0))->posicion_y);
+        // printf("LOCALIZED DEL POKEMON: NOMBRE: %s, CANTIDAD DE POSICIONES: %i, POSX1: %i, POSX2: %i\n", localizedPokemon->nombre, localizedPokemon->cantidadPosiciones, ((t_posicion*)list_get(localizedPokemon->posiciones, 0))->posicion_x, ((t_posicion*)list_get(localizedPokemon->posiciones, 0))->posicion_y);
 
         mandarLOCALIZED(localizedPokemon);
         free(localizedPokemon);
-        printf("termino la operacion de LOCALIZED_POKEMON de %s\n", getPokemonSem->getPokemon->nombre);
+        log_info(logger,"termino la operacion de LOCALIZED_POKEMON de %s", getPokemonSem->getPokemon->nombre);
     }else{
+        sleep(tiempoOperacion);
         log_warning(logger,"No existe el pokemon %s en tallgrass", getPokemonSem->getPokemon->nombre);
         localizedPokemon = crearLocalizedPokemon(0, getPokemonSem->getPokemon->ID_mensaje_recibido, getPokemonSem->getPokemon->nombre, 0,list_create());
         mandarLOCALIZED(localizedPokemon);
@@ -579,25 +567,24 @@ void atenderCatchPokemon(void* catchPoke){
     char* pathFilesPokemon = string_duplicate(pathFiles);
     string_append(&pathFilesPokemon,catchPokemonSem->catchPokemon->nombre);
     char* pathMetadataPoke = agregarAPath(pathFilesPokemon,"/Metadata.txt");
-    uint32_t indexSemaforo = 0;
     t_caught_pokemon* caughtPoke = crearCaughtPokemon(0,catchPokemonSem->catchPokemon->ID_mensaje_recibido,1);
 
     if(existeDirectorio(pathFilesPokemon)){
         if(estaOpen(catchPokemonSem->catchPokemon->nombre)){
-            reintentandoOperacion(pathFilesPokemon);
+            reintentandoOperacion(catchPokemonSem->catchPokemon->nombre);
         }
         waitSemYModificacionOpen(catchPokemonSem->indexSemaforo, pathMetadataPoke);
-        escribirCatchPokemon(catchPokemonATexto(catchPokemonSem->catchPokemon), pathMetadataPoke);
+        caughtPoke->catchStatus = escribirCatchPokemon(catchPokemonATexto(catchPokemonSem->catchPokemon), pathMetadataPoke);
         sleep(tiempoOperacion);
-        signalSemYModificacionOpen(indexSemaforo, pathMetadataPoke);
+        log_info(logger,"termino la operacion de CATCH_POKEMON de %s con CATCH STATUS DE %i\n", catchPokemonATexto(catchPokemonSem->catchPokemon), caughtPoke->catchStatus);
+        signalSemYModificacionOpen(catchPokemonSem->indexSemaforo, pathMetadataPoke);
 
-        printf("termino la operacion de CATCH_POKEMON de %s\n", catchPokemonATexto(catchPokemonSem->catchPokemon));
         mandarCAUGHT(caughtPoke);
 
     }else{
         caughtPoke->catchStatus = 0;
+        sleep(tiempoOperacion);
         log_warning(logger,"No existe el pokemon %s en tallgrass", catchPokemonSem->catchPokemon->nombre);
-        printf("No existe el directorio %s\n", pathFilesPokemon);
         mandarCAUGHT(caughtPoke);
         free(caughtPoke);
     }
@@ -620,16 +607,16 @@ void* atenderNewPokemon(void* newPokemonParam){
     if(!yaExistia){
         insertarMetadataEnPath(pathFilesPokemon,"./assets/MetadataArchivoGeneral.txt");
         waitSemYModificacionOpen(newPokeSem->indexSemaforo, pathMetadataPoke);
-        log_info(logger,"el index de la lista de semaforos en el if: %i",newPokeSem->indexSemaforo);
+        // log_info(logger,"el index de la lista de semaforos en el if: %i",newPokeSem->indexSemaforo);
     }else{
-        // pthread_mutex_lock(&mutexEstaOpen);
+        pthread_mutex_lock(&mutexEstaOpenNew);
         bool estaOpenBool = estaOpen(newPokeSem->newPokemon->nombre);
-        // pthread_mutex_unlock(&mutexEstaOpen);
+        pthread_mutex_unlock(&mutexEstaOpenNew);
 
         if(estaOpenBool){
             reintentandoOperacion(newPokeSem->newPokemon->nombre);
         }
-        log_info(logger,"el index de la lista de semaforos en el else: %i",newPokeSem->indexSemaforo);
+        // log_info(logger,"el index de la lista de semaforos en el else: %i",newPokeSem->indexSemaforo);
         waitSemYModificacionOpen(newPokeSem->indexSemaforo, pathMetadataPoke);
     }
     
@@ -638,13 +625,11 @@ void* atenderNewPokemon(void* newPokemonParam){
     t_posicion* posicion = crearPosicion(newPokeSem->newPokemon->posicionCantidad->posicion_x, newPokeSem->newPokemon->posicionCantidad->posicion_y);
 	t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(0, newPokeSem->newPokemon->ID_mensaje_recibido, newPokeSem->newPokemon->nombre, posicion);
 
-    mandarAPPEARED(appearedPokemon);
-    free(appearedPokemon);
-
-    printf("termino la operacion de NEW_POKEMON de %s\n", newPokemonATexto(newPokeSem->newPokemon));
 
     sleep(tiempoOperacion);
     signalSemYModificacionOpen(newPokeSem->indexSemaforo, pathMetadataPoke);
+    mandarAPPEARED(appearedPokemon);
+    free(appearedPokemon);
 
     free(newPokeSem->newPokemon);
     free(newPokeSem);
@@ -657,23 +642,21 @@ bool estaOpen(char* nombrePokemon){
     uint32_t indexSemaforo =  encontrarSemaforoDelPoke(nombrePokemon,semaforosPokemon);
     if (sem_getvalue(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, indexSemaforo))->semPoke), &valorSem) == 0){
         if(valorSem > 0){
-            log_info(logger,"ESTA CERRADO EL ARCHIVO con un valor del SEM: %i", valorSem);
+            // log_info(logger,"ESTA CERRADO EL ARCHIVO con un valor del SEM: %i", valorSem);
+            log_info(logger,"-- El archivo de %s esta CLOSED con valor del SEM %i", nombrePokemon, valorSem);
         }else{
             archivoOpen = true;
-            log_info(logger,"ESTA ABIERTO EL ARCHIVO con un valor del SEMN: %i", valorSem);
+            log_info(logger,"-- El archivo de %s esta OPEN con valor del SEM %i", nombrePokemon, valorSem);
+            // log_info(logger,"ESTA ABIERTO EL ARCHIVO con un valor del SEMN: %i", valorSem);
         }
 
     }
     return archivoOpen;
 }
 
-// bool estaOpenArchivo(char* pathMetadataPoke){
-//     t_config metadataPoke = 
-//     // char* valorOpen = co
-// }
 
 void waitSemYModificacionOpen(uint32_t indexSemaforo, char* pathMetadataPoke){
-    printf("EL INDEX DEL SEM ES: %i\n", indexSemaforo);
+    // printf("EL INDEX DEL SEM ES: %i\n", indexSemaforo);
     sem_wait(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, indexSemaforo))->semPoke)); 
     modificarOpenArchivo(pathMetadataPoke,"Y");
 }
@@ -685,7 +668,7 @@ void signalSemYModificacionOpen(uint32_t indexSemaforo, char* pathMetadataPoke){
 
 
 void reintentandoOperacion(char* nombrePoke){
-    log_info(logger,"entra en IF de si esta open");
+    // log_info(logger,"entra en IF de si esta open");
     pthread_t hiloRecuperacion;
     pthread_create(&hiloRecuperacion, NULL, reintentarOperacion,nombrePoke);
     pthread_join(hiloRecuperacion, NULL);
@@ -697,13 +680,13 @@ void* reintentarOperacion(void* nombrePoke){
     bool archivoOpen = true;
     uint32_t i = 0;
     while(archivoOpen){
-        sleep(tiempoReintentoOperacion);
-        // pthread_mutex_lock(&mutexEstaOpen);
-        archivoOpen = estaOpen(nombrePoke);
-        // pthread_mutex_unlock(&mutexEstaOpen);
         i++;
-        printf("reintento numero %i\n", i);
-        log_info(logger, "reintento numeo %i", i);
+        log_info(logger, "- Reintento nro %i -", i);
+        sleep(tiempoReintentoOperacion);
+        uint32_t indexSemaforo = getIndexSemaforo(nombrePokemon,semaforosPokemon);
+        sem_wait(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, indexSemaforo))->mutexOpenPoke)); 
+        archivoOpen = estaOpen(nombrePoke);
+        sem_post(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, indexSemaforo))->mutexOpenPoke)); 
     }
     return false;
 }

@@ -16,14 +16,16 @@
 #include<pthread.h>
 #include<semaphore.h>
 #include "serializador.h"
+#include "planificador.h"
 #include "utils.h"
 #include "models.h"
 
 t_log* logger;
 t_config* config;
-pthread_t thread;
+
 char* IP;
 char* PUERTO;
+bool primeraConexion;
 
 t_list* objetivoGlobal;
 t_list* pokemonesEnMapa;
@@ -32,6 +34,7 @@ t_suscribe* suscribeCaught;
 t_suscribe* suscribeAppeared;
 t_suscribe* suscribeLocalized;
 
+pthread_t thread;
 pthread_t threadSUSCRIBE_CAUGHT;
 pthread_t threadSUSCRIBE_APPEARED;
 pthread_t threadSUSCRIBE_LOCALIZED;
@@ -40,7 +43,9 @@ sem_t counterPokesEnMapa;
 sem_t counterEntrenadoresCatch;
 sem_t mutexPokesEnMapa;
 sem_t mutexReconnect;
+sem_t estaDesconectado;
 sem_t detectorDesconexion;
+sem_t pokesObjetivoGlobal;
 
 uint32_t idModule;
 
@@ -52,6 +57,7 @@ void liberar_conexion(uint32_t socket_cliente);
 uint32_t escuchaBroker();
 void establecerConexionBroker();
 void reconectarBroker();
+void desconectarBroker(uint32_t mq);
 
 void mandarGET();
 void enviarAck(t_acknowledgement* ack);

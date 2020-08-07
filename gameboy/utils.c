@@ -117,3 +117,24 @@ t_suscribe_gameboy* crearSuscribeGameboy(uint32_t con, uint32_t mq) {
 
 	return suscribe;
 }
+
+char* getNombreColaDeMensajes(uint32_t mq)
+{
+	switch (mq)
+	{
+		case NEW_POKEMON:
+			return "NEW_POKEMON";
+		case APPEARED_POKEMON:
+			return "APPEARED_POKEMON";
+		case CATCH_POKEMON:
+			return "CATCH_POKEMON";
+		case CAUGHT_POKEMON:
+			return "CAUGHT_POKEMON";
+		case GET_POKEMON:
+			return "GET_POKEMON";
+		case LOCALIZED_POKEMON:
+			return "LOCALIZED_POKEMON";
+		default:
+			return "CODIGO DESCONOCIDO";
+	}
+}

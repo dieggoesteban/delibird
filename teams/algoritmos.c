@@ -1,7 +1,6 @@
 #include "algoritmos.h"
 
 t_entrenador *FIFO(t_entrenador* e) {
-    printf("Ejecutando FIFO\n");
     sem_wait(&mutexREADY);
     t_entrenador* entrenador = list_get(colaREADY, 0);
     sem_post(&mutexREADY);
@@ -19,6 +18,10 @@ t_entrenador *SJF(t_entrenador* e) {
     list_sort(ready,tardaMenos);
     t_entrenador* entrenador = list_get(ready, 0);
 
+    entrenador->estimacionAnterior = getEstimacion(getTiempoReal(entrenador), entrenador->estimacionAnterior);
+
+    moverEntrenadorDeCola(colaREADY, colaREADY, entrenador);
+
     return entrenador;
 }
 
@@ -28,10 +31,8 @@ uint32_t getCurrentQuantum() {
 
 t_entrenador *RR(t_entrenador* e) {
     uint32_t q = getCurrentQuantum();
-    printf("Ejecutando RR, quantum actual: %i\n", q+1);
     if (q > 0) {
         if(e != NULL) {
-            printf("Retorno el mismo: %i\n", e->id);
             return e;
         } else {
             sem_wait(&mutexREADY);
@@ -56,18 +57,22 @@ t_entrenador *RR(t_entrenador* e) {
 AlgoritmoFunc* getAlgoritmo(char* config) {
 	if(strcmp(config,"FIFO") == 0) {
         desalojo = false;
+        log_info(logger, "Algoritmo empleado: FIFO");
 		return FIFO;
 	}
 	else if (strcmp(config,"RR") == 0) {
         desalojo = true;
+        log_info(logger, "Algoritmo empleado: Round Robin");
 		return RR;
 	}
 	else if (strcmp(config,"SJF-CD") == 0) {
         desalojo = true;
+        log_info(logger, "Algoritmo empleado: SJF Con Desalojo");
 		return SJF;
 	}
 	else if (strcmp(config,"SJF-SD") == 0) {
 		desalojo = false;
+        log_info(logger, "Algoritmo empleado: SJF Sin Desalojo");
 		return SJF;
 	}
     return NULL;

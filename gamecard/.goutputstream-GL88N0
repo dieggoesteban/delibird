@@ -21,9 +21,11 @@
 
 uint32_t arraySize(void* arr[]);
 t_list* arrayToList(void* arr[]);
+char* arrayToString(void* arr[]);
 bool perteneceALista(char *val, t_list* lista);
 uint32_t perteneceAListaContador(char *val, t_list* lista);
 bool list_equals(t_list* list1, t_list* list2);
 t_queue* listToQueue(t_list* lista);
+char* listToString(t_list* lista);
 
 #endif /* UTILSGENERALES_H_ */

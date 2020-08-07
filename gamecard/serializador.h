@@ -49,7 +49,7 @@ t_acknowledgement* deserializar_acknowledgement(t_buffer* buffer);
 t_paquete* serializar_idMensajeRecibido(t_id_mensaje_recibido* idMensajeRecibido);
 t_id_mensaje_recibido* deserializar_idMensajeRecibido(t_buffer* buffer);
 
-
+t_paquete* serializar_desconexion(t_register_module* registerModule);
 
 //CREACION DE LOS STRUCTS
 t_posicion_cantidad* crearPosicionCantidad(uint32_t x, uint32_t y, uint32_t cant);
@@ -68,6 +68,7 @@ t_newPokemon_indexSem* crearNewPokemonIndexSem(uint32_t indexSem, t_new_pokemon*
 t_catchPokemon_indexSem* crearCatchPokemonIndexSem(uint32_t indexSem, t_catch_pokemon* catchPoke);
 t_getPokemon_indexSem* crearGetPokemonIndexSem(uint32_t indexSem, t_get_pokemon* newPoke);
 t_acknowledgement* crearAcknowledgement(uint32_t idModulo,uint32_t ID_mensaje_recibido, uint32_t mq_cod);
+t_hilo_poke* crearHiloPoke(pthread_t hiloID, bool ejecutando);
 
 
 

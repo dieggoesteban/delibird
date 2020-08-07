@@ -30,6 +30,8 @@ t_message_queue* crearMessageQueue(uint32_t mq_cod)
     newMessageQueue->mensajes = list_create();
     newMessageQueue->subscribers = list_create();
 
+	// sem_init(&newMessageQueue->s_mensajes, 0, 1);
+	// sem_init(&newMessageQueue->s_subscribers, 0, 1);
 	if(pthread_mutex_init(&newMessageQueue->s_mensajes, NULL) != 0)
 		log_error(broker_custom_logger, "Error mutex init (s_mensajes) in crearMessageQueue");
 	if(pthread_mutex_init(&newMessageQueue->s_subscribers, NULL) != 0)
@@ -45,6 +47,10 @@ t_message* crearMessage()
     t_message* mensajeStruct = malloc(sizeof(t_message));
     mensajeStruct->suscriptoresConfirmados = list_create();
 	mensajeStruct->suscriptoresEnviados = list_create();
+
+	// pthread_mutexattr_t attr;
+	// pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
+	// pthread_mutexattr_init(&attr);
 
 	if(pthread_mutex_init(&mensajeStruct->s_suscriptoresEnviados, NULL) != 0)
 		log_error(broker_custom_logger, "Error mutex init (s_suscriptoresEnviados) in crearMessage");
@@ -104,9 +110,10 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 	{
 		case SUBSCRIBE:
 		{
+			//log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
 			t_register_module* registerModule = deserializar_registerModule(buffer);
 			subscribeNewModule(registerModule->moduleId, socket_cliente, registerModule->messageQueue);
-			free(registerModule);
+			// free(registerModule);
 			break;
 		}
 		case ACKNOWLEDGEMENT:
@@ -116,8 +123,16 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 			//log_info(broker_custom_logger, "Se ha recibido ACK de %i por el mensaje %i", socket_cliente, ack->idMessageReceived);
 			break;
 		}
+		case UNSUBSCRIBE:
+		{
+			t_register_module* unregisterModule = deserializar_registerModule(buffer);
+			unsubscribeModule(unregisterModule->moduleId, socket_cliente, unregisterModule->messageQueue);
+			// free(unregisterModule);
+			break;
+		}
 		case NEW_POKEMON:
 		{
+			log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
 			t_message_queue* messageQueue = getMessageQueueById(operation_cod);
 			t_new_pokemon* newPoke = deserializar_newPokemon(buffer);
 			t_message* message = crearMessage();
@@ -127,11 +142,6 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 			message->mq_cod = NEW_POKEMON;
 			newPoke->ID_mensaje_recibido = message->id;
 			message->mensaje = newPoke;
-
-			log_info(logger,"NEW_POKEMON: nombre: %s, id: %i, MQ: %i\n", newPoke->nombre, newPoke->ID_mensaje_recibido, message->mq_cod);
-
-
-
 			log_info(logger, "Se ha recibido un mensaje del cliente %i en la cola %s", socket_cliente, messageQueue->name);
 			addMessageToQueue(message, messageQueue);
 
@@ -140,12 +150,13 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 		}
 		case APPEARED_POKEMON:
 		{
+			log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
 			t_message_queue* messageQueue = getMessageQueueById(operation_cod);
 			t_appeared_pokemon* appearedPoke = deserializar_appearedPokemon(buffer);
 			t_message* message = crearMessage(appearedPoke, APPEARED_POKEMON);
 
 			message->id = asignarMessageId();
-			message->idCorrelativo = 0;
+			message->idCorrelativo = appearedPoke->ID_mensaje_original;
 			message->mq_cod = APPEARED_POKEMON;
 			appearedPoke->ID_mensaje_recibido = message->id;
 			message->mensaje = appearedPoke;
@@ -158,6 +169,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 		}
 		case GET_POKEMON:
 		{
+			log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
 			t_message_queue* messageQueue = getMessageQueueById(operation_cod);
 			t_get_pokemon* getPoke = deserializar_getPokemon(buffer);
 			t_message* message = crearMessage(getPoke, GET_POKEMON);
@@ -167,6 +179,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 			message->mq_cod = GET_POKEMON;
 			getPoke->ID_mensaje_recibido = message->id;
 			message->mensaje = getPoke;
+			log_info(logger,"LLEGO EL POKE EN GET %s", getPoke->nombre);
 
 			log_info(logger, "Se ha recibido un mensaje del cliente %i en la cola %s", socket_cliente, messageQueue->name);
 			addMessageToQueue(message, messageQueue);
@@ -176,13 +189,13 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 		}
 		case CAUGHT_POKEMON:
 		{
+			log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
 			t_message_queue* messageQueue = getMessageQueueById(operation_cod);
 			t_caught_pokemon* caughtPoke = deserializar_caughtPokemon(buffer);
-			printf("Recibi un caught: mID-> %i con el estado: %i\n", (uint32_t)caughtPoke->ID_mensaje_original, (uint32_t)caughtPoke->catchStatus);
 			t_message* message = crearMessage(caughtPoke, CAUGHT_POKEMON);
 
 			message->id = asignarMessageId();
-			message->idCorrelativo = 0;
+			message->idCorrelativo = caughtPoke->ID_mensaje_original;
 			message->mq_cod = CAUGHT_POKEMON;
 			caughtPoke->ID_mensaje_recibido = message->id;
 			message->mensaje = caughtPoke;
@@ -195,15 +208,18 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 		}
 		case LOCALIZED_POKEMON:
 		{
+			log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
 			t_message_queue* messageQueue = getMessageQueueById(operation_cod);
 			t_localized_pokemon* localizedPoke = deserializar_localizedPokemon(buffer);
 			t_message* message = crearMessage(localizedPoke, LOCALIZED_POKEMON);
 
 			message->id = asignarMessageId();
-			message->idCorrelativo = 0;
+			message->idCorrelativo = localizedPoke->ID_mensaje_original;
 			message->mq_cod = LOCALIZED_POKEMON;
 			localizedPoke->ID_mensaje_recibido = message->id;
 			message->mensaje = localizedPoke;
+
+			log_info(logger,"LLEGO EL POKE EN LOCALIZED %s", localizedPoke->nombre);
 
 			log_info(logger, "Se ha recibido un mensaje del cliente %i en la cola %s", socket_cliente, messageQueue->name);
 			addMessageToQueue(message, messageQueue);
@@ -213,6 +229,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 		}
 		case CATCH_POKEMON:
 		{
+			log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
 			t_message_queue* messageQueue = getMessageQueueById(operation_cod);
 			t_catch_pokemon* catchPoke = deserializar_catchPokemon(buffer);
 			t_message* message = crearMessage(catchPoke, CATCH_POKEMON);
@@ -232,16 +249,19 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 		default:
 			log_error(broker_custom_logger, "Codigo de operacion desconocido: %i", operation_cod);
 	}
+
+	free(buffer->stream);
+	free(buffer);
 }
 
 void receiveAcknowledgement(t_acknowledgement* ack, uint32_t socket_cliente)
 {
 	t_message_queue* messageQueue = getMessageQueueById(ack->mq);
 
-	t_message* targetMessage;
-	t_message* currentMessage;
+	t_message* targetMessage = NULL;
+	t_message* currentMessage = NULL;
 
-	pthread_mutex_lock(&messageQueue->s_mensajes);
+	pthread_mutex_lock(&messageQueue->s_mensajes); //<-- ACA REY
 	for(uint32_t i = 0; i < list_size(messageQueue->mensajes); i++) {
 		currentMessage = (t_message*)list_get(messageQueue->mensajes, i);
 		if (currentMessage->id == ack->idMessageReceived) {
@@ -251,21 +271,22 @@ void receiveAcknowledgement(t_acknowledgement* ack, uint32_t socket_cliente)
 	}
 	pthread_mutex_unlock(&messageQueue->s_mensajes);
 
+	uint32_t _is_the_subscriber(t_suscripcion* suscripcion) {
+		return suscripcion->idModule == ack->idModule;
+	}
+
+	//Está en la cola de mensajes
 	if(targetMessage != NULL)
 	{
 		pthread_mutex_lock(&targetMessage->s_suscriptoresConfirmados);
 		pthread_mutex_lock(&targetMessage->s_suscriptoresEnviados);
-			t_suscripcion* targetSuscriptor;
-			uint32_t _is_the_subscriber(t_suscripcion* suscripcion) {
-				return suscripcion->idModule == ack->idModule;
-			}
-				targetSuscriptor = (t_suscripcion*)list_find(targetMessage->suscriptoresEnviados, (void*)_is_the_subscriber);
+			t_suscripcion* targetSuscriptor = (t_suscripcion*)list_find(targetMessage->suscriptoresEnviados, (void*)_is_the_subscriber);
 			if(targetSuscriptor != NULL)
 				list_add(targetMessage->suscriptoresConfirmados, targetSuscriptor);
 
 			uint32_t countSuscriptoresEnviados = list_size(targetMessage->suscriptoresEnviados);
 			uint32_t countSuscriptoresConfirmados = list_size(targetMessage->suscriptoresConfirmados);		
-			log_info(broker_custom_logger, "Confirmados: %i/%i", countSuscriptoresConfirmados , countSuscriptoresEnviados);
+			log_info(broker_custom_logger, "Recibido ack del cliente id %i por el mensaje id %i", targetSuscriptor->idModule , targetMessage->id);
 			
 			if(countSuscriptoresEnviados == countSuscriptoresConfirmados && countSuscriptoresConfirmados == targetMessage->countSuscriptoresObjetivo)
 				sem_post(&targetMessage->s_puedeEliminarse);
@@ -273,8 +294,22 @@ void receiveAcknowledgement(t_acknowledgement* ack, uint32_t socket_cliente)
 		pthread_mutex_unlock(&targetMessage->s_suscriptoresEnviados);
 		pthread_mutex_unlock(&targetMessage->s_suscriptoresConfirmados);
 	}
-	else
-	log_warning(broker_custom_logger, "Mensaje con id %i no encontrado en la cola %s", ack->idMessageReceived, messageQueue->name);
+
+	//Buscar si el mensaje está en la cache		
+	uint32_t _is_cached(cache_message* message) {
+		return message->idMessage == ack->idMessageReceived;
+	}
+	pthread_mutex_lock(&s_metadatas);
+		cache_message* targetCachedMessage = (cache_message*)list_find(metadatas, (void*)_is_cached);
+		if(targetCachedMessage != NULL)
+		{
+			t_suscripcion* targetSuscriptor = (t_suscripcion*)list_find(targetCachedMessage->suscriptoresEnviados, (void*)_is_the_subscriber);
+			list_add(targetCachedMessage->suscriptoresConfirmados, (void*)targetSuscriptor);
+			log_debug(broker_custom_logger, "Suscriptor confirmado y agregado al mensaje de cache. Mensaje id %i suscriptor id %i", targetCachedMessage->idMessage, targetSuscriptor->idModule);
+		}
+	pthread_mutex_unlock(&s_metadatas);	
+	log_debug(broker_custom_logger, "Mensaje con id %i encontrado en la cache", ack->idMessageReceived);
+	
 }
 
 void subscribeNewModule(uint32_t idNewModule, uint32_t socket_cliente, uint32_t mq_cod)
@@ -283,11 +318,12 @@ void subscribeNewModule(uint32_t idNewModule, uint32_t socket_cliente, uint32_t 
 	t_suscripcion* suscripcion = crearSuscripcion(idNewModule, socket_cliente);
 
 	t_suscripcion* foundSuscripcion;
-	pthread_mutex_lock(&messageQueue->s_subscribers);
 	uint32_t _it_was_already_register(t_suscripcion* suscripcion) {
 		return suscripcion->idModule == idNewModule;
 	}
-	foundSuscripcion = (t_suscripcion*)list_find(messageQueue->subscribers, (void*)_it_was_already_register);
+	pthread_mutex_lock(&messageQueue->s_subscribers);
+		foundSuscripcion = (t_suscripcion*)list_find(messageQueue->subscribers, (void*)_it_was_already_register);
+	pthread_mutex_unlock(&messageQueue->s_subscribers);
 	if(foundSuscripcion != NULL)
 	{
 		//Se actualiza su socket de conexion si es necesario
@@ -299,28 +335,76 @@ void subscribeNewModule(uint32_t idNewModule, uint32_t socket_cliente, uint32_t 
 	}
 	else 
 	{
-		list_add(messageQueue->subscribers, (void *)suscripcion);
+		pthread_mutex_lock(&messageQueue->s_subscribers);
+			list_add(messageQueue->subscribers, (void *)suscripcion);
+		pthread_mutex_unlock(&messageQueue->s_subscribers);
 		log_info(logger, "Se ha registrado un nuevo suscriptor id %i a la cola %s", suscripcion->idModule, messageQueue->name);
 	}
+
+	//Enviar los mensajes de la cache
+	t_cache_dispatch_info* cache_dispatch_info = (t_cache_dispatch_info*)malloc(sizeof(t_cache_dispatch_info));
+	cache_dispatch_info->suscripcion = suscripcion;
+	cache_dispatch_info->mq_cod = mq_cod;
+
+	pthread_t dispatchCache;
+	pthread_create(&dispatchCache, NULL, (void*)dispatchCachedMessages, cache_dispatch_info);
+	pthread_join(dispatchCache, NULL);
+}
+
+void unsubscribeModule(uint32_t idNewModule, uint32_t socket_cliente, uint32_t mq_cod)
+{
+	t_message_queue* messageQueue = getMessageQueueById(mq_cod);
+
+	t_suscripcion* foundSuscripcion;
+	pthread_mutex_lock(&messageQueue->s_subscribers);
+	uint32_t _is_the_registration(t_suscripcion* suscripcion) {
+		return suscripcion->idModule == idNewModule;
+	}
+	foundSuscripcion = (t_suscripcion*)list_find(messageQueue->subscribers, (void*)_is_the_registration);
 	pthread_mutex_unlock(&messageQueue->s_subscribers);
+
+	if(foundSuscripcion == NULL)
+	{
+		log_warning(broker_custom_logger, "Desuscripcion: Suscriptor no encontrado");	
+		return;
+	}
+	
+	pthread_mutex_lock(&messageQueue->s_subscribers);	
+	t_suscripcion* targetSuscription;
+	for(uint32_t i = 0; i < list_size(messageQueue->subscribers); i++)
+	{
+		targetSuscription = (t_suscripcion*)list_get(messageQueue->subscribers, i);
+		if(targetSuscription->idModule == foundSuscripcion->idModule)
+		{
+			log_debug(broker_custom_logger, "Se ha desuscripto el modulo id %i con el socket %i de la cola %s", 
+				targetSuscription->idModule, targetSuscription->socket, messageQueue->name);
+			shutdown(targetSuscription->socket, 2);
+			close(targetSuscription->socket);
+			list_remove(messageQueue->subscribers, i);
+			break;
+		}
+	}
+	pthread_mutex_unlock(&messageQueue->s_subscribers);
+	
+	t_message* currentMessage;
+	pthread_mutex_lock(&messageQueue->s_mensajes);
+	for(uint32_t i = 0; i < list_size(messageQueue->mensajes); i++)
+	{
+		currentMessage = (t_message*)list_get(messageQueue->mensajes, i);
+		currentMessage->countSuscriptoresObjetivo--;
+	}
+	pthread_mutex_unlock(&messageQueue->s_mensajes);
 }
 
 void addMessageToQueue(t_message* message, t_message_queue* messageQueue)
 {
 	pthread_mutex_lock(&messageQueue->s_mensajes);
-		list_add(messageQueue->mensajes, message);
-
-		//Guardarlo en la cache
-		if(pthread_create(&message->caching, NULL, (void*)cacheMessage, message) < 0)
-			log_error(broker_custom_logger, "Error in pthread_create cacheMessage");
-		
-		if(pthread_join(message->caching, NULL) != 0)
-			log_error(broker_custom_logger, "Error in pthread_join cacheMessage");	
+		list_add(messageQueue->mensajes, (void*)message);
+		sem_post(&messageQueue->s_hayMensajes);
 	pthread_mutex_unlock(&messageQueue->s_mensajes);
-	sem_post(&messageQueue->s_hayMensajes);
 }
 
-void sendMessageFromQueue(t_message* message, t_suscripcion* suscriptor)
+void sendMessageFromQueue(t_message* message, t_suscripcion* suscriptor, cache_message* optionalCacheMetadata)
 {
 	t_paquete* paquete = (t_paquete*)malloc(sizeof(t_paquete));
 	switch(message->mq_cod)
@@ -378,40 +462,56 @@ void sendMessageFromQueue(t_message* message, t_suscripcion* suscriptor)
 	{
 		pthread_mutex_lock(&message->s_suscriptoresEnviados);
 			list_add(message->suscriptoresEnviados, suscriptor);
+			if(optionalCacheMetadata != NULL)
+				list_add(optionalCacheMetadata->suscriptoresEnviados, suscriptor);
 		pthread_mutex_unlock(&message->s_suscriptoresEnviados);
-		log_info(broker_custom_logger, "Mensaje id %i enviado a suscriptor %i", message->id, suscriptor->socket);
+		log_info(logger, "Mensaje id %i enviado a suscriptor %i", message->id, suscriptor->idModule);
 	}
 }
 
 void dispatchMessagesFromQueue(t_message_queue* messageQueue)
 {
-	t_message* message;
-	t_suscripcion* currentSubscriber = (t_suscripcion*)malloc(sizeof(t_suscripcion));
+	t_suscripcion* currentSubscriber;
 	uint32_t subscribersCount;
 	while(true)
 	{
 		sem_wait(&messageQueue->s_hayMensajes);
-		pthread_mutex_lock(&messageQueue->s_mensajes);
-			if(list_size(messageQueue->mensajes) > 0)
-				message = (t_message*)list_get(messageQueue->mensajes, 0);
-		pthread_mutex_unlock(&messageQueue->s_mensajes);
-
-		pthread_mutex_lock(&messageQueue->s_subscribers);
-			subscribersCount = list_size(messageQueue->subscribers);
-			message->countSuscriptoresObjetivo = subscribersCount;
-			for(uint32_t i = 0; i < subscribersCount; i++) {
-				currentSubscriber = (t_suscripcion*)list_get(messageQueue->subscribers, i);
-				sendMessageFromQueue(message, currentSubscriber);
-			}
-		pthread_mutex_unlock(&messageQueue->s_subscribers);		
-
-		if(pthread_create(&message->deleteFromQueue, NULL, (void*)deleteFromQueue, message) < 0)
-			log_error(broker_custom_logger, "Error in pthread_create deleteFromQueue");
-		
-		if(pthread_detach(message->deleteFromQueue) != 0)
-			log_error(broker_custom_logger, "Error in pthread_join deleteFromQueue");
+		t_message* message;
+		//pthread_mutex_lock(&messageQueue->s_mensajes);
+		for(uint32_t i = 0; i < list_size(messageQueue->mensajes); i++)
+		{
+			message = (t_message*)list_get(messageQueue->mensajes, i);
+			pthread_mutex_lock(&messageQueue->s_subscribers);
+				subscribersCount = list_size(messageQueue->subscribers);
+				if(subscribersCount == 0)
+				{
+					sem_post(&message->s_puedeEliminarse); //Es lo que vendría a ser el post del ack
+				}
+				
+				message->countSuscriptoresObjetivo = subscribersCount;
+				for(uint32_t i = 0; i < subscribersCount; i++) {
+					currentSubscriber = (t_suscripcion*)list_get(messageQueue->subscribers, i);
+					sendMessageFromQueue(message, currentSubscriber, NULL);
+				}
+			pthread_mutex_unlock(&messageQueue->s_subscribers);	
+			log_debug(broker_custom_logger, "Enviado a %i suscriptores", subscribersCount);
+			
+			//Guardarlo en la cache
+			if(pthread_create(&message->caching, NULL, (void*)cacheMessage, message) < 0)
+				log_error(broker_custom_logger, "Error in pthread_create cacheMessage");
+			
+			if(pthread_detach(message->caching) != 0)
+				log_error(broker_custom_logger, "Error in pthread_join cacheMessage");		
+			
+			//Eliminarlo de la cola
+			if(pthread_create(&message->deleteFromQueue, NULL, (void*)deleteFromQueue, message) < 0)
+				log_error(broker_custom_logger, "Error in pthread_create deleteFromQueue");
+			
+			if(pthread_join(message->deleteFromQueue, NULL) != 0)
+				log_error(broker_custom_logger, "Error in pthread_detach deleteFromQueue");
+		}
+		//pthread_mutex_unlock(&messageQueue->s_mensajes);
 	}
-	free(message);
 }
 
 void deleteFromQueue(t_message* message) 
@@ -419,7 +519,7 @@ void deleteFromQueue(t_message* message)
 	sem_wait(&message->s_puedeEliminarse); //Cache
 	sem_wait(&message->s_puedeEliminarse); //Ack
 	t_message_queue* messageQueue = getMessageQueueById(message->mq_cod);
-	t_message* current = (t_message*)malloc(sizeof(t_message));
+	t_message* current;
 	uint32_t targetIndex;
 	pthread_mutex_lock(&messageQueue->s_mensajes);
 		for(uint32_t i = 0; i < list_size(messageQueue->mensajes); i++)
@@ -434,10 +534,10 @@ void deleteFromQueue(t_message* message)
 		if(targetIndex >= 0)
 		{
 			list_remove(messageQueue->mensajes, targetIndex);			
-			log_warning(broker_custom_logger, "Mensaje eliminado de la cola");
+			//log_debug(broker_custom_logger, "Mensaje eliminado de la cola");
+			// free(current);
 		}
 	pthread_mutex_unlock(&messageQueue->s_mensajes);
-	free(current);
 }
 
 void notifySender(t_message* message, uint32_t socket_cliente)
@@ -446,14 +546,15 @@ void notifySender(t_message* message, uint32_t socket_cliente)
 	t_id_mensaje_recibido* idAsignado = crearIdMensajeRecibido(message->id);		
 	t_paquete* paquete = serializar_idMensajeRecibido(idAsignado);
 	enviarMensaje(paquete, socket_cliente);
+	// free(idAsignado);
 	//log_info(broker_custom_logger, "Respuesta de id (%i) enviada al cliente %i", message->id, socket_cliente);		
 }
 
 void cacheMessage(t_message* message)
 {
-	//algoritmo_memoria(message);
+	algoritmo_memoria(message);
 	sem_post(&message->s_puedeEliminarse);
-	//log_info(logger, "Mensaje id %i agregado a la cache", message->id);
+	//log_debug(logger, "Mensaje id %i agregado a la cache", message->id);
 }
 
 void inicializarCounterMessageId()
@@ -469,4 +570,20 @@ uint32_t asignarMessageId()
 	pthread_mutex_unlock(&s_counterMessageId);
 	
     return globalMessageCounterId;
+}
+
+//Cleaning
+void freeMessage(t_message* message) 
+{
+	list_destroy(message->suscriptoresEnviados);
+	list_destroy(message->suscriptoresConfirmados);
+	// free(message->mensaje);
+	// free(message);
+}
+
+void freeMessageQueue(t_message_queue* messageQueue)
+{
+	list_destroy(messageQueue->mensajes);
+	list_destroy(messageQueue->subscribers);
+	// free(messageQueue);
 }

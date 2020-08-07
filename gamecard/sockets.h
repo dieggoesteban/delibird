@@ -17,7 +17,7 @@
 #include "serializador.h"
 #include "models.h"
 #include "tallgrass.h"
-#include "utils.h"
+// #include "utils.h"
 
 t_log* logger;
 t_config* config;
@@ -44,6 +44,10 @@ t_message_queue* caughtPokemonMessageQueue;
 t_suscribe* suscribeNew;
 t_suscribe* suscribeCatch;
 t_suscribe* suscribeGet;
+
+t_list* hilosNew;
+t_list* hilosCatch;
+t_list* hilosGet;
 
 pthread_t threadSUSCRIBE_CATCH;
 pthread_t threadSUSCRIBE_NEW;
@@ -88,5 +92,5 @@ void process_suscribe_request(uint32_t cod_op, t_buffer* buffer, uint32_t client
 void mandarAPPEARED(t_appeared_pokemon* appearedPoke);
 void mandarCAUGHT(t_caught_pokemon* caughtPoke);
 void mandarLOCALIZED(t_localized_pokemon* localizedPoke);
-
+void desconectarBroker(uint32_t mq);
 #endif /* SOCKETS_H_ */

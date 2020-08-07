@@ -22,14 +22,21 @@ typedef enum
     SUBSCRIBE = 7,
 	MENSAJE_RECIBIDO = 8,
 	ACKNOWLEDGEMENT = 9,
-	ID_ASIGNADO_SUSCRIPCION = 10
+	ID_ASIGNADO_SUSCRIPCION = 10,
+	DESCONEXION = 11
 } operation_cod;
 
 
 
 typedef struct{
+	pthread_t idHilo;
+	bool ejecutando;
+} t_hilo_poke;
+
+typedef struct{
 	sem_t semPoke;
 	char* nombrePoke;
+	sem_t mutexOpenPoke;
 } t_semaforo_pokemon;
 
 typedef struct {

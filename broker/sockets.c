@@ -20,7 +20,7 @@ uint32_t enviarMensaje_returnResult(t_paquete* paquete, uint32_t socket_cliente)
 	uint32_t sendResult = send(socket_cliente,stream,sizePaquete,MSG_CONFIRM);
 	if(sendResult == -1)
 	{
-		log_error(broker_custom_logger, "Send error");
+		log_error(broker_custom_logger, "Send error %s");
 		liberarPaquete(paquete);
 		free(stream);
 		return 1;
@@ -34,7 +34,7 @@ void liberar_conexion(uint32_t socket_cliente) {
 	close(socket_cliente);
 }
 
-void liberarPaquete(t_paquete* paquete) {
+void liberarPaquete(t_paquete* paquete){
 	free(paquete->buffer->stream);
 	free(paquete->buffer);	
 	free(paquete);
@@ -45,7 +45,6 @@ void liberarPaquete(t_paquete* paquete) {
 #pragma region Funciones de Servidor
 void iniciar_servidor(void)
 {
-	uint32_t socket_servidor;
 	struct addrinfo hints, *servinfo, *p;
 
 	memset(&hints, 0, sizeof(hints));
@@ -60,9 +59,16 @@ void iniciar_servidor(void)
 		if ((socket_servidor = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1)
 			continue;
 
+		uint32_t flag = 1;
+		if (setsockopt(socket_servidor, SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(flag)) == -1)
+		{
+			log_error(broker_custom_logger, "Setsockopt fails");
+		}
+
 		if (bind(socket_servidor, p->ai_addr, p->ai_addrlen) == -1)
 		{
 			close(socket_servidor);
+			log_error(broker_custom_logger, "Error on binding: %s", strerror(errno));
 			continue;
 		}
 		break;
@@ -81,8 +87,17 @@ void esperar_cliente(uint32_t socket_servidor)
 
 	uint32_t tam_direccion = sizeof(struct sockaddr_in);
 	uint32_t socket_cliente = accept(socket_servidor, (void *)&dir_cliente, &tam_direccion);
-	pthread_create(&serverThread, NULL, (void *)serve_client, &socket_cliente);
-	pthread_join(serverThread, NULL);
+	if (socket_cliente != -1)
+	{
+		pthread_create(&serverThread, NULL, (void *)serve_client, &socket_cliente);
+		pthread_join(serverThread, NULL);
+	}
+	else
+	{
+		log_error(broker_custom_logger, "Accept error: %s\n", strerror(errno));
+		perror("accept");
+		exit(1);
+	}
 }
 
 void serve_client(uint32_t *socket_cliente)
@@ -91,13 +106,13 @@ void serve_client(uint32_t *socket_cliente)
 	uint32_t recvResult = recv(*socket_cliente, &operation_cod, sizeof(uint32_t), MSG_WAITALL);
 	if (recvResult == -1)
 	{
-		printf("Recv error\n");
+		log_error(broker_custom_logger, "Recv error. Errno: %s\n", strerror(errno));
 		liberar_conexion(*socket_cliente);
 		exit(1);
 	}
 	else if (recvResult == 0)
 	{
-		printf("El cliente %i cerro la conexion\n", *socket_cliente);
+		log_warning(broker_custom_logger, "El cliente %i cerro la conexion\n", *socket_cliente);
 		liberar_conexion(*socket_cliente);
 		return;
 	}

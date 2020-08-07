@@ -1,6 +1,7 @@
 #ifndef SOCKETS_H_
 #define SOCKETS_H_
 
+#include <errno.h>
 #include "global-includes.h"
 #include "models.h"
 #include "serializador.h"
@@ -9,6 +10,7 @@
 char* IP;
 char* PUERTO;
 pthread_t serverThread;
+uint32_t socket_servidor;
 
 //CLIENTE
 int crear_conexion(char* ip, char* puerto);

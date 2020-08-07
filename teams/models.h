@@ -21,7 +21,8 @@ typedef enum
     SUBSCRIBE = 7,
 	MENSAJE_RECIBIDO = 8,
 	ACKNOWLEDGEMENT = 9,
-	CONFIRMACION_MSJ = 10
+	CONFIRMACION_MSJ = 10,
+	DESCONEXION = 11
 } operation_cod;
 
 //struct que se manda como confirmacion de recibo de mensaje por parte de los modulos hacia el broker
@@ -38,6 +39,17 @@ typedef struct {
 typedef struct {
 	uint32_t AKC;
 } t_akc;
+
+typedef struct {
+	uint32_t idEntrenador;
+	bool deadlock;
+} t_trDeadlock;
+
+typedef struct {
+	t_list* entrenadores;
+	uint32_t cantIntercambios;
+	bool estaResuelto;
+} t_deadlock;
 
 typedef struct {
 	uint32_t messageQueue;
@@ -126,16 +138,25 @@ typedef struct{
 	char* nombre;
 } t_get_pokemon;
 
-typedef struct
-{
-    char* nombre;
-    t_posicion* posicion;
-} t_pokemon_posicion;
-
 typedef struct{
     char* nombre;
     uint32_t cantidad;
 }t_pokemon_cantidad;
+
+typedef struct
+{
+    char* nombre;
+    t_posicion* posicion;
+	uint32_t tiempoEjecucion;
+	uint32_t tiempoCaptura;
+} t_pokemon_posicion;
+
+typedef struct {
+	uint32_t id;
+	t_posicion* posicion;
+	uint32_t tiempoEjecucion;
+	uint32_t tiempoIntercambio;
+}t_entrenador_posicion;
 
 typedef struct
 {
@@ -144,10 +165,13 @@ typedef struct
     t_list* pokemonCapturados;
     t_list* pokemonObjetivo;
     uint32_t cantidadObjetivo;
+	uint32_t estimacionAnterior;
     t_pokemon_posicion* pokemonPlanificado;
+	t_entrenador_posicion* entrenadorPlanificado;
 	bool enEspera;
     bool deadlock;
 	sem_t mutex;
+	uint32_t cantCiclosCPU;
 } t_entrenador;
 
 typedef struct

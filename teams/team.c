@@ -10,6 +10,12 @@ void handler() {
 int main(int argc, char *argv[])
 {
     config = config_create("./assets/team.config");
+    cantEntrenadores = 0;
+    cantCambiosCtx = 0;
+    cantDeadlocks = 0;
+    cantIntercambios = 0;
+    cantCiclosTotales = 0;
+    primeraConexion = false;
     
     if(argv[1]) {
         idModule = atoi(argv[1]);
@@ -18,7 +24,6 @@ int main(int argc, char *argv[])
         idModule = (uint32_t)config_get_int_value(config,"ID_MODULE");
     }
 
-    sem_init(&waitForFinish, 0, 0);
     signal(SIGINT, handler);
 
     printf("Id modulo: %i \n", idModule);
@@ -38,22 +43,33 @@ int main(int argc, char *argv[])
     colaEXIT = list_create();
     pokemonesEnMapa = list_create();
     entrenadoresCatch = list_create();
+    trIds = list_create();
+    listaDeadlocks = list_create();
 
-
+    sem_init(&mutexDetector, 0, 0);
+    sem_init(&estaDesconectado, 0, 0);
     sem_init(&mutexNEW, 0, 1);
     sem_init(&mutexREADY, 0, 1);
     sem_init(&mutexBLOCKED, 0, 1);
     sem_init(&mutexEXEC, 0, 1);
-    sem_init(&mutexEXIT, 0, 1);
+    sem_init(&mutexPlanificadorEXEC, 0, 0);
+    sem_init(&mutexEXIT, 0, 0);
     sem_init(&mutexPokesEnMapa, 0, 1);
+    sem_init(&mutexReporteDeadlock, 0, 1);
     sem_init(&counterPokesEnMapa, 0, 0);
     sem_init(&counterEntrenadoresCatch, 0, 0);
     sem_init(&mutexReconnect, 0, 0);
     sem_init(&mutexEntrenadoresCatch, 0, 1);
     sem_init(&pokesObjetivoGlobal, 0, 1);
+    sem_init(&waitForFinish, 0, 0);
     
     inicializarTeam();
     establecerConexionBroker();
+    if(!primeraConexion) {
+        sem_wait(&pokesObjetivoGlobal);
+        mandarGET();
+        sem_post(&pokesObjetivoGlobal);
+    }
 
     if (pthread_create(&finalizarPrograma,NULL,(void*)terminar_programa,NULL) != 0)
         printf("Error FINALIZAR\n");
@@ -64,18 +80,20 @@ int main(int argc, char *argv[])
     if (pthread_create(&threadEXEC,NULL,(void*)planificadorEXEC,(void*)getAlgoritmo(ALGORITMO)) != 0)
         printf("Error EXEC\n");
 
+    if (pthread_create(&threadSERVER,NULL,(void*)iniciar_servidor,NULL) != 0)
+        printf("Error SERVIDOR\n");
+
     if (pthread_create(&threadDETECT_DISCON,NULL,(void*)detectarDesconexion,NULL) != 0)
-        printf("Error DETECTOR\n");
+        printf("Error DETECTOR DESCONEXION\n");
 
     if (pthread_create(&threadRECONNECT,NULL,(void*)reconectarBroker,NULL) != 0)
         printf("Error RECONEXION\n");
 
-    if (pthread_create(&threadSERVER,NULL,(void*)iniciar_servidor,NULL) != 0)
-        printf("Error SERVIDOR\n");
-
     pthread_detach(finalizarPrograma);
+    pthread_join(threadEXIT, NULL);
     pthread_join(threadREADY, NULL);
     pthread_join(threadEXEC, NULL);
+    pthread_join(threadDETECT_DEADLOCK, NULL);
     pthread_join(threadRECONNECT, NULL);
     pthread_join(threadSERVER, NULL);
     pthread_join(threadDETECT_DISCON, NULL);
@@ -87,17 +105,21 @@ int main(int argc, char *argv[])
 void terminar_programa() {
     sem_wait(&waitForFinish);
     printf("\nCERRANDO EL PROGRAMA*********************************\n");
-    // pthread_exit(&threadREADY);
-    // pthread_exit(&threadEXEC);
-    // pthread_exit(&threadSUSCRIBE_CAUGHT);
-    // pthread_exit(&threadSUSCRIBE_APPEARED);
-    // pthread_exit(&threadSUSCRIBE_LOCALIZED);
-    // pthread_exit(&threadSERVER);
 
-    liberar_conexion(suscribeCaught->conexion);
-    liberar_conexion(suscribeAppeared->conexion);
-    liberar_conexion(suscribeLocalized->conexion);
+    if(suscribeCaught->conexion != -1) {
+        liberar_conexion(suscribeCaught->conexion);
+    }
+    if(suscribeAppeared->conexion != -1) {
+        liberar_conexion(suscribeAppeared->conexion);
+    }
+    if(suscribeLocalized->conexion != -1) {
+        liberar_conexion(suscribeLocalized->conexion);
+    }
 
+    desconectarBroker(CAUGHT_POKEMON);
+    desconectarBroker(APPEARED_POKEMON);
+    desconectarBroker(LOCALIZED_POKEMON);
+    
     free(suscribeCaught);
     free(suscribeAppeared);
     free(suscribeLocalized);
@@ -116,7 +138,6 @@ void terminar_programa() {
     list_destroy_and_destroy_elements(colaEXIT, free);
     list_destroy_and_destroy_elements(pokemonesEnMapa, free);
 
-    log_info(logger,"Liberamos todo");
     config_destroy(config);
     log_destroy(logger);
 
@@ -129,9 +150,20 @@ void inicializarTeam()
     inicializarPid();
     inicializarEntrenadores();
     setObjetivoGlobal();
-    
+    pthread_t threadsEntrenadores[cantEntrenadores];
 
+    for(uint32_t i = 0; i < cantEntrenadores; i++) {
+        if (pthread_create(&threadsEntrenadores[i], NULL, (void *)hiloEntrenador, (void*)list_get(trIds, i)) != 0) {
+          printf("No se puedo crear el hilo %i", i);
+          break;
+        }
+    }
 
+    for(uint32_t i = 0; i < cantEntrenadores; i++) {
+        if (pthread_detach(threadsEntrenadores[i]) != 0) {
+          printf("No se pudo hacer un detach del hilo %i\n", i);
+        }
+    }
     //asignar pokes por posicion cercana LISTO
 
     //hacer los algoritmos de planificacion EN ESO
