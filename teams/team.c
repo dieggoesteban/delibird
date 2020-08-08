@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     cantDeadlocks = 0;
     cantIntercambios = 0;
     cantCiclosTotales = 0;
-    primeraConexion = false;
+    primerRafaga = true;
     
     if(argv[1]) {
         idModule = atoi(argv[1]);
@@ -65,11 +65,9 @@ int main(int argc, char *argv[])
     
     inicializarTeam();
     establecerConexionBroker();
-    if(!primeraConexion) {
-        sem_wait(&pokesObjetivoGlobal);
-        mandarGET();
-        sem_post(&pokesObjetivoGlobal);
-    }
+    sem_wait(&pokesObjetivoGlobal);
+    mandarGET();
+    sem_post(&pokesObjetivoGlobal);
 
     if (pthread_create(&finalizarPrograma,NULL,(void*)terminar_programa,NULL) != 0)
         printf("Error FINALIZAR\n");

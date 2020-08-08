@@ -31,6 +31,11 @@ uint32_t getCurrentQuantum() {
 
 t_entrenador *RR(t_entrenador* e) {
     uint32_t q = getCurrentQuantum();
+    if(primerRafaga) {
+        currentQuantum = quantum;
+        primerRafaga = false;
+    }
+    //printf("quantum actual: %i\n", q);
     if (q > 0) {
         if(e != NULL) {
             return e;
