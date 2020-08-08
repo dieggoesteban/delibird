@@ -12,17 +12,24 @@ t_entrenador *SJF(t_entrenador* e) {
     sem_wait(&mutexREADY);
     t_list* ready = list_duplicate(colaREADY);
     sem_post(&mutexREADY);
-    if(e != NULL)
-        list_add(ready, e);
-    
-    list_sort(ready,tardaMenos);
-    t_entrenador* entrenador = list_get(ready, 0);
+    if(primerRafaga) {
+        t_entrenador* entrenador = list_get(ready, 0);
+        primerRafaga = false;
+        return entrenador;
+    }
+    else {
+        if(e != NULL)
+            list_add(ready, e);
+        
+        list_sort(ready,tardaMenos);
+        t_entrenador* entrenador = list_get(ready, 0);
 
-    entrenador->estimacionAnterior = getEstimacion(getTiempoReal(entrenador), entrenador->estimacionAnterior);
+        entrenador->estimacionAnterior = getEstimacion(getTiempoReal(entrenador), entrenador->estimacionAnterior);
 
-    moverEntrenadorDeCola(colaREADY, colaREADY, entrenador);
+        moverEntrenadorDeCola(colaREADY, colaREADY, entrenador);
 
-    return entrenador;
+        return entrenador;
+    }
 }
 
 uint32_t getCurrentQuantum() {

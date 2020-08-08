@@ -9,7 +9,7 @@ void handler() {
 
 int main(int argc, char *argv[])
 {
-    config = config_create("./assets/team.config");
+    config = config_create("./assets/teamPF.config");
     cantEntrenadores = 0;
     cantCambiosCtx = 0;
     cantDeadlocks = 0;

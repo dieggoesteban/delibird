@@ -224,6 +224,10 @@ t_entrenador_posicion* getIntercambio(t_entrenador* tr1, t_entrenador* tr2) {
     return entrenador;
 }
 
+void capturarDefault() {
+    modoDesconectado();
+}
+
 void realizarCaptura(t_entrenador* entrenador) {
     log_info(logger, "El entrenador %i puede capturar y va a BLOCKED", entrenador->id);
     entrenador->enEspera = true;
@@ -234,7 +238,11 @@ void realizarCaptura(t_entrenador* entrenador) {
             moverEntrenadorDeCola(colaEXEC, colaBLOCKED, entrenador);
         } else {
             moverEntrenadorDeCola(colaEXEC, colaBLOCKED, entrenador);
-            modoDesconectado();
+            pthread_t captura;
+
+            pthread_create(&captura, NULL, (void*)capturarDefault, NULL);
+
+            pthread_detach(captura);
         }
     }
 }
