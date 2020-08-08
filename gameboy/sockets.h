@@ -26,7 +26,8 @@ bool terminaConexion;
 
 //METODOS DE CONEXION
 int crear_conexion(char* ip, char* puerto);
-void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente);
+void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente, char* nombreProceso);
+void enviarMensaje_sinProceso(t_paquete* paquete, uint32_t socket_cliente);
 char* recibir_mensaje(int socket_cliente);
 void liberar_conexion(int socket_cliente);
 t_buffer *recibir_buffer(uint32_t socket_cliente);

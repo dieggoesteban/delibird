@@ -28,7 +28,22 @@ void liberar_conexion(int socket_cliente) {
 	close(socket_cliente);
 }
 
-void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente) {
+void enviarMensaje(t_paquete* paquete, uint32_t socket_cliente, char* nombreProceso) {
+	int sizePaquete = paquete->buffer->size + 2 * sizeof(int);
+	void* stream = serializar_paquete(paquete, sizePaquete);
+	if(send(socket_cliente,stream,sizePaquete,MSG_CONFIRM) == -1)
+	{
+		log_error(gameboy_custom_logger, "Send error");
+		//Desuscribir a ese gil
+		liberar_conexion(socket_cliente);
+		exit(1);
+	}
+	log_info(logger, "Conectado y enviando mensaje a %s", nombreProceso);
+	liberarPaquete(paquete);
+	free(stream);
+}
+
+void enviarMensaje_sinProceso(t_paquete* paquete, uint32_t socket_cliente) {
 	int sizePaquete = paquete->buffer->size + 2 * sizeof(int);
 	void* stream = serializar_paquete(paquete, sizePaquete);
 	if(send(socket_cliente,stream,sizePaquete,MSG_CONFIRM) == -1)
@@ -48,7 +63,7 @@ void modoSuscriptor(void* arg) {
 	t_paquete *paquete = serializar_registerModule(registerModule, SUBSCRIBE);
 
 	free(registerModule);
-    enviarMensaje(paquete, suscribe->conexion);
+    enviarMensaje(paquete, suscribe->conexion, "BROKER");
 	
 	log_info(logger, "Se ha suscrito a la cola %s", getNombreColaDeMensajes(suscribe->messageQueue));
 	while(1) 
@@ -66,10 +81,18 @@ void temporizador (void* tiempo) {
 void serve_client(uint32_t* socket)
 {
 	int cod_op;
+	t_buffer* buffer;
 	if(recv(*socket, &cod_op, sizeof(int), 0) < 0){
 		cod_op = -1;
 	}
-	t_buffer *buffer = recibir_buffer(*socket);
+	if(cod_op > 0 && cod_op < 11) {
+		buffer = recibir_buffer(*socket);
+		if(buffer->size > 1000 || buffer->size <= 0) {
+			cod_op = -1;
+			free(buffer->stream);
+			free(buffer);
+		}
+	}
 	process_request(buffer, cod_op, *socket);
 }
 
@@ -77,7 +100,7 @@ void enviarAck(t_acknowledgement* ack) {
 	t_paquete* paquete = serializar_acknowledgement(ack);
 	free(ack);
 	uint32_t respuestaBroker = crear_conexion(ipBroker, puertoBroker);
-	enviarMensaje(paquete, respuestaBroker);
+	enviarMensaje_sinProceso(paquete, respuestaBroker);
 	liberar_conexion(respuestaBroker);
 	return;
 }
@@ -159,9 +182,9 @@ void process_request(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_c
 		default:
 		{
 			log_warning(gameboy_custom_logger, "Se corto la conexion con BROKER");
-			pthread_exit(&hiloSuscriptor);
+			exit(0);
 			break;
-		}
+		}	
 	}
 	if(ack != NULL)
 	{

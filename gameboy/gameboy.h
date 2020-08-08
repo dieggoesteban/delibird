@@ -26,7 +26,7 @@ pthread_t hiloSuscriptor;
 pthread_t hiloTemporizador; //Para la suscripcion
 sem_t waitForFinish;
 pthread_t t_finishProgram;
-
+t_suscribe_gameboy* suscribe;
 uint32_t temp;
 
 #endif /* GAMEBOY_H_ */

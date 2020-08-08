@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
             {
                 uint32_t mq = getColaDeMensajes(tipo_mensaje);
                 temp = atoi(argv[3]);
-                t_suscribe_gameboy* suscribe = crearSuscribeGameboy(conexion,mq);
+                suscribe = crearSuscribeGameboy(conexion,mq);
 
                 pthread_create(&hiloSuscriptor, NULL, (void*)modoSuscriptor, (void*)suscribe);
                 pthread_create(&hiloTemporizador, NULL, (void*)temporizador, (void*)temp);
@@ -51,16 +51,14 @@ int main(int argc, char *argv[])
                 t_register_module* unsubscribe = crearSuscribe(suscribe->messageQueue, ID_MODULE);
                 t_paquete* paquete = serializar_registerModule(unsubscribe, UNSUBSCRIBE);
                 free(unsubscribe);
-                enviarMensaje(paquete, crear_conexion(ipBroker, puertoBroker));
+                enviarMensaje_sinProceso(paquete, crear_conexion(ipBroker, puertoBroker));
                 close(suscribe->conexion);
                 close(conexion);
-                log_info(gameboy_custom_logger, "Conexion con broker finalizada");
             }
             else
             {
                 paquete = getPaquete(listaArgumentos, tipo_mensaje);
-                enviarMensaje(paquete, conexion);
-                
+                enviarMensaje(paquete, conexion, proceso);
                 //serve_client(&conexion);
             }
             log_info(gameboy_custom_logger, "Conexion con broker liberada");
@@ -81,11 +79,10 @@ int main(int argc, char *argv[])
 void terminarPrograma()
 {
     sem_wait(&waitForFinish);
-    
+
     t_register_module* unsubscribe = crearSuscribe(suscribe->messageQueue, ID_MODULE);
     t_paquete* paquete = serializar_registerModule(unsubscribe, UNSUBSCRIBE);
-    free(unsubscribe);
-    enviarMensaje(paquete, crear_conexion(ipBroker, puertoBroker));
+    enviarMensaje_sinProceso(paquete, crear_conexion(ipBroker, puertoBroker));
     close(suscribe->conexion);
     log_info(gameboy_custom_logger, "Conexion con broker finalizada");
 

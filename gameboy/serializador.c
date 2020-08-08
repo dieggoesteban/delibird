@@ -567,7 +567,6 @@ t_paquete* getPaquete(t_list* listaArgumentos, char* tipo_mensaje)
 	}
 	else if (strcmp(tipo_mensaje, "APPEARED_POKEMON") == 0)
 	{
-		log_info(logger, "entro a appeared_pokemon");
 		t_appeared_pokemon* appearedPokemon;
 		t_posicion* posicion = crearPosicion((uint32_t)atoi((char*)list_get(listaArgumentos,1)),(uint32_t)atoi((char*)list_get(listaArgumentos,2)));
 		if(list_size(listaArgumentos) == 3){
@@ -607,8 +606,6 @@ t_paquete* getPaquete(t_list* listaArgumentos, char* tipo_mensaje)
 			pokemon = crearCaughtPokemon(0, (uint32_t)atoi((char*)list_get(listaArgumentos,0)), 0);
 		}
 
-		
-
 		paquete = serializar_caughtPokemon(pokemon);
 
 		free(pokemon);
@@ -616,7 +613,6 @@ t_paquete* getPaquete(t_list* listaArgumentos, char* tipo_mensaje)
 	else if (strcmp(tipo_mensaje, "GET_POKEMON") == 0)
 	{
 		t_get_pokemon* getPokemon;
-		log_info(logger, "entro a get_pokemon");
 
 		if(list_size(listaArgumentos) == 1){
 			getPokemon = crearGetPokemon(0, (char*)list_get(listaArgumentos,0));
@@ -629,7 +625,6 @@ t_paquete* getPaquete(t_list* listaArgumentos, char* tipo_mensaje)
 	}
 	else if (strcmp(tipo_mensaje, "LOCALIZED_POKEMON") == 0)
 	{ //ESTE AL FINAL NO LO HACE GAMEBOY, PARECE SER LA UNICA MQ QUE NO -> PERO LO DEJO IGUAL ASI PRUEBO LA SERIALIZACION Y LA DESERIALIZACION (DESPUES SACAR THO)
-			log_info(logger, "entro a localized_pokemon");
 
 		t_posicion *pos1 = crearPosicion(5, 10);
 		t_posicion *pos2 = crearPosicion(8, 11);

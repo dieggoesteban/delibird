@@ -146,7 +146,6 @@ uint32_t escribirCatchPokemon(char *textoCatchPokemon, char* pathMetadataPoke ){
         free(keyAndValue);
         dictionary_destroy_and_destroy_elements(dicPoke,free);
         return 0;
-        //log error
     }
     free(keyAndValue[0]);
     free(keyAndValue[1]);
@@ -172,33 +171,34 @@ void separarTextoEnBloques(char *textoArchivo, char* pathMetadataPoke, bool modi
     uint32_t lengthTexto = strlen(textoArchivo);
     int sizeAEscribirPrimerBloque = 0;
     uint32_t bloqueAEscribir = 0;
-    // printf("size a escribir: %i\n", sizeAEscribirPrimerBloque);
-    // printf("bloque en el que escribir: %i\n", bloqueAEscribir);
+
     int i = 0;
     int j = 0;
     while (i != lengthTexto)
     {
-        bloqueAEscribir = verQueBloqueEscribir(pathMetadataPoke, &sizeAEscribirPrimerBloque, modificarBloques, j);
+        bloqueAEscribir = verQueBloqueEscribir(pathMetadataPoke, &sizeAEscribirPrimerBloque, modificarBloques, j, lengthTexto);
         char *string;
-        if(sizeAEscribirPrimerBloque < 0){
-            string = string_substring(textoArchivoTemp,i, abs(sizeAEscribirPrimerBloque));
-        }if(sizeAEscribirPrimerBloque > 0 && sizeAEscribirPrimerBloque < lengthTexto && i == 0){
-            string = string_substring(textoArchivoTemp,i, sizeAEscribirPrimerBloque);
-        }
-        else{
-            string = string_substring(textoArchivoTemp, i, sizeBloque);
-        }
-        // printf("Que estoy escribiendo ahora: %s\n", string);
-        escribirBloque(string, pathMetadataPoke, bloqueAEscribir, modoEscritura);
-        i += string_length(string);
-        sleep(3);
-        j++;
-        
-        
+        if(bloqueAEscribir == cantBloques + 1){
+            log_error(logger,"BLOQUES COMPLETOS - No se pueden agregar mas bloques, por ende no se pudo procesar el pedido");
+            break;
+        }else{
+            if(sizeAEscribirPrimerBloque < 0){
+                string = string_substring(textoArchivoTemp,i, abs(sizeAEscribirPrimerBloque));
+            }if(sizeAEscribirPrimerBloque > 0 && sizeAEscribirPrimerBloque < lengthTexto && i == 0){
+                string = string_substring(textoArchivoTemp,i, sizeAEscribirPrimerBloque);
+            }
+            else{
+                string = string_substring(textoArchivoTemp, i, sizeBloque);
+            }
+            escribirBloque(string, pathMetadataPoke, bloqueAEscribir, modoEscritura);
+            i += string_length(string);
+            // sleep(3);
+            j++;    
+        }  
     }
 }
 
-uint32_t verQueBloqueEscribir(char* pathMetadataPoke,int* sizeAEscribirPrimerBloque, bool modificarBloques, uint32_t j){
+uint32_t verQueBloqueEscribir(char* pathMetadataPoke,int* sizeAEscribirPrimerBloque, bool modificarBloques, uint32_t j, uint32_t lenghtTextoCompleto){
     t_config* metadataPoke = config_create(pathMetadataPoke);
     char** arrBloques = config_get_array_value(metadataPoke,"BLOCKS");
 
@@ -207,18 +207,22 @@ uint32_t verQueBloqueEscribir(char* pathMetadataPoke,int* sizeAEscribirPrimerBlo
     }else{
         uint32_t sizeArchivo = config_get_int_value(metadataPoke,"SIZE");
         *sizeAEscribirPrimerBloque = calculoBytesSobrantes(arrBloques, sizeArchivo);
-        
-        if(modificarBloques){
-            return atoi(arrBloques[j]);
+
+        if(tallGrassCompleto() && (sizeArchivo + lenghtTextoCompleto) >= sizeBloque){
+            return cantBloques + 1;
         }else{
-            if(*sizeAEscribirPrimerBloque < 0){
-                return buscarBloqueEInsertarEnArchivo(metadataPoke);
+            if(modificarBloques){
+                return atoi(arrBloques[j]);
             }else{
-                if(*sizeAEscribirPrimerBloque == 0){
+                if(*sizeAEscribirPrimerBloque < 0){
                     return buscarBloqueEInsertarEnArchivo(metadataPoke);
-                } else{
-                    config_destroy(metadataPoke);
-                    return atoi(arrBloques[arraySize((void*)arrBloques) -1]);
+                }else{
+                    if(*sizeAEscribirPrimerBloque == 0){
+                        return buscarBloqueEInsertarEnArchivo(metadataPoke);
+                    } else{
+                        config_destroy(metadataPoke);
+                        return atoi(arrBloques[arraySize((void*)arrBloques) -1]);
+                    }
                 }
             }
         }
@@ -252,12 +256,16 @@ void modificarBloquesNewPoke(char* textoCompleto, char* pathMetadataPoke){
     uint32_t bytesSobrantes = calculoBytesSobrantes(arrBloques, sizeArchivo);
 
     if(bytesSobrantes < 0){ //si los bytes sobrantes dan menor a 0, significa que necesita mas bloques para guardar
-        for(uint32_t i = 0; i >= 0; i += sizeBloque){ //se hace el for de esta manera para que se inserten todos los bloques necesarios para que pueda guardar la info nueva satisfactoriamente
-            buscarBloqueEInsertarEnArchivo(metadataPoke);
-        } 
+        if(!tallGrassCompleto()){
+            for(uint32_t i = 0; i >= 0; i += sizeBloque){ //se hace el for de esta manera para que se inserten todos los bloques necesarios para que pueda guardar la info nueva satisfactoriamente
+                buscarBloqueEInsertarEnArchivo(metadataPoke);
+            } 
+        setSizeArchivo(metadataPoke, 0);
+        separarTextoEnBloques(textoCompleto, pathMetadataPoke, true, "w");
+        }else{
+            log_error(logger,"BLOQUES COMPLETOS - Se intento aumentar la cantidad de un pokemon, pero esto implica agregar un bloque nuevo");
+        }
     } 
-    setSizeArchivo(metadataPoke, 0);
-    separarTextoEnBloques(textoCompleto, pathMetadataPoke, true, "w");
     config_destroy(metadataPoke);
 }
 
@@ -275,13 +283,13 @@ uint32_t buscarBloqueEInsertarEnArchivo(t_config* metadataPoke){
 void sacarUltimoBloqueDeArchivo(t_config* metadataPoke, char** arrBloques){
     t_list* listaBloques = arrayToList((void*)arrBloques);
     remove(agregarADirectorioBlocksChar(list_get(listaBloques,list_size(listaBloques)-1)));
-    //mutex
+    
     bitarray_clean_bit(bitmapArr,atoi(((char*)list_get(listaBloques,list_size(listaBloques)-1))));
-    //mutex
     list_remove(listaBloques,list_size(listaBloques)-1);
     if(list_size(listaBloques) == 0){
         list_add(listaBloques, "-1");
     }
+    bloquesLlenos = false;
     config_set_value(metadataPoke,"BLOCKS", listToString(listaBloques));
     config_save(metadataPoke);
 }
@@ -353,7 +361,7 @@ char* leerArchivo(char *pathMetadataPoke)
     char textoTemp[sizeBloque+1];
 
     if(atoi(arrBloques[0]) != -1){
-        printf("arr size: %i\n", arraySize((void*)arrBloques));
+        log_info(logger,"Cantidad de bloques del pokemon: %i\n", arraySize((void*)arrBloques));
         for (int i = 0; i < arraySize((void*)arrBloques); i++)
         {
             path = agregarADirectorioBlocksChar(arrBloques[i]);
@@ -495,7 +503,25 @@ uint32_t buscarBloqueLibre()
         i++;
     }
     bitarray_set_bit(bitmapArr,i);
+    if(bitarray_test_bit(bitmapArr, cantBloques-1) == 1 && i >= cantBloques-1){
+        bloquesLlenos = true;
+        if(i > cantBloques){
+            bitarray_clean_bit(bitmapArr,i);
+        }
+    }
     return i;
+}
+
+bool tallGrassCompleto(){
+    uint32_t i = 0;
+    while (bitarray_test_bit(bitmapArr, i) && bitarray_test_bit(bitmapArr, i)!= 0)
+    {
+        i++;
+    }
+    if(bitarray_test_bit(bitmapArr, cantBloques-1) == 1 && i >= cantBloques-1){
+        return true;
+    }
+    return false;
 }
 
 void insertarMetadataEnPath(char* pathDirectorio, char* archivoMetadata){
@@ -598,15 +624,29 @@ void* atenderNewPokemon(void* newPokemonParam){
     char* pathFilesPokemon = string_duplicate(pathFiles);
     string_append(&pathFilesPokemon,newPokeSem->newPokemon->nombre);
     char* pathMetadataPoke = agregarAPath(pathFilesPokemon,"/Metadata.txt");
+    bool escribirArchivo = true;
+    bool yaExistia = false;
 
-    pthread_mutex_lock(&yaExistiaDirec);
-    bool yaExistia = crearDirectorio(pathFilesPokemon);
-    pthread_mutex_unlock(&yaExistiaDirec);
-
+    if(!tallGrassCompleto()){
+        pthread_mutex_lock(&yaExistiaDirec);
+        yaExistia = crearDirectorio(pathFilesPokemon);
+        pthread_mutex_unlock(&yaExistiaDirec);
+    }else{
+        if(!existeDirectorio(pathFilesPokemon)){
+            escribirArchivo = false;
+        }else{
+            yaExistia = true;
+        }
+    }
 
     if(!yaExistia){
-        insertarMetadataEnPath(pathFilesPokemon,"./assets/MetadataArchivoGeneral.txt");
-        waitSemYModificacionOpen(newPokeSem->indexSemaforo, pathMetadataPoke);
+        if(!tallGrassCompleto()){
+            insertarMetadataEnPath(pathFilesPokemon,"./assets/MetadataArchivoGeneral.txt");
+            waitSemYModificacionOpen(newPokeSem->indexSemaforo, pathMetadataPoke);
+        }else{
+            rmdir(pathFilesPokemon);
+            escribirArchivo = false;
+        }
         // log_info(logger,"el index de la lista de semaforos en el if: %i",newPokeSem->indexSemaforo);
     }else{
         pthread_mutex_lock(&mutexEstaOpenNew);
@@ -620,16 +660,22 @@ void* atenderNewPokemon(void* newPokemonParam){
         waitSemYModificacionOpen(newPokeSem->indexSemaforo, pathMetadataPoke);
     }
     
-    escribirNewPokemon(newPokemonATexto(newPokeSem->newPokemon), pathMetadataPoke);
+    if(escribirArchivo){
+        escribirNewPokemon(newPokemonATexto(newPokeSem->newPokemon), pathMetadataPoke);
 
-    t_posicion* posicion = crearPosicion(newPokeSem->newPokemon->posicionCantidad->posicion_x, newPokeSem->newPokemon->posicionCantidad->posicion_y);
-	t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(0, newPokeSem->newPokemon->ID_mensaje_recibido, newPokeSem->newPokemon->nombre, posicion);
+        t_posicion* posicion = crearPosicion(newPokeSem->newPokemon->posicionCantidad->posicion_x, newPokeSem->newPokemon->posicionCantidad->posicion_y);
+        t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(0, newPokeSem->newPokemon->ID_mensaje_recibido, newPokeSem->newPokemon->nombre, posicion);
 
 
-    sleep(tiempoOperacion);
-    signalSemYModificacionOpen(newPokeSem->indexSemaforo, pathMetadataPoke);
-    mandarAPPEARED(appearedPokemon);
-    free(appearedPokemon);
+        sleep(tiempoOperacion);
+        
+        signalSemYModificacionOpen(newPokeSem->indexSemaforo, pathMetadataPoke);
+        mandarAPPEARED(appearedPokemon);
+        
+        free(appearedPokemon);
+    }else{
+        log_error(logger,"BLOQUES COMPLETOS - Se intento crear un nuevo pokemon %s, pero no se pudo", newPokeSem->newPokemon->nombre);
+    }
 
     free(newPokeSem->newPokemon);
     free(newPokeSem);
@@ -656,7 +702,6 @@ bool estaOpen(char* nombrePokemon){
 
 
 void waitSemYModificacionOpen(uint32_t indexSemaforo, char* pathMetadataPoke){
-    // printf("EL INDEX DEL SEM ES: %i\n", indexSemaforo);
     sem_wait(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, indexSemaforo))->semPoke)); 
     modificarOpenArchivo(pathMetadataPoke,"Y");
 }
@@ -668,7 +713,6 @@ void signalSemYModificacionOpen(uint32_t indexSemaforo, char* pathMetadataPoke){
 
 
 void reintentandoOperacion(char* nombrePoke){
-    // log_info(logger,"entra en IF de si esta open");
     pthread_t hiloRecuperacion;
     pthread_create(&hiloRecuperacion, NULL, reintentarOperacion,nombrePoke);
     pthread_join(hiloRecuperacion, NULL);

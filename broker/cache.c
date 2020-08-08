@@ -71,15 +71,15 @@ void memoria_buddySystem(t_message* message)
 
 void memoria_particiones(t_message* message) 
 {
-    cache_message* administrative = (cache_message*)malloc(sizeof(cache_message));
-    t_cache_buffer* addressFromMessageToCopy;
+    cache_message* administrative = (cache_message*)malloc(sizeof(cache_message)); //Info administrativa del mensaje a cachear
+    t_cache_buffer* addressFromMessageToCopy; //No era tan descriptivo este nombre
 
     switch (message->mq_cod)
     {
         case NEW_POKEMON:
         {
             t_new_pokemon* newPoke = (t_new_pokemon*)message->mensaje;
-            cache_new_pokemon cache_newPoke;
+            cache_new_pokemon cache_newPoke; //Solo representa lo del anexo II
 
             cache_newPoke.nameLength = newPoke->sizeNombre - 1;
             cache_newPoke.pokeName = malloc(cache_newPoke.nameLength);
@@ -88,12 +88,14 @@ void memoria_particiones(t_message* message)
             cache_newPoke.posY = newPoke->posicionCantidad->posicion_y;
             memcpy(cache_newPoke.pokeName, string_substring(newPoke->nombre, 0, cache_newPoke.nameLength), cache_newPoke.nameLength);
             
+            //Se guardan todos los datos administrativos de ese mensaje
             administrative->idMessage = newPoke->ID_mensaje_recibido;
             administrative->idCorrelational = 0;
             administrative->mq_cod = NEW_POKEMON;
             administrative->suscriptoresEnviados = list_duplicate(message->suscriptoresEnviados);
             administrative->suscriptoresConfirmados = list_duplicate(message->suscriptoresConfirmados);
             
+            //Serializado para hacer el memcpy al espacio de cache
             t_cache_buffer* buffer = serializar_cacheNewPokemon(&cache_newPoke);
             addressFromMessageToCopy = buffer;
             administrative->length = buffer->size;
@@ -215,12 +217,17 @@ void memoria_particiones(t_message* message)
     //Etapa 1: Buscar partición libre
     uint32_t partitionsSize;
     uint32_t acumFreeSpace = 0;
-    log_trace(broker_custom_logger, "Target size: %i", addressFromMessageToCopy->size);
+    log_trace(broker_custom_logger, "Cache: Size to allocate: %i", addressFromMessageToCopy->size);
     t_holes* targetHole = algoritmo_particion_libre(addressFromMessageToCopy->size); //Me asegura que de ese hole puedo sacar la particion minima por config
+    
+    //Si encontro una particion, pero el tamaño no es suficiente voy acumulando lo que consigo
     if(targetHole != NULL)
         acumFreeSpace += targetHole->length;
+
+    //Mientras no tenga un hueco disponible o la cantidad que consegui no alcance
     while(targetHole == NULL || acumFreeSpace < addressFromMessageToCopy->size)
     {
+        //Por enunciado, si es -1, solo hay que compactar cuando no haya particiones (osea nunca?)
         if(FRECUENCIA_COMPACTACION == -1)
         {
             pthread_mutex_lock(&s_partitions);
@@ -256,26 +263,25 @@ void memoria_particiones(t_message* message)
                     counterToCompactacion = 0;
                 pthread_mutex_unlock(&s_counterToCompactacion);
 
+                //Como dice el enunciado, se compacta y se vuelve a buscar un hueco libre
                 targetHole = algoritmo_particion_libre(addressFromMessageToCopy->size);
 
-                if(targetHole != NULL)
+                if(targetHole != NULL) //Si encontré tengo que acumular ese nuevo espacio para volver a chequear si ya me alcanza
                 {
                     acumFreeSpace += targetHole->length;
                 }
-
                 continue;
             }
         }
 
         //Etapa 3: Reemplazo y Consolidacion
         targetHole = algoritmo_reemplazo(addressFromMessageToCopy->size);
-        consolidar();
+        consolidar(); //Siempre que se reemplaza luego se consolida
 
         if(targetHole != NULL)
             acumFreeSpace += targetHole->length;
 
-
-        if(acumFreeSpace >= addressFromMessageToCopy->size)
+        if(acumFreeSpace >= addressFromMessageToCopy->size) //Si ya consegui el espacio suficiente voy y lo tomo
             targetHole = algoritmo_particion_libre(addressFromMessageToCopy->size);
     }
     
@@ -358,7 +364,7 @@ t_holes* reemplazo_fifo(uint32_t bytes)
             if(currentPartition->fifoPosition == victim->fifoPosition)
             {
                 addressToFindItsMetadata = currentPartition->pStart;
-                //log_trace(broker_custom_logger, "Eliminando particion ID: %i", currentPartition->id);
+                log_trace(broker_custom_logger, "Eliminando particion ID: %i", currentPartition->id);
                 list_remove(partitions, i);
                 break;
             }
@@ -374,8 +380,9 @@ t_holes* reemplazo_fifo(uint32_t bytes)
             metadata = (cache_message*)list_get(metadatas, i);
             if(metadata->startAddress == addressToFindItsMetadata)
             {
-                //log_trace(broker_custom_logger, "Eliminando metadata ID: %i", metadata->idMessage);
-                list_remove(metadatas, i);
+                log_trace(broker_custom_logger, "Eliminando metadata ID: %i", metadata->idMessage);
+                cache_message* removed = (cache_message*)list_remove(metadatas, i);
+                freeCacheMessage(removed);
                 break;
             }
         }
@@ -403,7 +410,7 @@ t_holes* reemplazo_lru(uint32_t bytes)
     targetLruPartition = (t_partition*)list_get(tempPartitionsList, 0);
 
     if(targetLruPartition == NULL) {
-        log_error(broker_custom_logger, "Target Fifo Partition es NULL");
+        log_error(broker_custom_logger, "Target LRU Partition es NULL");
         exit(1);
     }
 
@@ -443,7 +450,7 @@ t_holes* reemplazo_lru(uint32_t bytes)
         list_destroy(tempPartitionsList);
     pthread_mutex_unlock(&s_partitions);
 
-    //Se elimina la metadata
+    //Se elimina la metadata de la particion victima
     pthread_mutex_lock(&s_metadatas);
         cache_message* metadata;
         for(uint32_t i = 0; i < list_size(metadatas); i++)
@@ -456,6 +463,8 @@ t_holes* reemplazo_lru(uint32_t bytes)
             }
         }
     pthread_mutex_unlock(&s_metadatas);
+
+    //Se agrega a la lista de huecos
     pthread_mutex_lock(&s_holes);
         list_add(holes, (void*)newFreeSpace);
     pthread_mutex_unlock(&s_holes);
@@ -743,7 +752,7 @@ void consolidar()
 
     uint32_t i = 0;
     pthread_mutex_lock(&s_holes);
-    while (list_size(holes) >= 2 && i < list_size(holes) - 1)
+    while (list_size(holes) >= 2 && i < list_size(holes) - 1) //Mientras haya dos huecos para consolidar y no sea el de la punta
     {        
         lowerHole = list_get(holes, i);
         upperHole = list_get(holes, i + 1);
@@ -778,7 +787,7 @@ void compactar()
     pthread_mutex_unlock(&s_partitions);
     if(sizeHoles == 0 || sizePartitions == 0)
     {
-        log_info(broker_custom_logger, "No hay particiones o no hay huecos -> No es necesario compactar");
+        log_trace(broker_custom_logger, "No hay particiones o no hay huecos -> No es necesario compactar");
         return;
     }
 
@@ -813,7 +822,10 @@ void compactar()
         pthread_mutex_unlock(&s_partitions);
 
         if(targetPartitionIndex == -1)
+        {
             log_error(broker_custom_logger, "No hay particiones contiguas al ultimo hueco");
+            return;
+        }
 
         //Se hace un swap entre la particion y el hueco
         t_partition* relocatedPartition = createPartition(hole->pStart, targetPartition->length);
@@ -837,7 +849,7 @@ void compactar()
 
         consolidar(); //El algoritmo requiere que los huecos se vayan consolidando a medida que se mueven las particiones
     }
-    consolidar(); //Consolidacion post compactacion
+    consolidar(); //Consolidacion post compactacion - no me acuerdo, creo que por las dudas
     log_info(logger, "Se ha realizado una compactacion");
 }
 
@@ -1018,7 +1030,7 @@ uint32_t existHolesBetweenPartitions()
         t_partition* lastPartition = list_get(partitions, list_size(partitions) - 1); //La ultima particion
     pthread_mutex_unlock(&s_holes);
     pthread_mutex_unlock(&s_partitions);
-    return firstHole->pStart < lastPartition->pLimit;
+    return firstHole->pStart < lastPartition->pLimit; //Comparando los extremos ya sabemos si todavía hay un hueco que no esta en la punta
 }
 
 uint64_t getTimestamp()
