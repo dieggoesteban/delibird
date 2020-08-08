@@ -62,8 +62,6 @@ bool existeArchivo(char* rutaDirectorio){ //la ruta del direc tiene que terminar
 char *agregarAPuntoMontaje(char *restoRuta)
 {
     char *punto_montajeTemp = string_duplicate(punto_montaje);
-
-    log_info(logger, punto_montajeTemp);
     string_append(&punto_montajeTemp, restoRuta);
     log_info(logger, punto_montajeTemp);
     return punto_montajeTemp;

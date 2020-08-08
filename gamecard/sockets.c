@@ -285,7 +285,6 @@ void serve_suscribe(uint32_t* socket)
 	if(cod_op > 0 && cod_op < 11) {
 		buffer = recibir_buffer(*socket);
 		if(buffer->size > 1000 || buffer->size <= 0) {
-			log_debug(logger,"Entro en el if");
 			cod_op = -1;
 			free(buffer->stream);
 			free(buffer);

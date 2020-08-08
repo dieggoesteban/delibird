@@ -112,10 +112,11 @@ void inicializarGamecard(){
     config_destroy(metadataFS);
 
     pathBitmap = agregarADirectorioMetadataFS("Bitmap.txt");
-    printf("path bitmap: %s\n", pathBitmap);
     if(existeArchivo(pathBitmap)){
         bitmapArr = copiar_bitmap_en_disco(pathBitmap, cantBloques);
+        log_error(logger,"Ya existe el directorio %s",pathBitmap);
     }else{
+        log_info(logger,pathBitmap);
         bitmapArr = crear_bitmap_en_disco(pathBitmap, cantBloques);
     }
     
