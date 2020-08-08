@@ -564,7 +564,12 @@ void atenderGetPokemon(t_getPokemon_indexSem* getPokemonSem){
     char* pathMetadataPoke = agregarAPath(pathFilesPokemon,"/Metadata.txt");
 
     if(existeDirectorio(pathFilesPokemon)){
-        if(estaOpen(getPokemonSem->getPokemon->nombre)){
+        
+        sem_wait(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, getPokemonSem->indexSemaforo))->mutexOpenPoke)); 
+        bool estaOpenBool = estaOpen(getPokemonSem->getPokemon->nombre);
+        sem_post(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, getPokemonSem->indexSemaforo))->mutexOpenPoke)); 
+
+        if(estaOpenBool){
             reintentandoOperacion(getPokemonSem->getPokemon->nombre);
         }
         // log_info(logger,"el index de la lista de semaforos en el else: %i",getPokemonSem->indexSemaforo);
@@ -596,7 +601,12 @@ void atenderCatchPokemon(void* catchPoke){
     t_caught_pokemon* caughtPoke = crearCaughtPokemon(0,catchPokemonSem->catchPokemon->ID_mensaje_recibido,1);
 
     if(existeDirectorio(pathFilesPokemon)){
-        if(estaOpen(catchPokemonSem->catchPokemon->nombre)){
+
+        sem_wait(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, catchPokemonSem->indexSemaforo))->mutexOpenPoke)); 
+        bool estaOpenBool = estaOpen(catchPokemonSem->catchPokemon->nombre);
+        sem_post(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, catchPokemonSem->indexSemaforo))->mutexOpenPoke)); 
+
+        if(estaOpenBool){
             reintentandoOperacion(catchPokemonSem->catchPokemon->nombre);
         }
         waitSemYModificacionOpen(catchPokemonSem->indexSemaforo, pathMetadataPoke);
@@ -649,8 +659,9 @@ void* atenderNewPokemon(void* newPokemonParam){
         }
         // log_info(logger,"el index de la lista de semaforos en el if: %i",newPokeSem->indexSemaforo);
     }else{
-        
+        sem_wait(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, newPokeSem->indexSemaforo))->mutexOpenPoke)); 
         bool estaOpenBool = estaOpen(newPokeSem->newPokemon->nombre);
+        sem_post(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, newPokeSem->indexSemaforo))->mutexOpenPoke)); 
         
 
         if(estaOpenBool){
