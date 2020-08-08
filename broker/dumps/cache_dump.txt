@@ -1,9 +1,0 @@
-
-Dump: 08/08/2020 00:33:21
-Particion 1:  2998928544 - 2998928547    [X]    Size: 4b     LRU: 1635984470    COLA: 4   ID: 31
-Particion 2:  2998928548 - 2998928551    [X]    Size: 4b     LRU: 1637990067    COLA: 4   ID: 32
-Particion 3:  2998928552 - 2998928570    [X]    Size: 19b    LRU: 1645375386    COLA: 3   ID: 33
-Particion 4:  2998928571 - 2998928589    [X]    Size: 19b    LRU: 1633982041    COLA: 3   ID: 29
-Particion 5:  2998928590 - 2998928593    [X]    Size: 4b     LRU: 1635366476    COLA: 4   ID: 30
-Particion 6:  2998928594 - 2998928607    [L]    Size: 14b    LRU: -    COLA: -   ID: -
-

@@ -42,6 +42,7 @@ uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_men
 
 	if (strcmp(proceso, "BROKER") == 0)
 	{
+		//log_info(logger, "Conectado a BROKER a la cola %s", tipo_mensaje);
 		ipAux = config_get_string_value(config, "IP_BROKER");
 		puertoAux = config_get_string_value(config, "PUERTO_BROKER");
 		if (perteneceAlArray(tipo_mensaje, brokerCommands, 5) == 1)
@@ -51,12 +52,14 @@ uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_men
 	}
 	else if (strcmp(proceso, "SUSCRIPTOR") == 0)
 	{
+		//log_info(logger, "Conectado a BROKER en modo suscriptor");
 		ipAux = config_get_string_value(config, "IP_BROKER");
 		puertoAux = config_get_string_value(config, "PUERTO_BROKER");
 		isValid = 1;
 	}
 	else if (strcmp(proceso, "TEAM") == 0)
 	{
+		//log_info(logger, "Conectado a TEAM por la cola %s", tipo_mensaje);
 		ipAux = config_get_string_value(config, "IP_TEAM");
 		puertoAux = config_get_string_value(config, "PUERTO_TEAM");
 		if (perteneceAlArray(tipo_mensaje, teamCommands, 1) == 1)
@@ -66,6 +69,7 @@ uint32_t procesarComando(char** ip, char** puerto, char *proceso, char *tipo_men
 	}
 	else if (strcmp(proceso, "GAMECARD") == 0)
 	{
+		//log_info(logger, "Conectado a GAMECARD por la cola %s", tipo_mensaje);
 		ipAux = config_get_string_value(config, "IP_GAMECARD");
 		puertoAux = config_get_string_value(config, "PUERTO_GAMECARD");
 		if (perteneceAlArray(tipo_mensaje, gamecardCommands, 3) == 1)
