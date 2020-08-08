@@ -252,9 +252,13 @@ void modificarBloquesNewPoke(char* textoCompleto, char* pathMetadataPoke){
     uint32_t bytesSobrantes = calculoBytesSobrantes(arrBloques, sizeArchivo);
 
     if(bytesSobrantes < 0){ //si los bytes sobrantes dan menor a 0, significa que necesita mas bloques para guardar
-        for(uint32_t i = 0; i >= 0; i += sizeBloque){ //se hace el for de esta manera para que se inserten todos los bloques necesarios para que pueda guardar la info nueva satisfactoriamente
-            buscarBloqueEInsertarEnArchivo(metadataPoke);
-        } 
+        if(!bloquesLlenos){
+            for(uint32_t i = 0; i >= 0; i += sizeBloque){ //se hace el for de esta manera para que se inserten todos los bloques necesarios para que pueda guardar la info nueva satisfactoriamente
+                buscarBloqueEInsertarEnArchivo(metadataPoke);
+            } 
+        }else{
+            log_error(logger,"BLOQUES COMPLETOS - Se intento aumentar la cantidad de un pokemon, pero esto implica agregar un bloque nuevo");
+        }
     } 
     setSizeArchivo(metadataPoke, 0);
     separarTextoEnBloques(textoCompleto, pathMetadataPoke, true, "w");
@@ -275,13 +279,13 @@ uint32_t buscarBloqueEInsertarEnArchivo(t_config* metadataPoke){
 void sacarUltimoBloqueDeArchivo(t_config* metadataPoke, char** arrBloques){
     t_list* listaBloques = arrayToList((void*)arrBloques);
     remove(agregarADirectorioBlocksChar(list_get(listaBloques,list_size(listaBloques)-1)));
-    //mutex
+    
     bitarray_clean_bit(bitmapArr,atoi(((char*)list_get(listaBloques,list_size(listaBloques)-1))));
-    //mutex
     list_remove(listaBloques,list_size(listaBloques)-1);
     if(list_size(listaBloques) == 0){
         list_add(listaBloques, "-1");
     }
+    bloquesLlenos = false;
     config_set_value(metadataPoke,"BLOCKS", listToString(listaBloques));
     config_save(metadataPoke);
 }
@@ -495,6 +499,10 @@ uint32_t buscarBloqueLibre()
         i++;
     }
     bitarray_set_bit(bitmapArr,i);
+    if(bitarray_test_bit(bitmapArr, cantBloques-1) == 1 && i == cantBloques-1){
+        bloquesLlenos = true;
+    }
+    log_warning(logger,"EL BIT LIBRE DEVUELTO ES: %i", i);
     return i;
 }
 
@@ -598,6 +606,7 @@ void* atenderNewPokemon(void* newPokemonParam){
     char* pathFilesPokemon = string_duplicate(pathFiles);
     string_append(&pathFilesPokemon,newPokeSem->newPokemon->nombre);
     char* pathMetadataPoke = agregarAPath(pathFilesPokemon,"/Metadata.txt");
+    bool fueCreado = false;
 
     pthread_mutex_lock(&yaExistiaDirec);
     bool yaExistia = crearDirectorio(pathFilesPokemon);
@@ -605,8 +614,13 @@ void* atenderNewPokemon(void* newPokemonParam){
 
 
     if(!yaExistia){
-        insertarMetadataEnPath(pathFilesPokemon,"./assets/MetadataArchivoGeneral.txt");
-        waitSemYModificacionOpen(newPokeSem->indexSemaforo, pathMetadataPoke);
+        if(!bloquesLlenos){
+            insertarMetadataEnPath(pathFilesPokemon,"./assets/MetadataArchivoGeneral.txt");
+            waitSemYModificacionOpen(newPokeSem->indexSemaforo, pathMetadataPoke);
+            fueCreado = true;
+        }else{
+            rmdir(pathFilesPokemon);
+        }
         // log_info(logger,"el index de la lista de semaforos en el if: %i",newPokeSem->indexSemaforo);
     }else{
         pthread_mutex_lock(&mutexEstaOpenNew);
@@ -620,6 +634,11 @@ void* atenderNewPokemon(void* newPokemonParam){
         waitSemYModificacionOpen(newPokeSem->indexSemaforo, pathMetadataPoke);
     }
     
+    if(bloquesLlenos){
+        if(!fueCreado){
+            log_error(logger,"BLOQUES COMPLETOS - Se intento agregar un nuevo pokemon, no se pudo");
+        }
+    }
     escribirNewPokemon(newPokemonATexto(newPokeSem->newPokemon), pathMetadataPoke);
 
     t_posicion* posicion = crearPosicion(newPokeSem->newPokemon->posicionCantidad->posicion_x, newPokeSem->newPokemon->posicionCantidad->posicion_y);
@@ -627,8 +646,10 @@ void* atenderNewPokemon(void* newPokemonParam){
 
 
     sleep(tiempoOperacion);
-    signalSemYModificacionOpen(newPokeSem->indexSemaforo, pathMetadataPoke);
-    mandarAPPEARED(appearedPokemon);
+    if(!bloquesLlenos){
+        signalSemYModificacionOpen(newPokeSem->indexSemaforo, pathMetadataPoke);
+        mandarAPPEARED(appearedPokemon);
+    }
     free(appearedPokemon);
 
     free(newPokeSem->newPokemon);

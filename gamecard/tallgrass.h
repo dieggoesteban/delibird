@@ -47,6 +47,7 @@ t_list* semaforosPokemon;
 uint32_t tiempoReintentoConexion;
 uint32_t tiempoReintentoOperacion;
 uint32_t tiempoOperacion;
+bool bloquesLlenos;
 
 pthread_mutex_t mutexBitmap;
 pthread_mutex_t yaExistiaDirec;
