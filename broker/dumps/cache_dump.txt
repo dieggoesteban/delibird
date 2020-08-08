@@ -1,10 +1,9 @@
 
-Dump: 07/08/2020 21:46:25
-Particion 1:  2998928544 - 2998928547    [X]    Size: 4b     LRU: 189206868    COLA: 4   ID: 54
-Particion 2:  2998928548 - 2998928551    [X]    Size: 4b     LRU: 190113858    COLA: 4   ID: 55
-Particion 3:  2998928552 - 2998928555    [X]    Size: 4b     LRU: 190203834    COLA: 4   ID: 56
-Particion 4:  2998928556 - 2998928574    [X]    Size: 19b    LRU: 189193709    COLA: 3   ID: 53
-Particion 5:  2998928575 - 2998928594    [X]    Size: 20b    LRU: 198099866    COLA: 3   ID: 57
-Particion 6:  2998928595 - 2998928598    [X]    Size: 4b     LRU: 202120900    COLA: 4   ID: 58
-Particion 7:  2998928599 - 2998928607    [L]    Size: 9b    LRU: -    COLA: -   ID: -
+Dump: 08/08/2020 00:33:21
+Particion 1:  2998928544 - 2998928547    [X]    Size: 4b     LRU: 1635984470    COLA: 4   ID: 31
+Particion 2:  2998928548 - 2998928551    [X]    Size: 4b     LRU: 1637990067    COLA: 4   ID: 32
+Particion 3:  2998928552 - 2998928570    [X]    Size: 19b    LRU: 1645375386    COLA: 3   ID: 33
+Particion 4:  2998928571 - 2998928589    [X]    Size: 19b    LRU: 1633982041    COLA: 3   ID: 29
+Particion 5:  2998928590 - 2998928593    [X]    Size: 4b     LRU: 1635366476    COLA: 4   ID: 30
+Particion 6:  2998928594 - 2998928607    [L]    Size: 14b    LRU: -    COLA: -   ID: -
 
