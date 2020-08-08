@@ -22,7 +22,7 @@ char* PUERTO;
 char* LOG;
 char* ALGORITMO;
 bool primeraConexion;
-
+bool primerRafaga;
 
 //GLOBALES
 uint32_t idModule;

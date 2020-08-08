@@ -22,6 +22,8 @@ char* LOG;
 uint32_t quantum;
 uint32_t currentQuantum;
 
+bool primerRafaga;
+
 //GLOBALES
 t_list* objetivoGlobal;
 t_list* pokemonesEnMapa;

@@ -9,13 +9,14 @@ void handler() {
 
 int main(int argc, char *argv[])
 {
-    config = config_create("./assets/team.config");
+    config = config_create("./assets/teamPF.config");
     cantEntrenadores = 0;
     cantCambiosCtx = 0;
     cantDeadlocks = 0;
     cantIntercambios = 0;
     cantCiclosTotales = 0;
     primeraConexion = false;
+    primerRafaga = true;
     
     if(argv[1]) {
         idModule = atoi(argv[1]);
