@@ -68,11 +68,6 @@ void establecerConexionBroker()
 		pthread_detach(threadSUSCRIBE_CAUGHT);
 		pthread_detach(threadSUSCRIBE_APPEARED);
 		pthread_detach(threadSUSCRIBE_LOCALIZED);
-		if(!primeraConexion) {
-			sem_wait(&pokesObjetivoGlobal);
-			mandarGET();
-			sem_post(&pokesObjetivoGlobal);
-		}
 	}
 	else
 	{
@@ -132,7 +127,6 @@ void mandarGET() {
         if(valorSem == 0){
 			char *ip = config_get_string_value(config, "IP_BROKER");
 			char *puerto = config_get_string_value(config, "PUERTO_BROKER");
-			primeraConexion = true;
 			//uint32_t conexion = crear_conexion(ip, puerto);
 
 			for (uint32_t i = 0; i < list_size(objetivoGlobal); i++)
