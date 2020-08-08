@@ -47,6 +47,7 @@ t_list* semaforosPokemon;
 uint32_t tiempoReintentoConexion;
 uint32_t tiempoReintentoOperacion;
 uint32_t tiempoOperacion;
+bool bloquesLlenos;
 
 pthread_mutex_t mutexBitmap;
 pthread_mutex_t yaExistiaDirec;
@@ -104,7 +105,7 @@ void modificarOpenArchivo(char* metadataPoke, char* valorOpen);
 
 //CALCULOS Y BUSQUEDAS
 uint32_t buscarBloqueLibre();
-uint32_t verQueBloqueEscribir(char* pathMetadataPoke,int* sizeAEscribirPrimerBloque, bool modificarBloques, uint32_t j);
+uint32_t verQueBloqueEscribir(char* pathMetadataPoke,int* sizeAEscribirPrimerBloque, bool modificarBloques, uint32_t j, uint32_t lenghtTextoCompleto);
 void separarTextoEnBloques(char* textoArchivo, char* pathMetadataPoke, bool modificarBloques, char* modoEscritura);
 int calculoBytesSobrantes(char** arrBloques, uint32_t sizeArchivo);
 uint32_t buscarBloqueEInsertarEnArchivo(t_config* metadataPoke);
@@ -117,6 +118,7 @@ void* reintentarOperacion(void* metadataPoke);
 void reintentandoOperacion(char* metadataPoke);
 void waitSemYModificacionOpen(uint32_t indexSemaforo, char* pathMetadataPoke);
 void signalSemYModificacionOpen(uint32_t indexSemaforo, char* pathMetadataPoke);
+bool tallGrassCompleto();
 
 
 #endif /* TALLGRASS_H_ */
