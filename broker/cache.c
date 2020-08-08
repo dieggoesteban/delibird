@@ -215,6 +215,7 @@ void memoria_particiones(t_message* message)
     //Etapa 1: Buscar partición libre
     uint32_t partitionsSize;
     uint32_t acumFreeSpace = 0;
+    log_trace(broker_custom_logger, "Target size: %i", addressFromMessageToCopy->size);
     t_holes* targetHole = algoritmo_particion_libre(addressFromMessageToCopy->size); //Me asegura que de ese hole puedo sacar la particion minima por config
     if(targetHole != NULL)
         acumFreeSpace += targetHole->length;
@@ -251,7 +252,6 @@ void memoria_particiones(t_message* message)
             {          
                 log_trace(broker_custom_logger, "Counter to compactacion: %i/%i", counterToCompactacion, FRECUENCIA_COMPACTACION);
                 compactar();
-
                 pthread_mutex_lock(&s_counterToCompactacion);
                     counterToCompactacion = 0;
                 pthread_mutex_unlock(&s_counterToCompactacion);
@@ -259,7 +259,9 @@ void memoria_particiones(t_message* message)
                 targetHole = algoritmo_particion_libre(addressFromMessageToCopy->size);
 
                 if(targetHole != NULL)
+                {
                     acumFreeSpace += targetHole->length;
+                }
 
                 continue;
             }
@@ -356,6 +358,7 @@ t_holes* reemplazo_fifo(uint32_t bytes)
             if(currentPartition->fifoPosition == victim->fifoPosition)
             {
                 addressToFindItsMetadata = currentPartition->pStart;
+                //log_trace(broker_custom_logger, "Eliminando particion ID: %i", currentPartition->id);
                 list_remove(partitions, i);
                 break;
             }
@@ -371,6 +374,7 @@ t_holes* reemplazo_fifo(uint32_t bytes)
             metadata = (cache_message*)list_get(metadatas, i);
             if(metadata->startAddress == addressToFindItsMetadata)
             {
+                //log_trace(broker_custom_logger, "Eliminando metadata ID: %i", metadata->idMessage);
                 list_remove(metadatas, i);
                 break;
             }
@@ -914,21 +918,22 @@ t_holes* particionLibre_bf(uint32_t bytes)
 
     if(bestHole->length == bytesToAlloc) //No hace falta dividir el hueco
     {
-        result = createHole(currentHole->pStart, bytesToAlloc);
+        result = createHole(bestHole->pStart, bytesToAlloc);
         pthread_mutex_lock(&s_holes);
-            list_remove(holes, indexOfBestHole);
+            t_holes* removedHole = list_remove(holes, indexOfBestHole);
         pthread_mutex_unlock(&s_holes);
+        freeHole(removedHole);
     }
     else
     {
         //Hacer el split
-        t_holes* splittedHole = createHole(currentHole->pStart + bytesToAlloc, (currentHole->length - bytesToAlloc));
+        t_holes* splittedHole = createHole(bestHole->pStart + bytesToAlloc, (bestHole->length - bytesToAlloc));
+        result = createHole(bestHole->pStart, bytesToAlloc);
         pthread_mutex_lock(&s_holes);
             list_add(holes, (void*)splittedHole);
-            list_remove(holes, indexOfBestHole);
-            list_sort(holes, (void*)mem_address_menor_a_mayor);
+            t_holes* removedHole = list_remove(holes, indexOfBestHole);
         pthread_mutex_unlock(&s_holes);
-        result = createHole(currentHole->pStart, bytesToAlloc);
+        freeHole(removedHole);
     }    
     return result;
 }
