@@ -75,6 +75,7 @@ sem_t pokesObjetivoGlobal;
 sem_t mutexDetector;
 sem_t estaDesconectado;
 sem_t mutexReporteDeadlock;
+sem_t counterEntrenadoresDisponibles;
 
 uint32_t cicloCPU;
 uint32_t quantum;

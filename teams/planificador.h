@@ -40,6 +40,7 @@ sem_t mutexEXIT;
 sem_t estaDesconectado;
 sem_t waitForFinish;
 sem_t mutexReporteDeadlock;
+sem_t counterEntrenadoresDisponibles;
 
 t_list* objetivoGlobal;
 t_list* pokemonesEnMapa; // lucario pikachu pikachu pikachu squirtle

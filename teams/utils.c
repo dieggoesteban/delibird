@@ -158,7 +158,7 @@ void inicializarEntrenadores() {
 		sem_init(&entrenador->mutex, 0, 0);
 
 		list_add(colaNEW, entrenador);
-
+		sem_post(&counterEntrenadoresDisponibles);
 		list_destroy(objetivos);
 		list_destroy(pokemon);
 		free(coordenadas);
@@ -563,6 +563,7 @@ void procesarMensajeCaught(t_caught_pokemon* caughtPoke) {
 			} else {
 				//sem_wait(&mutexBLOCKED);
 				list_add(colaBLOCKED,tr);
+				sem_post(&counterEntrenadoresDisponibles);
 				//sem_post(&mutexBLOCKED);
 			}
 		} else {
@@ -570,6 +571,7 @@ void procesarMensajeCaught(t_caught_pokemon* caughtPoke) {
 			log_info(logger, "El entrenador %i no pudo capturar a %s\n", tr->id, poke);
 			//sem_wait(&mutexBLOCKED);
 			list_add(colaBLOCKED,tr);
+			sem_post(&counterEntrenadoresDisponibles);
 			//sem_post(&mutexBLOCKED);
 		}
 	}
@@ -726,6 +728,7 @@ void defaultCaptura(uint32_t index) {
 			sem_wait(&mutexBLOCKED);
 			list_add(colaBLOCKED,tr);
 			sem_post(&mutexBLOCKED);
+			sem_post(&counterEntrenadoresDisponibles);
 		}
 	}
 }

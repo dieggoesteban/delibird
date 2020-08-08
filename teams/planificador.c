@@ -91,11 +91,9 @@ void* planificadorREADY() {
         sem_wait(&mutexPokesEnMapa);
         t_pokemon_posicion* poke = (t_pokemon_posicion*)list_remove(pokemonesEnMapa,0);
         sem_post(&mutexPokesEnMapa);
+        sem_wait(&counterEntrenadoresDisponibles);
         t_entrenador* entrenador;
-        do {
-            entrenador = asignarAEntrenador(poke);
-        }
-        while(entrenador == NULL);
+        entrenador = asignarAEntrenador(poke);
         bool sePudo = moverEntrenadorDeCola(colaNEW, colaREADY, entrenador);
         if (!sePudo) {
             moverEntrenadorDeCola(colaBLOCKED, colaREADY, entrenador);

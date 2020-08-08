@@ -62,6 +62,7 @@ int main(int argc, char *argv[])
     sem_init(&mutexEntrenadoresCatch, 0, 1);
     sem_init(&pokesObjetivoGlobal, 0, 1);
     sem_init(&waitForFinish, 0, 0);
+    sem_init(&counterEntrenadoresDisponibles, 0, 0);
     
     inicializarTeam();
     establecerConexionBroker();

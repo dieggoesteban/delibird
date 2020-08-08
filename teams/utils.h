@@ -47,6 +47,7 @@ sem_t mutexDetector;
 sem_t counterPokesEnMapa;
 sem_t mutexEntrenadoresCatch;
 sem_t counterEntrenadoresCatch;
+sem_t counterEntrenadoresDisponibles;
 
 //CREAR
 t_pokemon_posicion* crearPokemonPosicion(char* nombre, t_posicion* posicion);
