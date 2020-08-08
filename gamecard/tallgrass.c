@@ -564,10 +564,10 @@ void atenderGetPokemon(t_getPokemon_indexSem* getPokemonSem){
     char* pathMetadataPoke = agregarAPath(pathFilesPokemon,"/Metadata.txt");
 
     if(existeDirectorio(pathFilesPokemon)){
-        
-        sem_wait(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, getPokemonSem->indexSemaforo))->mutexOpenPoke)); 
+
+        pthread_mutex_lock(&mutexEstaOpenGet);
         bool estaOpenBool = estaOpen(getPokemonSem->getPokemon->nombre);
-        sem_post(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, getPokemonSem->indexSemaforo))->mutexOpenPoke)); 
+        pthread_mutex_unlock(&mutexEstaOpenGet);
 
         if(estaOpenBool){
             reintentandoOperacion(getPokemonSem->getPokemon->nombre);
@@ -602,9 +602,9 @@ void atenderCatchPokemon(void* catchPoke){
 
     if(existeDirectorio(pathFilesPokemon)){
 
-        sem_wait(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, catchPokemonSem->indexSemaforo))->mutexOpenPoke)); 
+        pthread_mutex_lock(&mutexEstaOpenCatch);
         bool estaOpenBool = estaOpen(catchPokemonSem->catchPokemon->nombre);
-        sem_post(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, catchPokemonSem->indexSemaforo))->mutexOpenPoke)); 
+        pthread_mutex_unlock(&mutexEstaOpenCatch);
 
         if(estaOpenBool){
             reintentandoOperacion(catchPokemonSem->catchPokemon->nombre);
@@ -659,9 +659,9 @@ void* atenderNewPokemon(void* newPokemonParam){
         }
         // log_info(logger,"el index de la lista de semaforos en el if: %i",newPokeSem->indexSemaforo);
     }else{
-        sem_wait(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, newPokeSem->indexSemaforo))->mutexOpenPoke)); 
+        pthread_mutex_lock(&mutexEstaOpenNew);
         bool estaOpenBool = estaOpen(newPokeSem->newPokemon->nombre);
-        sem_post(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, newPokeSem->indexSemaforo))->mutexOpenPoke)); 
+        pthread_mutex_unlock(&mutexEstaOpenNew);
         
 
         if(estaOpenBool){
