@@ -361,7 +361,7 @@ char* leerArchivo(char *pathMetadataPoke)
     char textoTemp[sizeBloque+1];
 
     if(atoi(arrBloques[0]) != -1){
-        printf("arr size: %i\n", arraySize((void*)arrBloques));
+        log_info(logger,"Cantidad de bloques del pokemon: %i\n", arraySize((void*)arrBloques));
         for (int i = 0; i < arraySize((void*)arrBloques); i++)
         {
             path = agregarADirectorioBlocksChar(arrBloques[i]);
