@@ -80,7 +80,7 @@ char* listToString(t_list* lista){
 			}
 		}
 	}
-	printf("array to string: %s\n", arrString);
+	log_info(logger,"Bloques del pokemon: %s\n", arrString);
 	return arrString;
 }
 
