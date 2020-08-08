@@ -283,6 +283,7 @@ void sacarUltimoBloqueDeArchivo(t_config* metadataPoke, char** arrBloques){
     remove(agregarADirectorioBlocksChar(list_get(listaBloques,list_size(listaBloques)-1)));
     
     bitarray_clean_bit(bitmapArr,atoi(((char*)list_get(listaBloques,list_size(listaBloques)-1))));
+    log_info(logger,"Bit %i pasa a 0", atoi(((char*)list_get(listaBloques,list_size(listaBloques)-1))));
     list_remove(listaBloques,list_size(listaBloques)-1);
     if(list_size(listaBloques) == 0){
         list_add(listaBloques, "-1");
@@ -500,6 +501,7 @@ uint32_t buscarBloqueLibre()
     {
         i++;
     }
+    log_info(logger,"El bloque elegido fue %i", i);
     bitarray_set_bit(bitmapArr,i);
     if(bitarray_test_bit(bitmapArr, cantBloques-1) == 1 && i >= cantBloques-1){
         bloquesLlenos = true;
@@ -647,9 +649,9 @@ void* atenderNewPokemon(void* newPokemonParam){
         }
         // log_info(logger,"el index de la lista de semaforos en el if: %i",newPokeSem->indexSemaforo);
     }else{
-        pthread_mutex_lock(&mutexEstaOpenNew);
+        
         bool estaOpenBool = estaOpen(newPokeSem->newPokemon->nombre);
-        pthread_mutex_unlock(&mutexEstaOpenNew);
+        
 
         if(estaOpenBool){
             reintentandoOperacion(newPokeSem->newPokemon->nombre);
@@ -687,10 +689,10 @@ bool estaOpen(char* nombrePokemon){
     if (sem_getvalue(&(((t_semaforo_pokemon*)list_get(semaforosPokemon, indexSemaforo))->semPoke), &valorSem) == 0){
         if(valorSem > 0){
             // log_info(logger,"ESTA CERRADO EL ARCHIVO con un valor del SEM: %i", valorSem);
-            log_info(logger,"-- El archivo de %s esta CLOSED con valor del SEM %i", nombrePokemon, valorSem);
+            log_info(logger,"-- El archivo de %s esta CLOSED", nombrePokemon);
         }else{
             archivoOpen = true;
-            log_info(logger,"-- El archivo de %s esta OPEN con valor del SEM %i", nombrePokemon, valorSem);
+            log_info(logger,"-- El archivo de %s esta OPEN", nombrePokemon);
             // log_info(logger,"ESTA ABIERTO EL ARCHIVO con un valor del SEMN: %i", valorSem);
         }
 
