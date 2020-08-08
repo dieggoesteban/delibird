@@ -132,7 +132,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 		}
 		case NEW_POKEMON:
 		{
-			log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
+			//log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
 			t_message_queue* messageQueue = getMessageQueueById(operation_cod);
 			t_new_pokemon* newPoke = deserializar_newPokemon(buffer);
 			t_message* message = crearMessage();
@@ -150,7 +150,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 		}
 		case APPEARED_POKEMON:
 		{
-			log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
+			//log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
 			t_message_queue* messageQueue = getMessageQueueById(operation_cod);
 			t_appeared_pokemon* appearedPoke = deserializar_appearedPokemon(buffer);
 			t_message* message = crearMessage(appearedPoke, APPEARED_POKEMON);
@@ -169,7 +169,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 		}
 		case GET_POKEMON:
 		{
-			log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
+			//log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
 			t_message_queue* messageQueue = getMessageQueueById(operation_cod);
 			t_get_pokemon* getPoke = deserializar_getPokemon(buffer);
 			t_message* message = crearMessage(getPoke, GET_POKEMON);
@@ -179,7 +179,6 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 			message->mq_cod = GET_POKEMON;
 			getPoke->ID_mensaje_recibido = message->id;
 			message->mensaje = getPoke;
-			log_info(logger,"LLEGO EL POKE EN GET %s", getPoke->nombre);
 
 			log_info(logger, "Se ha recibido un mensaje del cliente %i en la cola %s", socket_cliente, messageQueue->name);
 			addMessageToQueue(message, messageQueue);
@@ -189,7 +188,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 		}
 		case CAUGHT_POKEMON:
 		{
-			log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
+			//log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
 			t_message_queue* messageQueue = getMessageQueueById(operation_cod);
 			t_caught_pokemon* caughtPoke = deserializar_caughtPokemon(buffer);
 			t_message* message = crearMessage(caughtPoke, CAUGHT_POKEMON);
@@ -208,7 +207,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 		}
 		case LOCALIZED_POKEMON:
 		{
-			log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
+			//log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
 			t_message_queue* messageQueue = getMessageQueueById(operation_cod);
 			t_localized_pokemon* localizedPoke = deserializar_localizedPokemon(buffer);
 			t_message* message = crearMessage(localizedPoke, LOCALIZED_POKEMON);
@@ -219,8 +218,6 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 			localizedPoke->ID_mensaje_recibido = message->id;
 			message->mensaje = localizedPoke;
 
-			log_info(logger,"LLEGO EL POKE EN LOCALIZED %s", localizedPoke->nombre);
-
 			log_info(logger, "Se ha recibido un mensaje del cliente %i en la cola %s", socket_cliente, messageQueue->name);
 			addMessageToQueue(message, messageQueue);
 			
@@ -229,7 +226,7 @@ void processMessage(t_buffer *buffer, uint32_t operation_cod, uint32_t socket_cl
 		}
 		case CATCH_POKEMON:
 		{
-			log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
+			//log_info(logger, "Se ha conectado un proceso a traves del socket %d", socket_cliente);
 			t_message_queue* messageQueue = getMessageQueueById(operation_cod);
 			t_catch_pokemon* catchPoke = deserializar_catchPokemon(buffer);
 			t_message* message = crearMessage(catchPoke, CATCH_POKEMON);
@@ -494,7 +491,7 @@ void dispatchMessagesFromQueue(t_message_queue* messageQueue)
 					sendMessageFromQueue(message, currentSubscriber, NULL);
 				}
 			pthread_mutex_unlock(&messageQueue->s_subscribers);	
-			log_debug(broker_custom_logger, "Enviado a %i suscriptores", subscribersCount);
+			//log_debug(broker_custom_logger, "Enviado a %i suscriptores", subscribersCount);
 			
 			//Guardarlo en la cache
 			if(pthread_create(&message->caching, NULL, (void*)cacheMessage, message) < 0)
