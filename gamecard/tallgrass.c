@@ -252,16 +252,16 @@ void modificarBloquesNewPoke(char* textoCompleto, char* pathMetadataPoke){
     uint32_t bytesSobrantes = calculoBytesSobrantes(arrBloques, sizeArchivo);
 
     if(bytesSobrantes < 0){ //si los bytes sobrantes dan menor a 0, significa que necesita mas bloques para guardar
-        if(!bloquesLlenos){
+        if(!tallGrassCompleto()){
             for(uint32_t i = 0; i >= 0; i += sizeBloque){ //se hace el for de esta manera para que se inserten todos los bloques necesarios para que pueda guardar la info nueva satisfactoriamente
                 buscarBloqueEInsertarEnArchivo(metadataPoke);
             } 
+        setSizeArchivo(metadataPoke, 0);
+        separarTextoEnBloques(textoCompleto, pathMetadataPoke, true, "w");
         }else{
             log_error(logger,"BLOQUES COMPLETOS - Se intento aumentar la cantidad de un pokemon, pero esto implica agregar un bloque nuevo");
         }
     } 
-    setSizeArchivo(metadataPoke, 0);
-    separarTextoEnBloques(textoCompleto, pathMetadataPoke, true, "w");
     config_destroy(metadataPoke);
 }
 
@@ -499,11 +499,26 @@ uint32_t buscarBloqueLibre()
         i++;
     }
     bitarray_set_bit(bitmapArr,i);
-    if(bitarray_test_bit(bitmapArr, cantBloques-1) == 1 && i == cantBloques-1){
+    if(bitarray_test_bit(bitmapArr, cantBloques-1) == 1 && i >= cantBloques-1){
         bloquesLlenos = true;
+        if(i > cantBloques){
+            bitarray_clean_bit(bitmapArr,i);
+        }
     }
     log_warning(logger,"EL BIT LIBRE DEVUELTO ES: %i", i);
     return i;
+}
+
+bool tallGrassCompleto(){
+    uint32_t i = 0;
+    while (bitarray_test_bit(bitmapArr, i) && bitarray_test_bit(bitmapArr, i)!= 0)
+    {
+        i++;
+    }
+    if(bitarray_test_bit(bitmapArr, cantBloques-1) == 1 && i >= cantBloques-1){
+        return true;
+    }
+    return false;
 }
 
 void insertarMetadataEnPath(char* pathDirectorio, char* archivoMetadata){
@@ -606,20 +621,29 @@ void* atenderNewPokemon(void* newPokemonParam){
     char* pathFilesPokemon = string_duplicate(pathFiles);
     string_append(&pathFilesPokemon,newPokeSem->newPokemon->nombre);
     char* pathMetadataPoke = agregarAPath(pathFilesPokemon,"/Metadata.txt");
-    bool fueCreado = false;
+    bool escribirArchivo = true;
+    bool yaExistia = false;
 
-    pthread_mutex_lock(&yaExistiaDirec);
-    bool yaExistia = crearDirectorio(pathFilesPokemon);
-    pthread_mutex_unlock(&yaExistiaDirec);
-
+    if(!tallGrassCompleto()){
+        pthread_mutex_lock(&yaExistiaDirec);
+        yaExistia = crearDirectorio(pathFilesPokemon);
+        pthread_mutex_unlock(&yaExistiaDirec);
+    }else{
+        if(!existeDirectorio(pathFilesPokemon)){
+            printf("NO EXISTE EL DIRECTORIO");
+            escribirArchivo = false;
+        }else{
+            yaExistia = true;
+        }
+    }
 
     if(!yaExistia){
-        if(!bloquesLlenos){
+        if(!tallGrassCompleto()){
             insertarMetadataEnPath(pathFilesPokemon,"./assets/MetadataArchivoGeneral.txt");
             waitSemYModificacionOpen(newPokeSem->indexSemaforo, pathMetadataPoke);
-            fueCreado = true;
         }else{
             rmdir(pathFilesPokemon);
+            escribirArchivo = false;
         }
         // log_info(logger,"el index de la lista de semaforos en el if: %i",newPokeSem->indexSemaforo);
     }else{
@@ -634,23 +658,22 @@ void* atenderNewPokemon(void* newPokemonParam){
         waitSemYModificacionOpen(newPokeSem->indexSemaforo, pathMetadataPoke);
     }
     
-    if(bloquesLlenos){
-        if(!fueCreado){
-            log_error(logger,"BLOQUES COMPLETOS - Se intento agregar un nuevo pokemon, no se pudo");
+    if(escribirArchivo){
+        escribirNewPokemon(newPokemonATexto(newPokeSem->newPokemon), pathMetadataPoke);
+
+        t_posicion* posicion = crearPosicion(newPokeSem->newPokemon->posicionCantidad->posicion_x, newPokeSem->newPokemon->posicionCantidad->posicion_y);
+        t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(0, newPokeSem->newPokemon->ID_mensaje_recibido, newPokeSem->newPokemon->nombre, posicion);
+
+
+        sleep(tiempoOperacion);
+        if(!bloquesLlenos){
+            signalSemYModificacionOpen(newPokeSem->indexSemaforo, pathMetadataPoke);
+            mandarAPPEARED(appearedPokemon);
         }
+        free(appearedPokemon);
+    }else{
+        log_error(logger,"BLOQUES COMPLETOS - Se intento crear un nuevo pokemon %s, pero no se pudo", newPokeSem->newPokemon->nombre);
     }
-    escribirNewPokemon(newPokemonATexto(newPokeSem->newPokemon), pathMetadataPoke);
-
-    t_posicion* posicion = crearPosicion(newPokeSem->newPokemon->posicionCantidad->posicion_x, newPokeSem->newPokemon->posicionCantidad->posicion_y);
-	t_appeared_pokemon* appearedPokemon = crearAppearedPokemon(0, newPokeSem->newPokemon->ID_mensaje_recibido, newPokeSem->newPokemon->nombre, posicion);
-
-
-    sleep(tiempoOperacion);
-    if(!bloquesLlenos){
-        signalSemYModificacionOpen(newPokeSem->indexSemaforo, pathMetadataPoke);
-        mandarAPPEARED(appearedPokemon);
-    }
-    free(appearedPokemon);
 
     free(newPokeSem->newPokemon);
     free(newPokeSem);

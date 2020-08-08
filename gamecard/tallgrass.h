@@ -118,6 +118,7 @@ void* reintentarOperacion(void* metadataPoke);
 void reintentandoOperacion(char* metadataPoke);
 void waitSemYModificacionOpen(uint32_t indexSemaforo, char* pathMetadataPoke);
 void signalSemYModificacionOpen(uint32_t indexSemaforo, char* pathMetadataPoke);
+bool tallGrassCompleto();
 
 
 #endif /* TALLGRASS_H_ */
